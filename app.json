@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Transporti",
+    "slug": "transporti",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.transporti.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Nous avons besoin de votre position pour vous aider à définir précisément les adresses de collecte et de livraison."
+      }
+    },
+    "android": {
+      "package": "com.transporti.app",
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Nous avons besoin de votre position pour vous aider à définir précisément les adresses de collecte et de livraison."
+        }
+      ]
+    ]
+  }
+}

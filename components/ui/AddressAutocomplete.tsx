@@ -1,0 +1,215 @@
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Platform,
+} from 'react-native';
+import { googlePlacesService, GoogleSuggestion, AddressDetails } from '../../services/googlePlaces.service';
+
+interface AddressAutocompleteProps {
+  value: string;
+  onChangeText: (text: string) => void;
+  onSelectAddress: (address: AddressDetails) => void;
+  placeholder?: string;
+  iconText?: string;
+}
+
+export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
+  value,
+  onChangeText,
+  onSelectAddress,
+  placeholder = 'Rechercher une adresse',
+  iconText = '📍',
+}) => {
+  const [suggestions, setSuggestions] = useState<GoogleSuggestion[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Start a new session when component mounts
+  useEffect(() => {
+    googlePlacesService.startSession();
+  }, []);
+
+  // Fetch suggestions as user types (with debounce)
+  useEffect(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    if (value.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    debounceTimer.current = setTimeout(async () => {
+      setLoading(true);
+      const results = await googlePlacesService.getSuggestions(value);
+      setSuggestions(results);
+      setShowSuggestions(results.length > 0);
+      setLoading(false);
+    }, 300); // 300ms debounce
+
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+  }, [value]);
+
+  const handleSelectSuggestion = async (suggestion: GoogleSuggestion) => {
+    setShowSuggestions(false);
+    setLoading(true);
+
+    // Retrieve full address details with coordinates
+    const addressDetails = await googlePlacesService.retrieveAddress(suggestion.place_id);
+    
+    setLoading(false);
+
+    if (addressDetails) {
+      onChangeText(addressDetails.fullAddress);
+      onSelectAddress(addressDetails);
+    }
+  };
+
+  const renderSuggestion = ({ item }: { item: GoogleSuggestion }) => (
+    <TouchableOpacity
+      style={styles.suggestionItem}
+      onPress={() => handleSelectSuggestion(item)}
+      activeOpacity={0.7}
+    >
+      <Text style={styles.suggestionIcon}>📍</Text>
+      <View style={styles.suggestionTextContainer}>
+        <Text style={styles.suggestionName}>{item.structured_formatting.main_text}</Text>
+        {item.structured_formatting.secondary_text && (
+          <Text style={styles.suggestionPlace}>{item.structured_formatting.secondary_text}</Text>
+        )}
+      </View>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputIcon}>{iconText}</Text>
+        <TextInput
+          style={styles.textInput}
+          value={value}
+          onChangeText={(text) => {
+            onChangeText(text);
+            if (text.length >= 2) {
+              setShowSuggestions(true);
+            }
+          }}
+          placeholder={placeholder}
+          placeholderTextColor="#999"
+          onFocus={() => {
+            if (suggestions.length > 0) {
+              setShowSuggestions(true);
+            }
+          }}
+        />
+        {loading && (
+          <ActivityIndicator
+            size="small"
+            color="#1464F6"
+            style={styles.loader}
+          />
+        )}
+      </View>
+
+      {showSuggestions && suggestions.length > 0 && (
+        <View style={styles.suggestionsContainer}>
+          <FlatList
+            data={suggestions}
+            renderItem={renderSuggestion}
+            keyExtractor={(item) => item.place_id}
+            style={styles.suggestionsList}
+            keyboardShouldPersistTaps="handled"
+          />
+        </View>
+      )}
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'relative',
+    zIndex: 1000,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#E9E9E9',
+    paddingHorizontal: 16,
+    paddingVertical: Platform.OS === 'ios' ? 14 : 12,
+    gap: 12,
+  },
+  inputIcon: {
+    fontSize: 18,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 15,
+    color: '#1A1A1A',
+    paddingVertical: 0,
+  },
+  loader: {
+    marginLeft: 8,
+  },
+  suggestionsContainer: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
+    marginTop: 4,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E9E9E9',
+    maxHeight: 250,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    zIndex: 1001,
+  },
+  suggestionsList: {
+    flexGrow: 0,
+  },
+  suggestionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+    gap: 12,
+  },
+  suggestionIcon: {
+    fontSize: 16,
+  },
+  suggestionTextContainer: {
+    flex: 1,
+  },
+  suggestionName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1A1A1A',
+    marginBottom: 2,
+  },
+  suggestionPlace: {
+    fontSize: 13,
+    color: '#666666',
+  },
+});
