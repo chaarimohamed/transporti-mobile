@@ -95,7 +95,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
         >
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Personal information</Text>
+        <Text style={styles.headerTitle}>Informations personnelles</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -113,10 +113,10 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
           </View>
           <View style={styles.photoTextContainer}>
             <Text style={styles.photoDescription}>
-              With a photo of yourself, you can personalise your profile and build greater trust with other members!
+              Avec une photo de vous, personnalisez votre profil et renforcez la confiance avec les autres membres !
             </Text>
             <TouchableOpacity onPress={handleChangePhoto}>
-              <Text style={styles.changePhotoLink}>Change your photo</Text>
+              <Text style={styles.changePhotoLink}>Changer votre photo</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -127,7 +127,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
           <View style={styles.row}>
             <View style={styles.halfInput}>
               <Input
-                label="First name"
+                label="Prénom"
                 placeholder="Ahmed"
                 value={firstName}
                 onChangeText={setFirstName}
@@ -135,7 +135,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
             </View>
             <View style={styles.halfInput}>
               <Input
-                label="Last name"
+                label="Nom"
                 placeholder="Louati"
                 value={lastName}
                 onChangeText={setLastName}
@@ -145,8 +145,8 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
 
           {/* Date of Birth */}
           <Input
-            label="Date of birth"
-            placeholder="DD/MM/YYYY"
+            label="Date de naissance"
+            placeholder="JJ/MM/AAAA"
             value={dateOfBirth}
             onChangeText={setDateOfBirth}
             keyboardType="numeric"
@@ -164,10 +164,10 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
 
           {/* Phone Number */}
           <View style={styles.phoneContainer}>
-            <Text style={styles.phoneLabel}>Phone number</Text>
+            <Text style={styles.phoneLabel}>Numéro de téléphone</Text>
             <View style={styles.phoneRow}>
               <View style={styles.countryCode}>
-                <Text style={styles.countryCodeText}>DE 🇩🇪</Text>
+                <Text style={styles.countryCodeText}>TN 🇹🇳</Text>
               </View>
               <View style={styles.phoneInput}>
                 <Input
@@ -179,7 +179,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
               </View>
             </View>
             <TouchableOpacity>
-              <Text style={styles.changeNumberLink}>Change my number</Text>
+              <Text style={styles.changeNumberLink}>Changer mon numéro</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -192,7 +192,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
             fullWidth
             disabled={isLoading}
           >
-            {isLoading ? 'Saving...' : 'Save changes'}
+            {isLoading ? 'Enregistrement...' : 'Enregistrer'}
           </Button>
         </View>
       </ScrollView>

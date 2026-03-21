@@ -476,7 +476,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   routeDotStart: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#2E8B57',
   },
   routeDotEnd: {
     backgroundColor: '#1464F6',
@@ -662,7 +662,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#DC2626',
+    color: '#D92D20',
     marginBottom: 16,
     textAlign: 'center',
   },

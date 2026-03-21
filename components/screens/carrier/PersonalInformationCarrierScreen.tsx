@@ -132,7 +132,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
         >
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Personal information</Text>
+        <Text style={styles.headerTitle}>Informations personnelles</Text>
         <View style={styles.placeholder} />
       </View>
 
@@ -150,10 +150,10 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
           </View>
           <View style={styles.photoTextContainer}>
             <Text style={styles.photoDescription}>
-              With a photo of yourself, you can personalise your profile and build greater trust with clients!
+              Avec une photo de vous, personnalisez votre profil et renforcez la confiance avec vos clients !
             </Text>
             <TouchableOpacity onPress={handleChangePhoto}>
-              <Text style={styles.changePhotoLink}>Change your photo</Text>
+              <Text style={styles.changePhotoLink}>Changer votre photo</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -164,7 +164,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
           <View style={styles.row}>
             <View style={styles.halfInput}>
               <Input
-                label="First name"
+                label="Prénom"
                 placeholder="Sami"
                 value={firstName}
                 onChangeText={setFirstName}
@@ -172,7 +172,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
             </View>
             <View style={styles.halfInput}>
               <Input
-                label="Last name"
+                label="Nom"
                 placeholder="Ben Ali"
                 value={lastName}
                 onChangeText={setLastName}
@@ -182,8 +182,8 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
 
           {/* Date of Birth */}
           <Input
-            label="Date of birth"
-            placeholder="DD/MM/YYYY"
+            label="Date de naissance"
+            placeholder="JJ/MM/AAAA"
             value={dateOfBirth}
             onChangeText={setDateOfBirth}
             keyboardType="numeric"
@@ -201,7 +201,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
 
           {/* Phone Number */}
           <View style={styles.phoneContainer}>
-            <Text style={styles.phoneLabel}>Phone number</Text>
+            <Text style={styles.phoneLabel}>Numéro de téléphone</Text>
             <View style={styles.phoneRow}>
               <View style={styles.countryCode}>
                 <Text style={styles.countryCodeText}>TN 🇹🇳</Text>
@@ -216,14 +216,14 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
               </View>
             </View>
             <TouchableOpacity>
-              <Text style={styles.changeNumberLink}>Change my number</Text>
+              <Text style={styles.changeNumberLink}>Changer mon numéro</Text>
             </TouchableOpacity>
           </View>
 
           {/* Gouvernorat */}
           <Dropdown
             label="Gouvernorat"
-            placeholder="Select your gouvernorat"
+            placeholder="Sélectionnez votre gouvernorat"
             value={gouvernorat}
             onValueChange={setGouvernorat}
             options={gouvernoratOptions}
@@ -232,7 +232,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
           {/* Vehicle Type */}
           <Dropdown
             label="Type de véhicule"
-            placeholder="Select your vehicle type"
+            placeholder="Sélectionnez votre type de véhicule"
             value={vehicleType}
             onValueChange={setVehicleType}
             options={vehicleTypeOptions}
@@ -247,7 +247,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
             fullWidth
             disabled={isLoading}
           >
-            {isLoading ? 'Saving...' : 'Save changes'}
+            {isLoading ? 'Enregistrement...' : 'Enregistrer'}
           </Button>
         </View>
       </ScrollView>

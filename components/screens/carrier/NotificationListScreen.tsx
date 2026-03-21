@@ -13,6 +13,7 @@ import {
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
+import BottomNav from '../../ui/BottomNav';
 import * as notificationService from '../../../services/notification.service';
 import * as shipmentService from '../../../services/shipment.service';
 
@@ -71,25 +72,22 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
 
     setProcessingId(notification.id);
     try {
-      // Request the shipment (carrier applies)
-      const result = await shipmentService.requestShipment(notification.shipmentId);
-      
+      // Accept the invitation — this sets status CONFIRMED and notifies the sender (BUG-01 fix)
+      const result = await shipmentService.acceptInvitation(notification.shipmentId);
+
       if (result.success) {
         Alert.alert(
           'Succès',
-          'Votre candidature a été envoyée à l\'expéditeur',
+          'Invitation acceptée ! L\'expédition est maintenant confirmée.',
           [
             {
               text: 'OK',
-              onPress: () => {
-                // Refresh notifications
-                fetchNotifications();
-              },
+              onPress: () => fetchNotifications(),
             },
           ]
         );
       } else {
-        Alert.alert('Erreur', result.error || 'Échec de l\'acceptation');
+        Alert.alert('Erreur', result.error || 'Impossible d\'accepter l\'invitation');
       }
     } catch (error) {
       Alert.alert('Erreur', 'Une erreur s\'est produite');
@@ -120,8 +118,10 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
   };
 
   const handleViewShipment = (notification: any) => {
-    if (notification.shipmentId) {
-      onNavigate?.('missionDetails', { shipmentId: notification.shipmentId });
+    // BUG-02 fix: fall back to notification.data.shipmentId when the top-level field is null
+    const shipmentId = notification.shipmentId || notification.data?.shipmentId;
+    if (shipmentId) {
+      onNavigate?.('missionDetails', { shipmentId });
     }
   };
 
@@ -174,15 +174,7 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => onNavigate?.('dashboard')}
-          style={styles.backButton}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.backIcon}>←</Text>
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
-        <View style={styles.headerRight} />
       </View>
 
       <ScrollView
@@ -239,8 +231,9 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
                 </View>
               )}
 
-              {/* View details button for other notification types */}
-              {notification.type !== 'SHIPMENT_INVITATION' && notification.shipmentId && (
+              {/* View details button for non-invitation notification types */}
+              {notification.type !== 'SHIPMENT_INVITATION' &&
+                (notification.shipmentId || notification.data?.shipmentId) && (
                 <TouchableOpacity
                   style={styles.viewButton}
                   onPress={() => handleViewShipment(notification)}
@@ -253,6 +246,13 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
           ))
         )}
       </ScrollView>
+
+      {/* Bottom Navigation */}
+      <BottomNav
+        active="notifications"
+        role="carrier"
+        onNavigate={onNavigate}
+      />
     </SafeAreaView>
   );
 };
@@ -263,43 +263,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F6F6',
   },
   header: {
+    paddingHorizontal: 24,
+    paddingTop: 72,
+    paddingBottom: 20,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E9E9E9',
-    paddingHorizontal: 20,
-    paddingTop: 72,
-    paddingBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F6F6F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backIcon: {
-    fontSize: 24,
-    color: '#1A1A1A',
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#444444',
-    flex: 1,
-    textAlign: 'center',
-  },
-  headerRight: {
-    width: 40,
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#1A1A1A',
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: 20,
+    padding: 16,
+    paddingBottom: 100,
   },
   loadingContainer: {
     flex: 1,
@@ -320,14 +301,14 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#DC2626',
+    color: '#D92D20',
     marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#DC2626',
+    backgroundColor: '#D92D20',
     borderRadius: 6,
   },
   retryText: {
@@ -365,13 +346,20 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   notificationIcon: {
-    fontSize: 32,
+    fontSize: 20,
+    width: 40,
+    height: 40,
+    lineHeight: 40,
+    textAlign: 'center',
+    backgroundColor: '#F6F6F6',
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   notificationContent: {
     flex: 1,
   },
   notificationTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#1A1A1A',
     marginBottom: 4,

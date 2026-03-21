@@ -461,8 +461,8 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   timelineIconCompleted: {
-    backgroundColor: '#10B981',
-    borderColor: '#10B981',
+    backgroundColor: '#2E8B57',
+    borderColor: '#2E8B57',
   },
   timelineIconCurrent: {
     backgroundColor: '#1464F6',
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
     marginTop: -4,
   },
   timelineLineCompleted: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#2E8B57',
   },
   stepDetails: {
     flex: 1,
@@ -540,7 +540,7 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: 'center',
     backgroundColor: '#ECFDF5',
-    borderColor: '#10B981',
+    borderColor: '#2E8B57',
     marginBottom: 16,
   },
   successIcon: {
@@ -568,7 +568,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#E9E9E9',
   },
   completeButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#2E8B57',
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 8,
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#DC2626',
+    color: '#D92D20',
     marginBottom: 16,
     textAlign: 'center',
   },

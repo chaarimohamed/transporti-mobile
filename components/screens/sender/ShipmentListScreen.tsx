@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#1A1A1A',
     marginBottom: 16,
@@ -305,14 +305,14 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#DC2626',
+    color: '#D92D20',
     marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#DC2626',
+    backgroundColor: '#D92D20',
     borderRadius: 6,
   },
   retryText: {

@@ -9,6 +9,7 @@ import {
   Alert,
   Platform,
   ActivityIndicator,
+  AppState,
 } from 'react-native';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
@@ -42,6 +43,31 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
       fetchData();
     }
   }, [initialData?.refresh]);
+
+  // BUG-01/02 fix: keep the badge count live so new notifications are reflected
+  // without requiring a full app restart or manual pull-to-refresh.
+  useEffect(() => {
+    const refreshCount = () => {
+      notificationService.getUnreadCount().then(result => {
+        if (result.success && result.count !== undefined) {
+          setUnreadCount(result.count);
+        }
+      });
+    };
+
+    // Refresh whenever the app returns to the foreground
+    const subscription = AppState.addEventListener('change', nextState => {
+      if (nextState === 'active') refreshCount();
+    });
+
+    // Also poll every 30 s while the screen is mounted
+    const interval = setInterval(refreshCount, 30000);
+
+    return () => {
+      subscription.remove();
+      clearInterval(interval);
+    };
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -124,38 +150,38 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>Bonjour</Text>
-            <Text style={styles.name}>{user?.firstName || 'Ahmed'}</Text>
-          </View>
-          <View style={styles.headerActions}>
-            <TouchableOpacity 
-              style={styles.bellButton} 
-              activeOpacity={0.7}
-              onPress={() => onNavigate?.('notificationListSender')}
-            >
-              <Text style={styles.bellIcon}>🔔</Text>
-              {unreadCount > 0 && (
-                <View style={styles.notificationBadge}>
-                  <Text style={styles.notificationBadgeText}>
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.logoutButton} 
-              activeOpacity={0.7}
-              onPress={handleLogout}
-            >
-              <Text style={styles.logoutIcon}>🚪</Text>
-            </TouchableOpacity>
-          </View>
+      {/* Header — kept outside ScrollView so touch events never conflict with scroll gestures (BUG-02) */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.greeting}>Bonjour</Text>
+          <Text style={styles.name}>{user?.firstName || 'Ahmed'}</Text>
         </View>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={styles.bellButton}
+            activeOpacity={0.7}
+            onPress={() => onNavigate?.('notificationListSender')}
+          >
+            <Text style={styles.bellIcon}>🔔</Text>
+            {unreadCount > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationBadgeText}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            activeOpacity={0.7}
+            onPress={handleLogout}
+          >
+            <Text style={styles.logoutIcon}>🚪</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
 
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* CTA Button */}
         <Button
           onPress={() => onNavigate?.('newShipment')}
@@ -279,7 +305,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
   },
   greeting: {
     fontSize: 16,
@@ -452,14 +480,14 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#DC2626',
+    color: '#D92D20',
     marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#DC2626',
+    backgroundColor: '#D92D20',
     borderRadius: 6,
   },
   retryText: {

@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#1A1A1A',
     marginBottom: 16,
@@ -271,9 +271,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statNumber: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#1464F6',
+    color: '#1A1A1A',
     marginBottom: 4,
   },
   statLabel: {
@@ -312,9 +312,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   priceText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#1464F6',
+    color: '#1A1A1A',
   },
   routeContainer: {
     marginBottom: 16,
@@ -377,14 +377,14 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#DC2626',
+    color: '#D92D20',
     marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#DC2626',
+    backgroundColor: '#D92D20',
     borderRadius: 6,
   },
   retryText: {

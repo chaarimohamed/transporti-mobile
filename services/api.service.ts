@@ -15,7 +15,11 @@ import * as storage from '../utils/storage';
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
   timeout: API_CONFIG.TIMEOUT,
-  headers: API_CONFIG.HEADERS,
+  headers: {
+    ...API_CONFIG.HEADERS,
+    // Required to bypass ngrok browser warning page in development
+    'ngrok-skip-browser-warning': 'true',
+  },
 });
 
 /**

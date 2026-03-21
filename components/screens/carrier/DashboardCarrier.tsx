@@ -10,6 +10,7 @@ import {
   Platform,
   ActivityIndicator,
   RefreshControl,
+  AppState,
 } from 'react-native';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
@@ -36,6 +37,28 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
 
   useEffect(() => {
     fetchDashboardData();
+  }, []);
+
+  // Keep the notification badge live (same fix as sender dashboard)
+  useEffect(() => {
+    const refreshCount = () => {
+      notificationService.getUnreadCount().then(result => {
+        if (result.success && result.count !== undefined) {
+          setUnreadCount(result.count);
+        }
+      });
+    };
+
+    const subscription = AppState.addEventListener('change', nextState => {
+      if (nextState === 'active') refreshCount();
+    });
+
+    const interval = setInterval(refreshCount, 30000);
+
+    return () => {
+      subscription.remove();
+      clearInterval(interval);
+    };
   }, []);
 
   const fetchDashboardData = async () => {
@@ -142,6 +165,37 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header — outside ScrollView so the bell button is always reliably tappable */}
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.greeting}>Bonjour</Text>
+          <Text style={styles.name}>{user?.firstName || 'Sami'}</Text>
+        </View>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={styles.bellButton}
+            activeOpacity={0.7}
+            onPress={() => onNavigate?.('notificationList')}
+          >
+            <Text style={styles.bellIcon}>🔔</Text>
+            {unreadCount > 0 && (
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationBadgeText}>
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            activeOpacity={0.7}
+            onPress={handleLogout}
+          >
+            <Text style={styles.logoutIcon}>🚪</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -149,38 +203,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.greeting}>Bonjour</Text>
-            <Text style={styles.name}>{user?.firstName || 'Sami'}</Text>
-          </View>
-          <View style={styles.headerActions}>
-            <TouchableOpacity 
-              style={styles.bellButton} 
-              activeOpacity={0.7}
-              onPress={() => onNavigate?.('notificationList')}
-            >
-              <Text style={styles.bellIcon}>🔔</Text>
-              {unreadCount > 0 && (
-                <View style={styles.notificationBadge}>
-                  <Text style={styles.notificationBadgeText}>
-                    {unreadCount > 9 ? '9+' : unreadCount}
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.logoutButton} 
-              activeOpacity={0.7}
-              onPress={handleLogout}
-            >
-              <Text style={styles.logoutIcon}>🚪</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Dark KPI Card */}
+        {/* Dark KPI Card */}}
         <View style={styles.kpiCard}>
           <View style={styles.kpiContent}>
             <View>
@@ -299,7 +322,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
   },
   greeting: {
     fontSize: 16,
@@ -313,15 +338,15 @@ const styles = StyleSheet.create({
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 12,
   },
   bellButton: {
     width: 44,
     height: 44,
-    backgroundColor: '#F0F9FF',
+    backgroundColor: '#FCFCFC',
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: '#BFDBFE',
+    borderColor: '#E9E9E9',
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -407,7 +432,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   statNumber: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
     color: '#1A1A1A',
     marginBottom: 4,
@@ -509,7 +534,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   priceText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
     color: '#1A1A1A',
   },
@@ -533,14 +558,14 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 14,
-    color: '#DC2626',
+    color: '#D92D20',
     marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#DC2626',
+    backgroundColor: '#D92D20',
     borderRadius: 6,
   },
   retryText: {

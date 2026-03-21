@@ -218,7 +218,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
   },
   content: {
     flexGrow: 1,
@@ -233,10 +233,10 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#1464F6',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#3B82F6',
+    shadowColor: '#1464F6',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -251,25 +251,25 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1E293B',
+    color: '#1A1A1A',
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 14,
-    color: '#64748B',
+    color: '#666666',
     marginBottom: 24,
     textAlign: 'center',
     paddingHorizontal: 16,
   },
   errorContainer: {
-    backgroundColor: '#FEE2E2',
+    backgroundColor: '#FEF2F2',
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
   },
   errorText: {
-    color: '#DC2626',
+    color: '#D92D20',
     fontSize: 14,
   },
   inputs: {
@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
-    color: '#64748B',
+    color: '#666666',
     marginBottom: 8,
   },
 });

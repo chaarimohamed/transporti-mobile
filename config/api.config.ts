@@ -10,14 +10,23 @@ import { Platform } from 'react-native';
 
 // Determine the base URL based on platform
 const getBaseUrl = () => {
-  // For development - using ngrok tunnel
   const isDevelopment = __DEV__;
-  
-  if (isDevelopment) {
-    // ngrok URL - updated automatically
-    return 'https://unperceptional-unvaguely-ervin.ngrok-free.dev/api';
+  const envUrl = process.env.EXPO_PUBLIC_API_URL;
+
+  if (envUrl && envUrl.length > 0) {
+    return envUrl;
   }
-  
+
+  if (isDevelopment) {
+    // Android emulator uses 10.0.2.2 to reach the host machine
+    if (Platform.OS === 'android') {
+      return 'http://10.0.2.2:3000/api';
+    }
+
+    // iOS simulator or web
+    return 'http://localhost:3000/api';
+  }
+
   // Production: Replace with your actual backend URL
   return 'https://api.transporti.tn/api';
 };

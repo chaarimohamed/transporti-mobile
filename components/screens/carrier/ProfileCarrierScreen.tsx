@@ -78,63 +78,49 @@ const ProfileCarrierScreen: React.FC<ProfileCarrierScreenProps> = ({
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header with Profile Info */}
+      <View style={styles.header}>
+        <View style={styles.avatarContainer}>
+          <Text style={styles.avatarText}>
+            {user?.firstName?.[0]?.toUpperCase() || 'T'}
+          </Text>
+        </View>
+        <Text style={styles.name}>
+          {user?.firstName || 'Transporteur'} {user?.lastName || ''}
+        </Text>
+        <Text style={styles.role}>Transporteur • Membre depuis {new Date().getFullYear()}</Text>
+      </View>
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Profil</Text>
+        {menuItems.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.menuItem}
+            onPress={item.onPress}
+            activeOpacity={0.7}
+          >
+            <View style={styles.menuLeft}>
+              <Text style={styles.menuIconText}>{item.icon}</Text>
+              <Text style={styles.menuLabel}>{item.label}</Text>
+            </View>
+            <Text style={styles.menuArrow}>›</Text>
+          </TouchableOpacity>
+        ))}
+
+        <View style={styles.logoutSection}>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={handleLogout}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.logoutIcon}>🚪</Text>
+            <Text style={styles.logoutText}>Déconnexion</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Profile Info */}
-        <View style={styles.profileCard}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {user?.firstName?.[0]?.toUpperCase() || 'T'}
-            </Text>
-          </View>
-          <Text style={styles.name}>
-            {user?.firstName || 'Transporteur'} {user?.lastName || ''}
-          </Text>
-          <Text style={styles.role}>Expéditeur • Membre depuis 2026</Text>
-        </View>
-
-        {/* Menu Items */}
-        <View style={styles.menuContainer}>
-          {menuItems.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.menuItem,
-                index === menuItems.length - 1 && styles.menuItemLast,
-              ]}
-              onPress={item.onPress}
-              activeOpacity={0.7}
-            >
-              <View style={styles.menuLeft}>
-                <View style={styles.menuIcon}>
-                  <Text style={styles.menuIconText}>{item.icon}</Text>
-                </View>
-                <Text style={styles.menuLabel}>{item.label}</Text>
-              </View>
-              <Text style={styles.menuArrow}>›</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Logout Button */}
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={handleLogout}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.logoutIcon}>🚪</Text>
-          <Text style={styles.logoutText}>Déconnexion</Text>
-        </TouchableOpacity>
-
-        <View style={styles.footer} />
       </ScrollView>
 
       {/* Bottom Navigation */}
@@ -156,41 +142,41 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
+    padding: 16,
     paddingBottom: 100,
   },
   header: {
-    paddingHorizontal: 24,
     paddingTop: 72,
     paddingBottom: 24,
+    paddingHorizontal: 24,
     backgroundColor: '#FFFFFF',
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  profileCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E9E9E9',
     alignItems: 'center',
-    marginBottom: 16,
   },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+  avatarContainer: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
     backgroundColor: '#1464F6',
+    borderWidth: 4,
+    borderColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   avatarText: {
-    fontSize: 32,
+    fontSize: 36,
     fontWeight: '700',
     color: '#FFFFFF',
   },
   name: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
     color: '#1A1A1A',
     marginBottom: 4,
@@ -199,73 +185,57 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666666',
   },
-  menuContainer: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginBottom: 16,
-    overflow: 'hidden',
-  },
   menuItem: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
-  menuItemLast: {
-    borderBottomWidth: 0,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E9E9E9',
+    borderRadius: 16,
+    marginBottom: 8,
   },
   menuLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  menuIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F6F6F6',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
   menuIconText: {
     fontSize: 20,
+    marginRight: 12,
+    width: 24,
+    textAlign: 'center',
   },
   menuLabel: {
-    fontSize: 16,
-    color: '#1A1A1A',
+    fontSize: 14,
     fontWeight: '500',
+    color: '#1A1A1A',
   },
   menuArrow: {
-    fontSize: 24,
+    fontSize: 20,
     color: '#CCCCCC',
-    fontWeight: '300',
+    marginLeft: 8,
+  },
+  logoutSection: {
+    paddingTop: 16,
   },
   logoutButton: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-    marginHorizontal: 16,
+    alignItems: 'center',
     padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#FFE5E5',
+    backgroundColor: 'rgba(217, 45, 32, 0.05)',
+    borderRadius: 16,
   },
   logoutIcon: {
-    fontSize: 20,
+    fontSize: 18,
     marginRight: 8,
   },
   logoutText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#DC2626',
-  },
-  footer: {
-    height: 24,
+    color: '#D92D20',
   },
 });
 

@@ -241,13 +241,15 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F6F6F6',
     justifyContent: 'center',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   backIcon: {
-    fontSize: 24,
+    fontSize: 20,
     color: '#1A1A1A',
   },
   headerTitle: {

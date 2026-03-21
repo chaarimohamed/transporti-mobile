@@ -769,7 +769,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#DC2626',
+    color: '#D92D20',
     marginBottom: 24,
     textAlign: 'center',
   },

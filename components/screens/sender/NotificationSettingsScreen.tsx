@@ -42,84 +42,129 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Channels Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>CANAUX</Text>
-
+        <Text style={styles.sectionTitle}>Notifications push</Text>
+        <View style={styles.settingsCard}>
           <View style={styles.settingItem}>
-            <View style={styles.settingItemLeft}>
+            <View style={styles.settingLeft}>
               <Text style={styles.settingIcon}>🔔</Text>
-              <Text style={styles.settingLabel}>Push Mobile</Text>
+              <View style={styles.settingTexts}>
+                <Text style={styles.settingLabel}>Push Mobile</Text>
+                <Text style={styles.settingDescription}>
+                  Recevoir les notifications sur votre appareil
+                </Text>
+              </View>
             </View>
             <Switch
               value={pushEnabled}
               onValueChange={setPushEnabled}
-              trackColor={{ false: '#E9E9E9', true: '#1464F6' }}
+              trackColor={{ false: '#E5E5E5', true: '#1464F6' }}
               thumbColor="#FFFFFF"
             />
           </View>
 
+          <View style={styles.divider} />
+
           <View style={styles.settingItem}>
-            <View style={styles.settingItemLeft}>
+            <View style={styles.settingLeft}>
               <Text style={styles.settingIcon}>✉️</Text>
-              <Text style={styles.settingLabel}>Email</Text>
+              <View style={styles.settingTexts}>
+                <Text style={styles.settingLabel}>Email</Text>
+                <Text style={styles.settingDescription}>
+                  Recevoir les notifications par email
+                </Text>
+              </View>
             </View>
             <Switch
               value={emailEnabled}
               onValueChange={setEmailEnabled}
-              trackColor={{ false: '#E9E9E9', true: '#1464F6' }}
+              trackColor={{ false: '#E5E5E5', true: '#1464F6' }}
               thumbColor="#FFFFFF"
             />
           </View>
         </View>
 
-        {/* Divider */}
-        <View style={styles.divider} />
-
-        {/* Alerts Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>ALERTES</Text>
-
-          <View style={styles.alertItem}>
-            <Text style={styles.alertLabel}>Mises à jour de statut</Text>
+        <Text style={styles.sectionTitle}>Alertes</Text>
+        <View style={styles.settingsCard}>
+          <View style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Text style={styles.settingIcon}>🔄</Text>
+              <View style={styles.settingTexts}>
+                <Text style={styles.settingLabel}>Mises à jour de statut</Text>
+                <Text style={styles.settingDescription}>
+                  Changements de statut de vos expéditions
+                </Text>
+              </View>
+            </View>
             <Switch
               value={statusUpdates}
               onValueChange={setStatusUpdates}
-              trackColor={{ false: '#E9E9E9', true: '#1464F6' }}
+              trackColor={{ false: '#E5E5E5', true: '#1464F6' }}
               thumbColor="#FFFFFF"
             />
           </View>
 
-          <View style={styles.alertItem}>
-            <Text style={styles.alertLabel}>Nouvelles offres de mission</Text>
+          <View style={styles.divider} />
+
+          <View style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Text style={styles.settingIcon}>📦</Text>
+              <View style={styles.settingTexts}>
+                <Text style={styles.settingLabel}>Nouvelles offres de mission</Text>
+                <Text style={styles.settingDescription}>
+                  Propositions de transporteurs pour vos envois
+                </Text>
+              </View>
+            </View>
             <Switch
               value={newOffers}
               onValueChange={setNewOffers}
-              trackColor={{ false: '#E9E9E9', true: '#1464F6' }}
+              trackColor={{ false: '#E5E5E5', true: '#1464F6' }}
               thumbColor="#FFFFFF"
             />
           </View>
 
-          <View style={styles.alertItem}>
-            <Text style={styles.alertLabel}>Messages reçus</Text>
+          <View style={styles.divider} />
+
+          <View style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Text style={styles.settingIcon}>💬</Text>
+              <View style={styles.settingTexts}>
+                <Text style={styles.settingLabel}>Messages reçus</Text>
+                <Text style={styles.settingDescription}>
+                  Nouveaux messages des transporteurs
+                </Text>
+              </View>
+            </View>
             <Switch
               value={messages}
               onValueChange={setMessages}
-              trackColor={{ false: '#E9E9E9', true: '#1464F6' }}
+              trackColor={{ false: '#E5E5E5', true: '#1464F6' }}
               thumbColor="#FFFFFF"
             />
           </View>
 
-          <View style={styles.alertItem}>
-            <Text style={styles.alertLabel}>Promotions et actus</Text>
+          <View style={styles.divider} />
+
+          <View style={styles.settingItem}>
+            <View style={styles.settingLeft}>
+              <Text style={styles.settingIcon}>🎁</Text>
+              <View style={styles.settingTexts}>
+                <Text style={styles.settingLabel}>Promotions et actus</Text>
+                <Text style={styles.settingDescription}>
+                  Offres spéciales et actualités
+                </Text>
+              </View>
+            </View>
             <Switch
               value={promotions}
               onValueChange={setPromotions}
-              trackColor={{ false: '#E9E9E9', true: '#1464F6' }}
+              trackColor={{ false: '#E5E5E5', true: '#1464F6' }}
               thumbColor="#FFFFFF"
             />
           </View>
         </View>
+
+        <View style={styles.footer} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -167,57 +212,57 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 24,
-  },
-  section: {
-    marginBottom: 24,
+    paddingBottom: 40,
   },
   sectionTitle: {
-    fontSize: 12,
+    fontSize: 16,
     fontWeight: '700',
-    color: '#444444',
-    letterSpacing: 1,
-    marginBottom: 16,
+    color: '#1A1A1A',
+    marginBottom: 12,
+  },
+  settingsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    marginBottom: 24,
+    overflow: 'hidden',
   },
   settingItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E9E9E9',
-    marginBottom: 12,
+    justifyContent: 'space-between',
+    padding: 16,
   },
-  settingItemLeft: {
+  settingLeft: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    marginRight: 16,
   },
   settingIcon: {
-    fontSize: 20,
+    fontSize: 24,
     marginRight: 12,
   },
+  settingTexts: {
+    flex: 1,
+  },
   settingLabel: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 16,
+    fontWeight: '600',
     color: '#1A1A1A',
+    marginBottom: 2,
+  },
+  settingDescription: {
+    fontSize: 13,
+    color: '#666666',
+    lineHeight: 18,
   },
   divider: {
     height: 1,
-    backgroundColor: '#E9E9E9',
-    marginBottom: 24,
+    backgroundColor: '#F0F0F0',
+    marginLeft: 52,
   },
-  alertItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  alertLabel: {
-    fontSize: 14,
-    color: '#1A1A1A',
-    flex: 1,
+  footer: {
+    height: 20,
   },
 });
 
