@@ -37,6 +37,8 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
       setLastName(user.lastName || '');
       setEmail(user.email || '');
       setPhone(user.phone || '');
+      // BUG-06 fix: pre-populate carrier-specific fields stored at registration
+      setGouvernorat(user.gouvernerat || '');
     }
   }, [user]);
 
@@ -89,6 +91,8 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
         email,
         phone,
         ...(dateOfBirth && { dateOfBirth }),
+        // BUG-05 fix: send carrier-specific fields so the backend persists them
+        ...(gouvernorat && { gouvernorat }),
       });
       
       if (result.success && result.user) {

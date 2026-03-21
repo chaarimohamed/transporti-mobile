@@ -161,6 +161,7 @@ export const updateProfile = async (data: {
   email?: string;
   phone?: string;
   dateOfBirth?: string;
+  gouvernorat?: string; // carrier-specific
 }): Promise<{ success: boolean; user?: User; error?: string }> => {
   try {
     const response = await apiClient.put<ApiResponse<User>>(
