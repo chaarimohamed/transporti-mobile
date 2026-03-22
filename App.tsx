@@ -145,6 +145,7 @@ function AppContent() {
           return <ActiveMissionsScreen onNavigate={navigate} />;
         case 'updateStatus':
           return <UpdateStatusScreen route={{ params: screenParams }} onNavigate={navigate} />;
+        case 'notifications':
         case 'notificationList':
           return <NotificationListScreen onNavigate={navigate} />;
         case 'paymentCodeInput':
@@ -207,14 +208,11 @@ function AppContent() {
       case 'privacySecurityCarrier':
         return <PrivacySecurityCarrierScreen onNavigate={navigate} returnScreen={screenParams?.returnScreen} />;
       case 'verifyEmail':
-      case 'carrierOnboarding2':
         return (
           <View style={styles.dashboardContainer}>
             <View style={styles.dashboardContent}>
               <Text style={styles.dashboardText}>Coming Soon...</Text>
-              <Text style={styles.dashboardSubtext}>
-                {currentScreen === 'verifyEmail' ? 'Email Verification' : 'Carrier Onboarding'}
-              </Text>
+              <Text style={styles.dashboardSubtext}>Email Verification</Text>
             </View>
           </View>
         );

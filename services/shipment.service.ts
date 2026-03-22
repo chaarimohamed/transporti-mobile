@@ -11,7 +11,7 @@ export interface Shipment {
   to: string;
   cargo?: string;
   price: number;
-  status: 'PENDING' | 'REQUESTED' | 'CONFIRMED' | 'IN_TRANSIT' | 'DELIVERED' | 'CANCELLED';
+  status: 'PENDING' | 'REQUESTED' | 'CONFIRMED' | 'HANDOVER_PENDING' | 'IN_TRANSIT' | 'DELIVERED' | 'CANCELLED';
   description?: string;
   senderId: string;
   carrierId?: string;
@@ -559,5 +559,30 @@ export const getInvitedCarriers = async (shipmentId: string): Promise<{ success:
       success: false,
       error: apiError.message,
     };
+  }
+};
+
+/**
+ * Sender confirms they handed the parcel to the carrier.
+ * Transitions the shipment from HANDOVER_PENDING → IN_TRANSIT.
+ * POST /api/shipments/:id/confirm-handover
+ */
+export const confirmHandover = async (shipmentId: string): Promise<{ success: boolean; shipment?: Shipment; error?: string }> => {
+  try {
+    const response = await apiClient.post<{ success: boolean; data?: Shipment; error?: string }>(
+      `${API_ENDPOINTS.SHIPMENTS.LIST}/${shipmentId}/confirm-handover`
+    );
+
+    if (response.data.success && response.data.data) {
+      return { success: true, shipment: response.data.data };
+    }
+
+    return {
+      success: false,
+      error: response.data.error || 'Impossible de confirmer la remise',
+    };
+  } catch (error) {
+    const apiError = handleApiError(error);
+    return { success: false, error: apiError.message };
   }
 };

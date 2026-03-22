@@ -103,16 +103,20 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case 'HANDOVER_PENDING':
+        return { status: 'warning' as const, text: 'remise en cours' };
       case 'IN_TRANSIT':
-        return { status: 'info' as const, text: 'En transit' };
+        return { status: 'info' as const, text: 'en transit' };
       case 'DELIVERED':
-        return { status: 'success' as const, text: 'Livré' };
+        return { status: 'success' as const, text: 'livrée' };
       case 'PENDING':
-        return { status: 'warning' as const, text: 'En attente' };
+        return { status: 'warning' as const, text: 'en attente' };
+      case 'REQUESTED':
+        return { status: 'warning' as const, text: 'candidature reçue' };
       case 'CONFIRMED':
-        return { status: 'success' as const, text: 'Confirmé' };
+        return { status: 'success' as const, text: 'confirmée' };
       case 'CANCELLED':
-        return { status: 'neutral' as const, text: 'Annulé' };
+        return { status: 'neutral' as const, text: 'annulée' };
       default:
         return { status: 'neutral' as const, text: status };
     }
@@ -267,7 +271,7 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
                         <Text style={styles.searchTransporterLink}>Chercher un transporteur →</Text>
                       </TouchableOpacity>
                     )}
-                    {(shipment.status === 'CONFIRMED' || shipment.status === 'IN_TRANSIT' || shipment.status === 'DELIVERED') && (
+                    {(shipment.status === 'CONFIRMED' || shipment.status === 'HANDOVER_PENDING' || shipment.status === 'IN_TRANSIT' || shipment.status === 'DELIVERED') && (
                       <TouchableOpacity 
                         activeOpacity={0.7}
                         onPress={() => onNavigate?.('shipmentDetails', { id: shipment.id })}

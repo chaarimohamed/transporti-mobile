@@ -14,7 +14,7 @@ import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import * as shipmentService from '../../../services/shipment.service';
-import { Shipment } from '../../../services/shipment.service';
+import { Shipment, confirmHandover } from '../../../services/shipment.service';
 
 interface ShipmentDetailsScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
@@ -57,16 +57,20 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case 'HANDOVER_PENDING':
+        return { status: 'warning' as const, text: 'remise en cours' };
       case 'IN_TRANSIT':
-        return { status: 'warning' as const, text: 'En transit' };
+        return { status: 'warning' as const, text: 'en transit' };
       case 'DELIVERED':
-        return { status: 'success' as const, text: 'Livré' };
+        return { status: 'success' as const, text: 'livrée' };
       case 'PENDING':
-        return { status: 'neutral' as const, text: 'En attente' };
+        return { status: 'neutral' as const, text: 'en attente' };
       case 'REQUESTED':
-        return { status: 'warning' as const, text: 'Demande reçue' };
+        return { status: 'warning' as const, text: 'candidature reçue' };
+      case 'CONFIRMED':
+        return { status: 'success' as const, text: 'confirmée' };
       case 'CANCELLED':
-        return { status: 'neutral' as const, text: 'Annulé' };
+        return { status: 'neutral' as const, text: 'annulée' };
       default:
         return { status: 'neutral' as const, text: status };
     }
@@ -227,6 +231,56 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
       Alert.alert('Refuser le transporteur', confirmMsg, [
         { text: 'Annuler', style: 'cancel' },
         { text: 'Refuser', style: 'destructive', onPress: onConfirm },
+      ]);
+    }
+  };
+
+  const handleConfirmHandover = async () => {
+    if (!shipment) return;
+
+    const confirmMsg = 'Confirmez-vous avoir remis le colis au transporteur ?';
+
+    const onConfirm = async () => {
+      try {
+        setLoading(true);
+        const result = await confirmHandover(shipment.id);
+
+        if (result.success && result.shipment) {
+          setShipment(result.shipment);
+          const successMsg = 'Remise confirmée ! Le transporteur est maintenant en route.';
+          if (Platform.OS === 'web') {
+            window.alert(successMsg);
+          } else {
+            Alert.alert('Succès', successMsg);
+          }
+        } else {
+          const errorMsg = result.error || 'Impossible de confirmer la remise';
+          if (Platform.OS === 'web') {
+            window.alert(errorMsg);
+          } else {
+            Alert.alert('Erreur', errorMsg);
+          }
+        }
+      } catch (err) {
+        console.error('Error confirming handover:', err);
+        if (Platform.OS === 'web') {
+          window.alert('Erreur de connexion');
+        } else {
+          Alert.alert('Erreur', 'Erreur de connexion');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      if (window.confirm(confirmMsg)) {
+        onConfirm();
+      }
+    } else {
+      Alert.alert('Confirmer la remise', confirmMsg, [
+        { text: 'Annuler', style: 'cancel' },
+        { text: 'Confirmer', onPress: onConfirm },
       ]);
     }
   };
@@ -425,6 +479,36 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
               </View>
               <TouchableOpacity style={styles.phoneButton}>
                 <Text style={styles.phoneIcon}>📞</Text>
+              </TouchableOpacity>
+            </Card>
+          </>
+        )}
+
+        {/* Handover Confirmation (if HANDOVER_PENDING) */}
+        {shipment.status === 'HANDOVER_PENDING' && (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Remise du colis</Text>
+            </View>
+            <Card style={styles.handoverCard}>
+              <View style={styles.handoverHeader}>
+                <Text style={styles.handoverIcon}>🤝</Text>
+                <View style={styles.handoverInfo}>
+                  <Text style={styles.handoverTitle}>Le transporteur est arrivé</Text>
+                  <Text style={styles.handoverSubtitle}>
+                    Confirmez que vous avez remis le colis au transporteur pour qu'il puisse démarrer la livraison.
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                style={styles.handoverButton}
+                onPress={handleConfirmHandover}
+                disabled={loading}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.handoverButtonText}>
+                  {loading ? 'Confirmation...' : '✅ J\'ai remis le colis au transporteur'}
+                </Text>
               </TouchableOpacity>
             </Card>
           </>
@@ -648,12 +732,54 @@ const styles = StyleSheet.create({
   },
   phoneIcon: {
     fontSize: 20,
-  },  requestCard: {
+  },
+  requestCard: {
     padding: 16,
     marginBottom: 24,
     backgroundColor: '#FFF9E6',
     borderWidth: 1,
     borderColor: '#FFC107',
+  },
+  handoverCard: {
+    padding: 16,
+    marginBottom: 24,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#1464F6',
+  },
+  handoverHeader: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+    alignItems: 'flex-start',
+  },
+  handoverIcon: {
+    fontSize: 32,
+  },
+  handoverInfo: {
+    flex: 1,
+  },
+  handoverTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1464F6',
+    marginBottom: 6,
+  },
+  handoverSubtitle: {
+    fontSize: 13,
+    color: '#374151',
+    lineHeight: 19,
+  },
+  handoverButton: {
+    backgroundColor: '#1464F6',
+    borderRadius: 10,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  handoverButtonText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '700',
   },
   requestHeader: {
     flexDirection: 'row',

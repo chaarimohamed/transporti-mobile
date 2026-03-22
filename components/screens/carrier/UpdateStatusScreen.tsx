@@ -20,7 +20,7 @@ interface UpdateStatusScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
 }
 
-type MissionStep = 'PICKUP' | 'LOADING' | 'IN_TRANSIT' | 'DELIVERED';
+type MissionStep = 'PICKUP' | 'HANDOVER_PENDING' | 'LOADING' | 'IN_TRANSIT' | 'DELIVERED';
 
 interface StepConfig {
   key: MissionStep;
@@ -63,6 +63,8 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
         // Determine current step based on mission status
         if (result.mission.status === 'CONFIRMED') {
           setCurrentStep('PICKUP');
+        } else if (result.mission.status === 'HANDOVER_PENDING') {
+          setCurrentStep('HANDOVER_PENDING');
         } else if (result.mission.status === 'IN_TRANSIT') {
           setCurrentStep('IN_TRANSIT');
         } else if (result.mission.status === 'DELIVERED') {
@@ -112,12 +114,13 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
         if (result.mission) {
           setMission(result.mission);
         }
-        setCurrentStep('IN_TRANSIT');
-        console.log('✅ Status updated to IN_TRANSIT');
+        // Backend now sets HANDOVER_PENDING (waiting for sender to confirm handover)
+        setCurrentStep('HANDOVER_PENDING');
+        console.log('✅ Status updated to HANDOVER_PENDING — awaiting sender confirmation');
         
-        // Show success message
+        // Show informational message
         if (typeof window !== 'undefined' && typeof window.alert === 'function') {
-          window.alert('Récupération confirmée');
+          window.alert('En attente de confirmation de l\'expéditeur');
         }
       } else {
         console.log('❌ Error:', result.error);
@@ -213,6 +216,12 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
       label: 'À récupérer',
       icon: '📍',
       description: `${mission.from}`,
+    },
+    {
+      key: 'HANDOVER_PENDING',
+      label: 'Remise en cours',
+      icon: '🤝',
+      description: 'En attente de confirmation de l\'expéditeur',
     },
     {
       key: 'IN_TRANSIT',
@@ -317,6 +326,17 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
                             {submitting ? 'Chargement...' : 'Confirmer la récupération'}
                           </Text>
                         </TouchableOpacity>
+                      </View>
+                    )}
+
+                    {current && !isCompleted && step.key === 'HANDOVER_PENDING' && (
+                      <View style={styles.stepActions}>
+                        <View style={styles.waitingBadge}>
+                          <Text style={styles.waitingText}>⏳ En attente de l'expéditeur</Text>
+                        </View>
+                        <Text style={styles.waitingSubText}>
+                          L'expéditeur doit confirmer qu'il vous a remis le colis
+                        </Text>
                       </View>
                     )}
 
@@ -549,6 +569,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#059669',
     fontWeight: '600',
+  },
+  waitingBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginTop: 4,
+    marginBottom: 6,
+  },
+  waitingText: {
+    fontSize: 12,
+    color: '#B45309',
+    fontWeight: '600',
+  },
+  waitingSubText: {
+    fontSize: 12,
+    color: '#92400E',
+    lineHeight: 18,
   },
   successCard: {
     padding: 24,

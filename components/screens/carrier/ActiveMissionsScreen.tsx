@@ -81,13 +81,13 @@ const ActiveMissionsScreen: React.FC<ActiveMissionsScreenProps> = ({
     switch (status) {
       case 'CONFIRMED':
         return {
-          text: 'Confirmée',
+          text: 'confirmée',
           borderColor: '#3B82F6',
           bgColor: '#EFF6FF',
         };
       case 'IN_TRANSIT':
         return {
-          text: 'En cours',
+          text: 'en transit',
           borderColor: '#F59E0B',
           bgColor: '#FEF3C7',
         };

@@ -60,15 +60,17 @@ const ShipmentListScreen: React.FC<ShipmentListScreenProps> = ({ onNavigate }) =
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'REQUESTED':
-        return { status: 'warning' as const, text: 'Demande reçue' };
+        return { status: 'warning' as const, text: 'candidature reçue' };
       case 'IN_TRANSIT':
-        return { status: 'warning' as const, text: 'En transit' };
+        return { status: 'warning' as const, text: 'en transit' };
       case 'DELIVERED':
-        return { status: 'success' as const, text: 'Livré' };
+        return { status: 'success' as const, text: 'livrée' };
       case 'PENDING':
-        return { status: 'neutral' as const, text: 'En attente' };
+        return { status: 'neutral' as const, text: 'en attente' };
+      case 'CONFIRMED':
+        return { status: 'success' as const, text: 'confirmée' };
       case 'CANCELLED':
-        return { status: 'neutral' as const, text: 'Annulé' };
+        return { status: 'neutral' as const, text: 'annulée' };
       default:
         return { status: 'neutral' as const, text: status };
     }

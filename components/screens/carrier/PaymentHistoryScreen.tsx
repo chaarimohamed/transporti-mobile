@@ -142,9 +142,9 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
 
   const renderHistoryCard = (item: HistoryItem) => {
     const statusConfig = {
-      paid: { label: 'PAYÉ', variant: 'success' as const },
-      pending: { label: 'EN ATTENTE', variant: 'warning' as const },
-      problem: { label: 'PROBLÈME', variant: 'error' as const },
+      paid: { label: 'livrée', variant: 'success' as const },
+      pending: { label: 'en transit', variant: 'warning' as const },
+      problem: { label: 'annulée', variant: 'error' as const },
     };
 
     return (
