@@ -203,7 +203,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        {/* Dark KPI Card */}}
+        {/* Dark KPI Card */}
         <View style={styles.kpiCard}>
           <View style={styles.kpiContent}>
             <View>

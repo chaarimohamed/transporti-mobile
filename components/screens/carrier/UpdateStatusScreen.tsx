@@ -139,11 +139,14 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
     if (!missionId || !mission) return;
 
     // Navigate to payment code input screen
+    const senderName = mission.sender
+      ? `${mission.sender.firstName} ${mission.sender.lastName}`
+      : 'Client';
     onNavigate?.('paymentCodeInput', {
       missionId: missionId,
       shipmentId: mission.id,
       amount: mission.price,
-      clientName: 'Client', // You can update this if you have client info
+      clientName: senderName,
       address: mission.to,
     });
   };
@@ -177,9 +180,10 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
             onPress={() => onNavigate?.('activeMissions')}
             style={styles.backButton}
           >
-            <Text style={styles.backButtonText}>← Retour</Text>
+            <Text style={styles.backIcon}>←</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Suivi Mission</Text>
+          <View style={styles.headerSpacer} />
         </View>
         <View style={styles.errorContainer}>
           <Text style={styles.errorText}>⚠️ {error}</Text>
@@ -226,7 +230,7 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
           onPress={() => onNavigate?.('activeMissions')}
           style={styles.backButton}
         >
-          <Text style={styles.backButtonText}>← Retour</Text>
+          <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Suivi de mission</Text>
         <Badge status="neutral" text={mission.refNumber} />
@@ -373,26 +377,36 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F6F6',
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 72,
+    paddingBottom: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E9E9E9',
-    paddingHorizontal: 24,
-    paddingTop: 72,
-    paddingBottom: 16,
   },
   backButton: {
-    marginBottom: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F6F6F6',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  backButtonText: {
-    fontSize: 16,
-    color: '#1464F6',
-    fontWeight: '500',
+  backIcon: {
+    fontSize: 20,
+    color: '#1A1A1A',
+  },
+  headerSpacer: {
+    width: 32,
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontWeight: '600',
     color: '#1A1A1A',
-    marginBottom: 8,
+    flex: 1,
+    marginLeft: 8,
   },
   scrollView: {
     flex: 1,

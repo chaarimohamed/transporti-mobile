@@ -221,7 +221,7 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
                   <TouchableOpacity
                     style={[styles.actionButton, styles.viewDetailsButton]}
                     onPress={() => onNavigate?.('missionDetails', { 
-                      shipmentId: notification.shipmentId,
+                      shipmentId: notification.shipmentId || notification.data?.shipmentId,
                       fromInvitation: true 
                     })}
                     activeOpacity={0.7}

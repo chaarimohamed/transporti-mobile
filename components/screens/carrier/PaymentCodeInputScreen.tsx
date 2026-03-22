@@ -74,12 +74,16 @@ const PaymentCodeInputScreen: React.FC<PaymentCodeInputScreenProps> = ({
       const result = await missionService.confirmDelivery(shipmentId, fullCode);
 
       if (result.success) {
+        // Derive real client name from confirmed mission sender data
+        const realClientName = result.mission?.sender
+          ? `${result.mission.sender.firstName} ${result.mission.sender.lastName}`
+          : clientName;
         // Code is correct, navigate to success screen
         onNavigate?.('paymentSuccess', {
           missionId,
           shipmentId,
           amount,
-          clientName,
+          clientName: realClientName,
           receiptNumber: result.receiptNumber || `RCP${Math.floor(Math.random() * 1000)}`,
           mission: result.mission, // Pass the full mission data
         });

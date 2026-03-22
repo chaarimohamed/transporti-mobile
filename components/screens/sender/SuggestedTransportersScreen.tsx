@@ -14,7 +14,6 @@ import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import * as shipmentService from '../../../services/shipment.service';
-import * as notificationService from '../../../services/notification.service';
 import { Shipment, Carrier } from '../../../services/shipment.service';
 
 interface SuggestedTransportersScreenProps {
@@ -32,6 +31,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
 }) => {
   const [loading, setLoading] = useState(true);
   const [carriers, setCarriers] = useState<Carrier[]>([]);
+  const [invitedCarrierIds, setInvitedCarrierIds] = useState<Set<string>>(new Set());
   const [applications, setApplications] = useState<Shipment[]>([]);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
@@ -52,18 +52,12 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
         return;
       }
       
-      // Fetch applications, carriers, and notifications to get invited carriers
-      const [applicationsResult, carriersResult, notificationsResult] = await Promise.all([
+      // Fetch applications, available carriers, and already-invited carrier IDs
+      const [applicationsResult, carriersResult, invitedResult] = await Promise.all([
         shipmentService.getMyShipments(),
         shipmentService.getAvailableCarriers(shipmentId),
-        notificationService.getNotifications(),
+        shipmentService.getInvitedCarriers(shipmentId),
       ]);
-
-      console.log('📊 Fetch results:', {
-        applications: applicationsResult,
-        carriers: carriersResult,
-        notifications: notificationsResult,
-      });
 
       // Filter applications for current shipment
       if (applicationsResult.success && applicationsResult.shipments) {
@@ -73,41 +67,15 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
         setApplications(shipmentApplications);
       }
 
-      // Get invited carrier IDs from notifications
-      const invitedCarrierIds = new Set<string>();
-      if (notificationsResult.success && notificationsResult.notifications) {
-        const invitationNotifs = notificationsResult.notifications
-          .filter(n => n.type === 'SHIPMENT_INVITATION' && n.shipmentId === shipmentId);
-        
-        console.log('🎯 Invitation notifications for this shipment:', invitationNotifs);
-        
-        invitationNotifs.forEach(n => {
-          if (n.carrierId) invitedCarrierIds.add(n.carrierId);
-        });
-      }
+      // Store invited carrier IDs from the dedicated endpoint
+      const invitedIds = new Set<string>(
+        (invitedResult.success ? invitedResult.carrierIds ?? [] : []) as string[]
+      );
+      setInvitedCarrierIds(invitedIds);
 
-      console.log('👥 Invited carrier IDs:', Array.from(invitedCarrierIds));
-
-      // Filter out invited carriers - they should not appear in the list at all
-      // Once a carrier is invited for this shipment, they are completely hidden
+      // All carriers are shown; invited ones will be visually distinguished in the UI
       if (carriersResult.success && carriersResult.carriers) {
-        const available: Carrier[] = [];
-        
-        carriersResult.carriers.forEach(carrier => {
-          // Exclude carriers who have been invited to this specific shipment
-          if (!invitedCarrierIds.has(carrier.id)) {
-            available.push(carrier);
-          }
-        });
-        
-        console.log('📋 Filtered carriers:', { 
-          total: carriersResult.carriers.length,
-          invited: invitedCarrierIds.size, 
-          available: available.length 
-        });
-        
-        // Only show carriers that haven't been invited
-        setCarriers(available);
+        setCarriers(carriersResult.carriers);
       } else if (carriersResult.error) {
         console.error('❌ Error fetching carriers:', carriersResult.error);
       }
@@ -323,8 +291,10 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
         {/* Transporter Cards */}
         {carriers.length > 0 && (
           <View style={styles.transportersList}>
-            {carriers.map((carrier) => (
-            <Card key={carrier.id} style={styles.transporterCard}>
+            {carriers.map((carrier) => {
+            const isInvited = invitedCarrierIds.has(carrier.id);
+            return (
+            <Card key={carrier.id} style={[styles.transporterCard, isInvited && styles.transporterCardInvited]}>
               <View style={styles.cardContent}>
                 {/* Avatar */}
                 <View style={styles.avatar}>
@@ -338,6 +308,11 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
                     <Text style={styles.transporterName}>
                       {carrier.firstName} {carrier.lastName}
                     </Text>
+                    {isInvited && (
+                      <View style={styles.invitedBadge}>
+                        <Text style={styles.invitedBadgeText}>Déjà invité</Text>
+                      </View>
+                    )}
                   </View>
 
                   <View style={styles.contactInfo}>
@@ -357,6 +332,11 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
                 </View>
               </View>
 
+              {isInvited ? (
+                <View style={styles.invitedButton}>
+                  <Text style={styles.invitedButtonText}>✓ Invitation envoyée</Text>
+                </View>
+              ) : (
               <TouchableOpacity
                 style={styles.inviteButton}
                 onPress={() => handleInviteTransporter(carrier)}
@@ -364,8 +344,10 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
               >
                 <Text style={styles.inviteButtonText}>Inviter</Text>
               </TouchableOpacity>
+              )}
             </Card>
-          ))}
+            );
+          })}
           </View>
         )}
 
@@ -663,6 +645,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#1464F6',
+  },
+  transporterCardInvited: {
+    opacity: 0.85,
+    borderColor: '#B0B0B0',
+  },
+  invitedBadge: {
+    backgroundColor: '#E9F5E9',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    marginLeft: 8,
+  },
+  invitedBadgeText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#2E7D32',
+  },
+  invitedButton: {
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 2,
+    borderColor: '#B0B0B0',
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  invitedButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#888888',
   },
   bottomSpacer: {
     height: 20,

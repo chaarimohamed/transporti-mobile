@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -23,37 +23,18 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
   onNavigate,
   initialData,
 }) => {
-  const [format, setFormat] = useState('M');
+  // Initialise directly from initialData so values are always restored on back-navigation
+  const [format, setFormat] = useState(initialData?.format || 'M');
   const [showFormatPicker, setShowFormatPicker] = useState(false);
-  const [showDimensions, setShowDimensions] = useState(false);
-  const [height, setHeight] = useState('');
-  const [width, setWidth] = useState('');
-  const [length, setLength] = useState('');
-  const [specialInstructions, setSpecialInstructions] = useState('');
-  const [declaredValue, setDeclaredValue] = useState('');
-  const [insurance, setInsurance] = useState(false);
-
-  // Restore state from initialData when navigating back
-  useEffect(() => {
-    if (initialData?.format) {
-      setFormat(initialData.format);
-    }
-    if (initialData?.dimensions) {
-      setShowDimensions(true);
-      setHeight(initialData.dimensions.height || '');
-      setWidth(initialData.dimensions.width || '');
-      setLength(initialData.dimensions.length || '');
-    }
-    if (initialData?.specialInstructions) {
-      setSpecialInstructions(initialData.specialInstructions);
-    }
-    if (initialData?.declaredValue) {
-      setDeclaredValue(initialData.declaredValue.toString());
-    }
-    if (initialData?.insurance !== undefined) {
-      setInsurance(initialData.insurance);
-    }
-  }, [initialData]);
+  const [showDimensions, setShowDimensions] = useState(!!initialData?.dimensions);
+  const [height, setHeight] = useState(String(initialData?.dimensions?.height || ''));
+  const [width, setWidth] = useState(String(initialData?.dimensions?.width || ''));
+  const [length, setLength] = useState(String(initialData?.dimensions?.length || ''));
+  const [specialInstructions, setSpecialInstructions] = useState(initialData?.specialInstructions || '');
+  const [declaredValue, setDeclaredValue] = useState(
+    initialData?.declaredValue ? String(initialData.declaredValue) : ''
+  );
+  const [insurance, setInsurance] = useState(initialData?.insurance || false);
 
   const handleNext = () => {
     const data = {

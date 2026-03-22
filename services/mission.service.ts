@@ -16,6 +16,13 @@ export interface Mission {
     firstName: string;
     lastName: string;
     phone: string;
+    matricule?: string;
+  };
+  sender?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
   };
   createdAt: string;
   updatedAt: string;

@@ -532,3 +532,32 @@ export const getAvailableCarriers = async (shipmentId: string): Promise<{ succes
     };
   }
 };
+
+/**
+ * Get IDs of carriers already invited to a shipment
+ */
+export const getInvitedCarriers = async (shipmentId: string): Promise<{ success: boolean; carrierIds?: string[]; error?: string }> => {
+  try {
+    const response = await apiClient.get<{ success: boolean; data: string[] }>(
+      `${API_ENDPOINTS.SHIPMENTS.LIST}/${shipmentId}/invited-carriers`
+    );
+
+    if (response.data.success) {
+      return {
+        success: true,
+        carrierIds: response.data.data || [],
+      };
+    }
+
+    return {
+      success: false,
+      error: response.data.error || 'Échec de la récupération',
+    };
+  } catch (error) {
+    const apiError = handleApiError(error);
+    return {
+      success: false,
+      error: apiError.message,
+    };
+  }
+};

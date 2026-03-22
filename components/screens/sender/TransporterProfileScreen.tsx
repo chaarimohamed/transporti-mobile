@@ -80,8 +80,17 @@ const TransporterProfileScreen: React.FC<TransporterProfileScreenProps> = ({
   };
 
   const handleViewReviews = () => {
-    // TODO: Navigate to reviews screen
-    console.log('View reviews for transporter:', carrier.id);
+    if (!carrier.totalReviews || carrier.totalReviews === 0) {
+      Alert.alert(
+        'Avis clients',
+        'Ce transporteur n\'a pas encore reçu d\'avis.'
+      );
+    } else {
+      Alert.alert(
+        'Avis clients',
+        `Note moyenne : ${carrier.averageRating?.toFixed(1) ?? 'N/A'} / 5\nNombre d'avis : ${carrier.totalReviews}`
+      );
+    }
   };
 
   return (
@@ -124,6 +133,16 @@ const TransporterProfileScreen: React.FC<TransporterProfileScreenProps> = ({
           {carrier.verified && (
             <Badge status="success" text="Identité vérifiée" />
           )}
+
+          {/* Rating */}
+          <View style={styles.ratingRow}>
+            <Text style={styles.starIcon}>⭐</Text>
+            <Text style={styles.ratingText}>
+              {carrier.averageRating && carrier.averageRating > 0
+                ? `${carrier.averageRating.toFixed(1)} / 5  •  ${carrier.totalReviews ?? 0} avis`
+                : 'Pas encore évalué'}
+            </Text>
+          </View>
         </View>
 
         {/* Contact Info Card - Only shown after matching is confirmed */}
@@ -261,6 +280,20 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1A1A1A',
     marginBottom: 12,
+  },
+  ratingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+    gap: 4,
+  },
+  starIcon: {
+    fontSize: 16,
+  },
+  ratingText: {
+    fontSize: 14,
+    color: '#555555',
+    fontWeight: '500',
   },
   profileInfo: {
     alignItems: 'center',

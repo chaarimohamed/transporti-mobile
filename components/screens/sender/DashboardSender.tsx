@@ -267,7 +267,7 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
                         <Text style={styles.searchTransporterLink}>Chercher un transporteur →</Text>
                       </TouchableOpacity>
                     )}
-                    {shipment.status === 'CONFIRMED' && (
+                    {(shipment.status === 'CONFIRMED' || shipment.status === 'IN_TRANSIT' || shipment.status === 'DELIVERED') && (
                       <TouchableOpacity 
                         activeOpacity={0.7}
                         onPress={() => onNavigate?.('shipmentDetails', { id: shipment.id })}

@@ -26,8 +26,11 @@ const PaymentSuccessScreen: React.FC<PaymentSuccessScreenProps> = ({
 }) => {
   const missionId = route?.params?.missionId || '#12345';
   const shipmentId = route?.params?.shipmentId;
-  const amount = route?.params?.amount || 45;
-  const clientName = route?.params?.clientName || 'Ahmed Ben Ali';
+  const amount = route?.params?.mission?.price || route?.params?.amount || 45;
+  const mission = route?.params?.mission;
+  const clientName = mission?.sender
+    ? `${mission.sender.firstName} ${mission.sender.lastName}`
+    : route?.params?.clientName || 'Client';
   const receiptNumber = route?.params?.receiptNumber || 'RCP123';
   const currentDate = new Date().toLocaleDateString('fr-FR', {
     day: 'numeric',
@@ -71,6 +74,16 @@ const PaymentSuccessScreen: React.FC<PaymentSuccessScreenProps> = ({
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={handleBackToMissions}
+        >
+          <Text style={styles.backIcon}>←</Text>
+        </TouchableOpacity>
+        <View style={styles.headerSpacer} />
+      </View>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Success Icon */}
         <Animated.View
@@ -162,6 +175,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 8,
+    backgroundColor: '#FFFFFF',
+  },
+  backButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F6F6F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backIcon: {
+    fontSize: 20,
+    color: '#1A1A1A',
+  },
+  headerSpacer: {
+    flex: 1,
+  },
   scrollContent: {
     flexGrow: 1,
     padding: 24,
@@ -169,7 +205,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   successIconContainer: {
-    marginTop: 40,
+    marginTop: 16,
     marginBottom: 24,
   },
   successCircle: {

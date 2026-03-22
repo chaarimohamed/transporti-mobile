@@ -13,6 +13,7 @@ import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import BottomNav from '../../ui/BottomNav';
 import * as shipmentService from '../../../services/shipment.service';
+import * as notificationService from '../../../services/notification.service';
 import { Shipment } from '../../../services/shipment.service';
 
 interface MissionListScreenProps {
@@ -24,6 +25,7 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [invitedShipmentIds, setInvitedShipmentIds] = useState<Set<string>>(new Set());
 
   const filters = ['Toutes', 'Proches', 'Date', 'Prix'];
 
@@ -36,12 +38,26 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
       setLoading(true);
       setError('');
 
-      const result = await shipmentService.getAvailableShipments();
+      const [shipmentsResult, notifResult] = await Promise.all([
+        shipmentService.getAvailableShipments(),
+        notificationService.getNotifications(),
+      ]);
 
-      if (result.success && result.shipments) {
-        setShipments(result.shipments);
+      if (shipmentsResult.success && shipmentsResult.shipments) {
+        setShipments(shipmentsResult.shipments);
       } else {
-        setError(result.error || 'Erreur de chargement');
+        setError(shipmentsResult.error || 'Erreur de chargement');
+      }
+
+      // Build set of shipment IDs where this carrier has a pending invitation
+      if (notifResult.success && notifResult.notifications) {
+        const ids = new Set<string>(
+          notifResult.notifications
+            .filter(n => n.type === 'SHIPMENT_INVITATION')
+            .map(n => n.shipmentId || n.data?.shipmentId)
+            .filter(Boolean) as string[]
+        );
+        setInvitedShipmentIds(ids);
       }
     } catch (err) {
       console.error('Error fetching shipments:', err);
@@ -121,7 +137,9 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
             </Text>
           </Card>
         ) : (
-          shipments.map((shipment) => (
+          shipments.map((shipment) => {
+            const isInvited = invitedShipmentIds.has(shipment.id);
+            return (
             <Card key={shipment.id} style={styles.missionCard}>
               <View style={styles.missionHeader}>
                 <View style={styles.routeContainer}>
@@ -143,7 +161,8 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
 
               <View style={styles.badgesContainer}>
                 <Badge status="neutral" text={shipment.cargo || 'Marchandise'} />
-                {shipment.createdAt && new Date(shipment.createdAt) >= new Date(Date.now() - 86400000) && (
+                {isInvited && <Badge status="warning" text="Invité" />}
+                {!isInvited && shipment.createdAt && new Date(shipment.createdAt) >= new Date(Date.now() - 86400000) && (
                   <Badge status="warning" text="Nouveau" />
                 )}
               </View>
@@ -155,15 +174,25 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
                 >
                   <Text style={styles.detailsButtonText}>Détails</Text>
                 </Button>
-                <Button
-                  onPress={() => onNavigate?.('missionDetails', { id: shipment.id })}
-                  style={styles.acceptButton}
-                >
-                  <Text style={styles.acceptButtonText}>Postuler</Text>
-                </Button>
+                {isInvited ? (
+                  <Button
+                    onPress={() => onNavigate?.('notificationList')}
+                    style={styles.invitedButton}
+                  >
+                    <Text style={styles.invitedButtonText}>Invitation reçue 📬</Text>
+                  </Button>
+                ) : (
+                  <Button
+                    onPress={() => onNavigate?.('missionDetails', { id: shipment.id })}
+                    style={styles.acceptButton}
+                  >
+                    <Text style={styles.acceptButtonText}>Postuler</Text>
+                  </Button>
+                )}
               </View>
             </Card>
-          ))
+            );
+          })
         )}
       </ScrollView>
 
@@ -286,6 +315,17 @@ const styles = StyleSheet.create({
   acceptButtonText: {
     color: '#FFFFFF',
     fontSize: 14,
+    fontWeight: '600',
+  },
+  invitedButton: {
+    flex: 1,
+    backgroundColor: '#FFF3CD',
+    borderWidth: 1,
+    borderColor: '#FFC107',
+  },
+  invitedButtonText: {
+    color: '#856404',
+    fontSize: 13,
     fontWeight: '600',
   },
   loadingContainer: {
