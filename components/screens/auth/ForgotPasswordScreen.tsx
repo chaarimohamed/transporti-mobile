@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableOpacity } from 'react-native';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
 import { forgotPassword, resetPassword } from '../../../services/authService';
@@ -17,6 +17,17 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [devToken, setDevToken] = useState(''); // For development mode
+
+  const handleBack = () => {
+    if (step === 'reset') {
+      // Go back to the email step instead of leaving the screen
+      setStep('email');
+      setError('');
+      setResetToken('');
+    } else {
+      onNavigate('login');
+    }
+  };
 
   const handleRequestReset = async () => {
     setError('');
@@ -38,21 +49,14 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
       const result = await forgotPassword(email.trim());
 
       if (result.success) {
-        // If in development, show the token
         if (result.resetToken) {
           setDevToken(result.resetToken);
-          Alert.alert(
-            'Code de développement',
-            `Code: ${result.resetToken}\n\n(Ce code n'apparaîtra qu'en mode développement)`,
-            [{ text: 'OK' }]
-          );
         }
-        
-        Alert.alert(
-          'Succès',
-          result.message || 'Un code de réinitialisation a été envoyé à votre email',
-          [{ text: 'OK', onPress: () => setStep('reset') }]
-        );
+        // Single alert — embed the dev code in the message so it's visible immediately
+        const alertMsg = result.resetToken
+          ? `${result.message || 'Code généré.'}\n\n[🔧 Dev] Code : ${result.resetToken}`
+          : (result.message || 'Si un compte existe avec cet email, un code a été envoyé');
+        Alert.alert('Code envoyé', alertMsg, [{ text: 'OK', onPress: () => setStep('reset') }]);
       } else {
         setError(result.error || 'Erreur lors de la demande');
       }
@@ -106,6 +110,16 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
       style={styles.container} 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      {/* Back navigation bar — ← goes back to login (step email) or back to email step (step reset) */}
+      <View style={styles.topBar}>
+        <TouchableOpacity style={styles.backButton} onPress={handleBack} activeOpacity={0.7}>
+          <Text style={styles.backIcon}>←</Text>
+        </TouchableOpacity>
+        {step === 'reset' && (
+          <Text style={styles.topBarTitle}>Réinitialiser le mot de passe</Text>
+        )}
+      </View>
+
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <View style={styles.logo}>
@@ -202,12 +216,9 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>Vous vous souvenez de votre mot de passe ?</Text>
-            <Button 
-              variant="ghost" 
-              onPress={() => onNavigate('login')}
-            >
-              Se connecter
-            </Button>
+            <TouchableOpacity onPress={() => onNavigate('login')} activeOpacity={0.7}>
+              <Text style={styles.footerLink}>Se connecter</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -293,5 +304,36 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666666',
     marginBottom: 8,
+  },
+  footerLink: {
+    fontSize: 14,
+    color: '#1464F6',
+    fontWeight: '600',
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 12 : 16,
+    paddingBottom: 8,
+    minHeight: 52,
+  },
+  backButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F6F6F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backIcon: {
+    fontSize: 20,
+    color: '#1A1A1A',
+  },
+  topBarTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1A1A1A',
+    marginLeft: 12,
   },
 });

@@ -56,6 +56,13 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
       >
         {/* Progress Indicator */}
         <View style={styles.progressContainer}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => onNavigate?.('carrierRegister')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.backIcon}>←</Text>
+          </TouchableOpacity>
           <View style={styles.progressBar}>
             <View style={[styles.progressFill, { width: '33%' }]} />
           </View>
@@ -204,6 +211,19 @@ const styles = StyleSheet.create({
   progressContainer: {
     marginTop: 32,
     marginBottom: 24,
+  },
+  backButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F6F6F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  backIcon: {
+    fontSize: 20,
+    color: '#1A1A1A',
   },
   progressBar: {
     height: 4,

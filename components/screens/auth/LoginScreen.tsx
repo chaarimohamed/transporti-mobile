@@ -100,6 +100,24 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
               <Text style={styles.link}>Créer un compte</Text>
             </TouchableOpacity>
           </View>
+
+          {/* Legal disclaimer — BUG-09: must be TouchableOpacity links, not plain Text */}
+          <View style={styles.legalFooter}>
+            <Text style={styles.legalText}>En continuant, vous acceptez nos </Text>
+            <TouchableOpacity
+              onPress={() => onNavigate('termsAndConditions', { returnScreen: 'login' })}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.legalLink}>Conditions générales</Text>
+            </TouchableOpacity>
+            <Text style={styles.legalText}> et notre </Text>
+            <TouchableOpacity
+              onPress={() => onNavigate('privacySecurity', { returnScreen: 'login' })}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.legalLink}>Politique de confidentialité</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -182,5 +200,23 @@ const styles = StyleSheet.create({
     color: '#1464F6',
     fontSize: 14,
     fontWeight: '600',
+  },
+  legalFooter: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginTop: 20,
+    paddingHorizontal: 8,
+  },
+  legalText: {
+    fontSize: 12,
+    color: '#999999',
+    lineHeight: 18,
+  },
+  legalLink: {
+    fontSize: 12,
+    color: '#1464F6',
+    fontWeight: '500',
+    lineHeight: 18,
   },
 });
