@@ -209,7 +209,7 @@ const ApplicationListScreen: React.FC<ApplicationListScreenProps> = ({ onNavigat
       </ScrollView>
 
       {/* Bottom Navigation */}
-      <BottomNav active="notifs" role="sender" onNavigate={onNavigate} />
+      <BottomNav active="notifications" role="sender" onNavigate={onNavigate} />
     </SafeAreaView>
   );
 };

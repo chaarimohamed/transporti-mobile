@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { Card } from '../../ui/Card';
 import Badge from '../../ui/Badge';
-import * as missionService from '../../../services/mission.service';
+import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 
 interface PaymentHistoryScreenProps {
@@ -44,15 +44,15 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
       setLoading(true);
       
       // Fetch all missions for the carrier
-      const result = await missionService.getMyMissions();
+      const result = await shipmentService.getMyShipments();
       
-      if (result.success && result.missions) {
-        setMissions(result.missions);
+      if (result.success && result.shipments) {
+        setMissions(result.shipments);
         
         // Calculate stats
-        const deliveredMissions = result.missions.filter(m => m.status === 'DELIVERED');
+        const deliveredMissions = result.shipments.filter(m => m.status === 'DELIVERED');
         const totalEarnings = deliveredMissions.reduce((sum, m) => sum + m.price, 0);
-        const totalMissions = result.missions.filter(m => 
+        const totalMissions = result.shipments.filter(m => 
           m.status !== 'CANCELLED' && m.status !== 'PENDING'
         ).length;
         const successRate = totalMissions > 0 

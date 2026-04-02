@@ -8,12 +8,14 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Alert,
+  Platform,
 } from 'react-native';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import * as missionService from '../../../services/mission.service';
-import { Mission } from '../../../services/mission.service';
+import * as shipmentService from '../../../services/shipment.service';
+import { Shipment } from '../../../services/shipment.service';
 
 interface UpdateStatusScreenProps {
   route?: { params?: { id?: string } };
@@ -34,7 +36,7 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
   onNavigate,
 }) => {
   const missionId = route?.params?.id;
-  const [mission, setMission] = useState<Mission | null>(null);
+  const [mission, setMission] = useState<Shipment | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -53,21 +55,21 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
       setLoading(true);
       setError('');
 
-      const result = await missionService.getMissionById(missionId);
+      const result = await shipmentService.getShipmentById(missionId);
 
-      if (result.success && result.mission) {
-        console.log('📦 Mission loaded:', result.mission);
-        console.log('📊 Mission status:', result.mission.status);
-        setMission(result.mission);
+      if (result.success && result.shipment) {
+        console.log('📦 Shipment loaded:', result.shipment);
+        console.log('📊 Shipment status:', result.shipment.status);
+        setMission(result.shipment);
         
-        // Determine current step based on mission status
-        if (result.mission.status === 'CONFIRMED') {
+        // Determine current step based on shipment status
+        if (result.shipment.status === 'CONFIRMED') {
           setCurrentStep('PICKUP');
-        } else if (result.mission.status === 'HANDOVER_PENDING') {
+        } else if (result.shipment.status === 'HANDOVER_PENDING') {
           setCurrentStep('HANDOVER_PENDING');
-        } else if (result.mission.status === 'IN_TRANSIT') {
+        } else if (result.shipment.status === 'IN_TRANSIT') {
           setCurrentStep('IN_TRANSIT');
-        } else if (result.mission.status === 'DELIVERED') {
+        } else if (result.shipment.status === 'DELIVERED') {
           setCurrentStep('DELIVERED');
         }
       } else {
@@ -89,52 +91,50 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
 
     console.log('🚀 handleStartMission called with missionId:', missionId);
 
-    // Use window.confirm for web compatibility
-    const confirmed = typeof window !== 'undefined' && typeof window.confirm === 'function'
-      ? window.confirm('Confirmez-vous avoir récupéré la marchandise ?')
-      : true; // Auto-confirm on native if Alert doesn't work
+    const doStart = async () => {
+      try {
+        setSubmitting(true);
+        console.log('📡 Calling updateMissionStatus...');
+        const result = await missionService.updateMissionStatus(
+          missionId,
+          'IN_TRANSIT'
+        );
 
-    if (!confirmed) {
-      console.log('❌ User cancelled');
-      return;
-    }
+        console.log('✅ Result:', result);
 
-    try {
-      setSubmitting(true);
-      console.log('📡 Calling updateMissionStatus...');
-      const result = await missionService.updateMissionStatus(
-        missionId,
-        'IN_TRANSIT'
+        if (result.success) {
+          // Update the mission state immediately
+          if (result.mission) {
+            setMission(result.mission as unknown as Shipment);
+          }
+          // Backend now sets HANDOVER_PENDING (waiting for sender to confirm handover)
+          setCurrentStep('HANDOVER_PENDING');
+          console.log('✅ Status updated to HANDOVER_PENDING — awaiting sender confirmation');
+          Alert.alert('Récupération confirmée', 'En attente de confirmation de l\'expéditeur.');
+        } else {
+          console.log('❌ Error:', result.error);
+          Alert.alert('Erreur', result.error || 'Échec de la mise à jour');
+        }
+      } catch (err) {
+        console.error('Error starting mission:', err);
+        Alert.alert('Erreur', 'Erreur de connexion. Veuillez réessayer.');
+      } finally {
+        setSubmitting(false);
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm('Confirmez-vous avoir récupéré la marchandise ?');
+      if (confirmed) doStart();
+    } else {
+      Alert.alert(
+        'Confirmer la récupération',
+        'Confirmez-vous avoir récupéré la marchandise ?',
+        [
+          { text: 'Annuler', style: 'cancel' },
+          { text: 'Confirmer', onPress: doStart },
+        ]
       );
-
-      console.log('✅ Result:', result);
-
-      if (result.success) {
-        // Update the mission state immediately
-        if (result.mission) {
-          setMission(result.mission);
-        }
-        // Backend now sets HANDOVER_PENDING (waiting for sender to confirm handover)
-        setCurrentStep('HANDOVER_PENDING');
-        console.log('✅ Status updated to HANDOVER_PENDING — awaiting sender confirmation');
-        
-        // Show informational message
-        if (typeof window !== 'undefined' && typeof window.alert === 'function') {
-          window.alert('En attente de confirmation de l\'expéditeur');
-        }
-      } else {
-        console.log('❌ Error:', result.error);
-        if (typeof window !== 'undefined' && typeof window.alert === 'function') {
-          window.alert(result.error || 'Échec de la mise à jour');
-        }
-      }
-    } catch (err) {
-      console.error('Error starting mission:', err);
-      if (typeof window !== 'undefined' && typeof window.alert === 'function') {
-        window.alert('Erreur de connexion');
-      }
-    } finally {
-      setSubmitting(false);
     }
   };
 

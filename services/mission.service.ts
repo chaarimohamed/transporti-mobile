@@ -8,7 +8,7 @@ export interface Mission {
   cargo: string;
   price: number;
   date: string;
-  status: 'PENDING' | 'REQUESTED' | 'CONFIRMED' | 'IN_TRANSIT' | 'DELIVERED' | 'CANCELLED';
+  status: 'PENDING' | 'REQUESTED' | 'CONFIRMED' | 'HANDOVER_PENDING' | 'IN_TRANSIT' | 'DELIVERED' | 'CANCELLED';
   description?: string;
   carrierId?: string;
   carrier?: {

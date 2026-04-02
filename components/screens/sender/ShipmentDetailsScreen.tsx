@@ -438,6 +438,14 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
                   <Text style={styles.requestSubtitle}>En attente de votre décision</Text>
                 </View>
               </View>
+
+              <TouchableOpacity
+                style={styles.viewApplicationButton}
+                onPress={() => onNavigate?.('applicationDetails', { shipment })}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.viewApplicationButtonText}>👁 Voir la candidature →</Text>
+              </TouchableOpacity>
               
               <View style={styles.requestActions}>
                 <TouchableOpacity 
@@ -517,19 +525,18 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
 
       {/* Bottom Actions */}
       <View style={styles.bottomActions}>
-        {shipment.status === 'PENDING' || shipment.status === 'IN_TRANSIT' ? (
-          <>
-            <Button style={styles.trackButton} onPress={() => {}}>
-              <Text style={styles.trackButtonText}>Suivre la livraison</Text>
-            </Button>
-            <Button
-              style={styles.cancelButton}
-              onPress={handleCancelShipment}
-              disabled={loading}
-            >
-              <Text style={styles.cancelButtonText}>Annuler l'expédition</Text>
-            </Button>
-          </>
+        {(shipment.status === 'PENDING' || shipment.status === 'REQUESTED') ? (
+          <Button
+            style={styles.cancelButton}
+            onPress={handleCancelShipment}
+            disabled={loading}
+          >
+            <Text style={styles.cancelButtonText}>Annuler l'expédition</Text>
+          </Button>
+        ) : shipment.status === 'IN_TRANSIT' ? (
+          <Button style={styles.trackButton} onPress={() => {}}>
+            <Text style={styles.trackButtonText}>Suivre la livraison</Text>
+          </Button>
         ) : (
           <Button onPress={() => onNavigate?.('dashboard')}>
             <Text style={styles.backButtonText}>Retour au dashboard</Text>
