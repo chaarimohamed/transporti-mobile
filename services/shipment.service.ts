@@ -30,6 +30,20 @@ export interface Shipment {
     firstName: string;
     lastName: string;
     phone: string;
+    gouvernerat?: string;
+    averageRating?: number;
+    totalReviews?: number;
+    vehicleType?: string;
+  };
+  requestedCarrier?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    gouvernerat?: string;
+    averageRating?: number;
+    totalReviews?: number;
+    vehicleType?: string;
   };
 }
 

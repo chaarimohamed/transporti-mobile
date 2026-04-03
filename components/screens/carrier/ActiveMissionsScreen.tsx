@@ -42,9 +42,13 @@ const ActiveMissionsScreen: React.FC<ActiveMissionsScreenProps> = ({
       const result = await shipmentService.getMyShipments();
 
       if (result.success && result.shipments) {
-        // Filter to only show confirmed and in transit
+        // Show all active statuses: applied, confirmed, handover pending, in transit
         const activeShipments = result.shipments.filter(
-          (s) => s.status === 'CONFIRMED' || s.status === 'IN_TRANSIT'
+          (s) =>
+            s.status === 'REQUESTED' ||
+            s.status === 'CONFIRMED' ||
+            s.status === 'HANDOVER_PENDING' ||
+            s.status === 'IN_TRANSIT'
         );
         setShipments(activeShipments);
       } else {
@@ -79,15 +83,27 @@ const ActiveMissionsScreen: React.FC<ActiveMissionsScreenProps> = ({
 
   const getStatusConfig = (status: string) => {
     switch (status) {
+      case 'REQUESTED':
+        return {
+          text: 'Appliqué',
+          borderColor: '#8B5CF6',
+          bgColor: '#F5F3FF',
+        };
       case 'CONFIRMED':
         return {
-          text: 'confirmée',
+          text: 'Confirmée',
           borderColor: '#3B82F6',
           bgColor: '#EFF6FF',
         };
+      case 'HANDOVER_PENDING':
+        return {
+          text: 'Remise en attente',
+          borderColor: '#F97316',
+          bgColor: '#FFF7ED',
+        };
       case 'IN_TRANSIT':
         return {
-          text: 'en transit',
+          text: 'En transit',
           borderColor: '#F59E0B',
           bgColor: '#FEF3C7',
         };

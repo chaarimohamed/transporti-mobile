@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
+  Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
 import { Dropdown } from '../../ui/Dropdown';
@@ -25,22 +27,53 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date(2000, 0, 1));
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [gouvernorat, setGouvernorat] = useState('');
   const [vehicleType, setVehicleType] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      setFirstName(user.firstName || '');
-      setLastName(user.lastName || '');
-      setEmail(user.email || '');
-      setPhone(user.phone || '');
-      // BUG-06 fix: pre-populate carrier-specific fields stored at registration
-      setGouvernorat(user.gouvernerat || '');
+  const parseDateString = (str: string): Date => {
+    if (!str) return new Date(2000, 0, 1);
+    const parts = str.split('/');
+    if (parts.length !== 3) return new Date(2000, 0, 1);
+    const [day, month, year] = parts.map(Number);
+    const d = new Date(year, month - 1, day);
+    return isNaN(d.getTime()) ? new Date(2000, 0, 1) : d;
+  };
+
+  const formatDateToString = (date: Date): string => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const populateForm = (u: any) => {
+    setFirstName(u.firstName || '');
+    setLastName(u.lastName || '');
+    setEmail(u.email || '');
+    setPhone(u.phone || '');
+    setGouvernorat(u.gouvernerat || '');
+    setVehicleType(u.vehicleType || '');
+    if (u.dateOfBirth) {
+      setDateOfBirth(u.dateOfBirth);
+      setSelectedDate(parseDateString(u.dateOfBirth));
     }
-  }, [user]);
+  };
+
+  useEffect(() => {
+    // Populate from cached user immediately, then refresh from server
+    if (user) populateForm(user);
+    authService.getMe().then((result) => {
+      if (result.success && result.user) {
+        populateForm(result.user);
+        if (updateUser) updateUser(result.user);
+      }
+    });
+  }, []);
 
   const gouvernoratOptions = [
     { label: 'Tunis', value: 'TUNIS' },
@@ -93,6 +126,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
         ...(dateOfBirth && { dateOfBirth }),
         // BUG-05 fix: send carrier-specific fields so the backend persists them
         ...(gouvernorat && { gouvernorat }),
+        ...(vehicleType && { vehicleType }),
       });
       
       if (result.success && result.user) {
@@ -185,13 +219,43 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
           </View>
 
           {/* Date of Birth */}
-          <Input
-            label="Date de naissance"
-            placeholder="JJ/MM/AAAA"
-            value={dateOfBirth}
-            onChangeText={setDateOfBirth}
-            keyboardType="numeric"
-          />
+          <View>
+            <Text style={styles.dateLabel}>Date de naissance</Text>
+            <TouchableOpacity
+              style={styles.dateButton}
+              onPress={() => setShowDatePicker(true)}
+              activeOpacity={0.7}
+            >
+              <Text style={dateOfBirth ? styles.dateButtonText : styles.dateButtonPlaceholder}>
+                {dateOfBirth || 'JJ/MM/AAAA'}
+              </Text>
+              <Text style={styles.dateIcon}>📅</Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={selectedDate}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                maximumDate={new Date()}
+                minimumDate={new Date(1920, 0, 1)}
+                onChange={(_, date) => {
+                  if (Platform.OS === 'android') setShowDatePicker(false);
+                  if (date) {
+                    setSelectedDate(date);
+                    setDateOfBirth(formatDateToString(date));
+                  }
+                }}
+              />
+            )}
+            {showDatePicker && Platform.OS === 'ios' && (
+              <TouchableOpacity
+                style={styles.dateConfirmButton}
+                onPress={() => setShowDatePicker(false)}
+              >
+                <Text style={styles.dateConfirmText}>Confirmer</Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
           {/* Email */}
           <Input
@@ -385,6 +449,44 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 8,
     textAlign: 'right',
+  },
+  dateLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#444444',
+    marginBottom: 8,
+  },
+  dateButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E9E9E9',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 18,
+  },
+  dateButtonText: {
+    fontSize: 15,
+    color: '#1A1A1A',
+  },
+  dateButtonPlaceholder: {
+    fontSize: 15,
+    color: '#AAAAAA',
+  },
+  dateIcon: {
+    fontSize: 18,
+  },
+  dateConfirmButton: {
+    marginTop: 8,
+    alignItems: 'flex-end',
+    paddingRight: 4,
+  },
+  dateConfirmText: {
+    fontSize: 14,
+    color: '#1464F6',
+    fontWeight: '600',
   },
   buttonContainer: {
     marginTop: 32,

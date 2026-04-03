@@ -141,7 +141,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
   };
 
   const handleRejectCarrier = async (shipment: Shipment) => {
-    const confirmMsg = 'Voulez-vous refuser ce transporteur ? L\'expédition sera supprimée.';
+    const confirmMsg = 'Voulez-vous refuser ce transporteur ? ';
     
     const onConfirm = async () => {
       try {
@@ -228,23 +228,55 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
             </Text>
 
             <View style={styles.applicationsList}>
-              {applications.map((application) => (
+              {applications.map((application) => {
+                const appCarrier = application.requestedCarrier;
+                const initials = appCarrier
+                  ? `${appCarrier.firstName?.[0] ?? ''}${appCarrier.lastName?.[0] ?? ''}`
+                  : 'TR';
+                return (
                 <Card key={application.id} style={styles.applicationCard}>
-                  <View style={styles.applicationHeader}>
-                    <View style={styles.applicationAvatar}>
-                      <Text style={styles.applicationAvatarText}>TR</Text>
-                    </View>
-                    <View style={styles.applicationInfo}>
-                      <Text style={styles.applicationName}>Transporteur #{application.requestedCarrierId?.slice(0, 6)}</Text>
-                      <View style={styles.applicationMeta}>
-                        <Text style={styles.starIcon}>⭐</Text>
-                        <Text style={styles.applicationRating}>4.8</Text>
-                        <Text style={styles.applicationDivider}>•</Text>
-                        <Text style={styles.applicationText}>En attente</Text>
+                  {/* Tapping the carrier info navigates to their profile */}
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => appCarrier && onNavigate?.('transporterProfile', {
+                      transporter: appCarrier,
+                      shipmentId,
+                      shipmentRefNumber: currentShipment?.refNumber,
+                      shipmentStatus: currentShipment?.status,
+                    })}
+                  >
+                    <View style={styles.applicationHeader}>
+                      <View style={styles.applicationAvatar}>
+                        <Text style={styles.applicationAvatarText}>{initials}</Text>
                       </View>
+                      <View style={styles.applicationInfo}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                          <Text style={styles.applicationName}>
+                            {appCarrier
+                              ? `${appCarrier.firstName} ${appCarrier.lastName}`
+                              : `Transporteur #${application.requestedCarrierId?.slice(0, 6)}`}
+                          </Text>
+                          {appCarrier && <Text style={{ fontSize: 12, color: '#1464F6' }}>›</Text>}
+                        </View>
+                        <View style={styles.applicationMeta}>
+                          <Text style={styles.starIcon}>⭐</Text>
+                          <Text style={styles.applicationRating}>
+                            {appCarrier?.averageRating && appCarrier.averageRating > 0
+                              ? appCarrier.averageRating.toFixed(1)
+                              : 'N/A'}
+                          </Text>
+                          <Text style={styles.applicationDivider}>•</Text>
+                          <Text style={styles.applicationText}>En attente</Text>
+                        </View>
+                        {appCarrier?.gouvernerat && (
+                          <Text style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
+                            📍 {appCarrier.gouvernerat}
+                          </Text>
+                        )}
+                      </View>
+                      <Text style={styles.applicationPrice}>{application.price} DT</Text>
                     </View>
-                    <Text style={styles.applicationPrice}>{application.price} DT</Text>
-                  </View>
+                  </TouchableOpacity>
 
                   <View style={styles.applicationActions}>
                     <TouchableOpacity
@@ -273,7 +305,8 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
                     </TouchableOpacity>
                   </View>
                 </Card>
-              ))}
+                );
+              })}
             </View>
           </View>
         )}

@@ -5,10 +5,12 @@ export interface User {
   lastName: string;
   phone: string;
   role: 'sender' | 'carrier';
+  dateOfBirth?: string;
   // Carrier-specific fields
   gouvernerat?: string;
   license?: string;
   matricule?: string;
+  vehicleType?: string;
   verified?: boolean;
   // Timestamps
   createdAt: string;
@@ -32,9 +34,11 @@ export interface RegisterData {
   lastName: string;
   phone: string;
   role: 'sender' | 'carrier';
+  dateOfBirth?: string;
   gouvernerat?: string;
   license?: string;
   matricule?: string;
+  vehicleType?: string;
 }
 
 export interface AuthContextType {

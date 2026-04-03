@@ -20,11 +20,11 @@ const getBaseUrl = () => {
   if (isDevelopment) {
     // Android emulator uses 10.0.2.2 to reach the host machine
     if (Platform.OS === 'android') {
-      return 'http://10.0.2.2:3000/api';
+      return 'https://unperceptional-unvaguely-ervin.ngrok-free.dev/api';
     }
 
     // iOS simulator or web
-    return 'http://localhost:3000/api';
+    return 'https://unperceptional-unvaguely-ervin.ngrok-free.dev/api';
   }
 
   // Production: Replace with your actual backend URL

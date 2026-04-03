@@ -7,7 +7,9 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
+  Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -24,14 +26,44 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date(2000, 0, 1));
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const parseDateString = (str: string): Date => {
+    if (!str) return new Date(2000, 0, 1);
+    const parts = str.split('/');
+    if (parts.length !== 3) return new Date(2000, 0, 1);
+    const [day, month, year] = parts.map(Number);
+    const d = new Date(year, month - 1, day);
+    return isNaN(d.getTime()) ? new Date(2000, 0, 1) : d;
+  };
+
+  const formatDateToString = (date: Date): string => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
+  const populateForm = (u: any) => {
+    setFirstName(u.firstName || '');
+    setLastName(u.lastName || '');
+    setEmail(u.email || '');
+    setPhone(u.phone || '');
+    if (u.dateOfBirth) {
+      setDateOfBirth(u.dateOfBirth);
+      setSelectedDate(parseDateString(u.dateOfBirth));
+    }
+  };
 
   useEffect(() => {
     if (user) {
       setFirstName(user.firstName || '');
       setLastName(user.lastName || '');
+      setDateOfBirth(user.dateOfBirth || '');
       setEmail(user.email || '');
       setPhone(user.phone || '');
     }
@@ -144,13 +176,43 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
           </View>
 
           {/* Date of Birth */}
-          <Input
-            label="Date de naissance"
-            placeholder="JJ/MM/AAAA"
-            value={dateOfBirth}
-            onChangeText={setDateOfBirth}
-            keyboardType="numeric"
-          />
+          <View>
+            <Text style={styles.dateLabel}>Date de naissance</Text>
+            <TouchableOpacity
+              style={styles.dateButton}
+              onPress={() => setShowDatePicker(true)}
+              activeOpacity={0.7}
+            >
+              <Text style={dateOfBirth ? styles.dateButtonText : styles.dateButtonPlaceholder}>
+                {dateOfBirth || 'JJ/MM/AAAA'}
+              </Text>
+              <Text style={styles.dateIcon}>📅</Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={selectedDate}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                maximumDate={new Date()}
+                minimumDate={new Date(1920, 0, 1)}
+                onChange={(_, date) => {
+                  if (Platform.OS === 'android') setShowDatePicker(false);
+                  if (date) {
+                    setSelectedDate(date);
+                    setDateOfBirth(formatDateToString(date));
+                  }
+                }}
+              />
+            )}
+            {showDatePicker && Platform.OS === 'ios' && (
+              <TouchableOpacity
+                style={styles.dateConfirmButton}
+                onPress={() => setShowDatePicker(false)}
+              >
+                <Text style={styles.dateConfirmText}>Confirmer</Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
           {/* Email */}
           <Input
@@ -326,6 +388,44 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginTop: 8,
     textAlign: 'right',
+  },
+  dateLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#444444',
+    marginBottom: 8,
+  },
+  dateButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E9E9E9',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 18,
+  },
+  dateButtonText: {
+    fontSize: 15,
+    color: '#1A1A1A',
+  },
+  dateButtonPlaceholder: {
+    fontSize: 15,
+    color: '#AAAAAA',
+  },
+  dateIcon: {
+    fontSize: 18,
+  },
+  dateConfirmButton: {
+    marginTop: 8,
+    alignItems: 'flex-end',
+    paddingRight: 4,
+  },
+  dateConfirmText: {
+    fontSize: 14,
+    color: '#1464F6',
+    fontWeight: '600',
   },
   buttonContainer: {
     marginTop: 32,
