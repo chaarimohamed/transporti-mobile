@@ -8,10 +8,13 @@ import {
   SafeAreaView,
   TextInput,
   Platform,
+  Alert,
 } from 'react-native';
+import * as Location from 'expo-location';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
+import { Dropdown } from '../../ui/Dropdown';
 import { AddressAutocomplete } from '../../ui/AddressAutocomplete';
 import { AddressDetails } from '../../../services/googlePlaces.service';
 
@@ -26,7 +29,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
 }) => {
   const [pickupAddress, setPickupAddress] = useState('');
   const [pickupCoordinates, setPickupCoordinates] = useState<{ lat: number; lng: number } | null>(null);
-  const [meetingPoint, setMeetingPoint] = useState('vehicle'); // 'vehicle' or 'home'
+  const [helperCount, setHelperCount] = useState(0);
   const [isNotSender, setIsNotSender] = useState(false);
   const [senderName, setSenderName] = useState('');
   const [senderPhone, setSenderPhone] = useState('');
@@ -40,8 +43,8 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
     if (initialData?.pickupCoordinates) {
       setPickupCoordinates(initialData.pickupCoordinates);
     }
-    if (initialData?.meetingPoint) {
-      setMeetingPoint(initialData.meetingPoint);
+    if (initialData?.helperCount !== undefined) {
+      setHelperCount(initialData.helperCount);
     }
     if (initialData?.isNotSender !== undefined) {
       setIsNotSender(initialData.isNotSender);
@@ -62,7 +65,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
       ...initialData,
       pickupAddress,
       pickupCoordinates,
-      meetingPoint,
+      helperCount,
       isNotSender,
       senderName,
       senderPhone,
@@ -78,6 +81,31 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
     });
   };
 
+  const handleGetCurrentLocation = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission refusée', "L'accès à la localisation est requis");
+      return;
+    }
+    try {
+      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+      const [place] = await Location.reverseGeocodeAsync({
+        latitude: loc.coords.latitude,
+        longitude: loc.coords.longitude,
+      });
+      if (place) {
+        const parts = [place.streetNumber, place.street, place.city, place.region].filter(Boolean);
+        const address = parts.join(', ');
+        setPickupAddress(address);
+        setPickupCoordinates({ lat: loc.coords.latitude, lng: loc.coords.longitude });
+      } else {
+        Alert.alert('Erreur', 'Impossible de déterminer votre adresse');
+      }
+    } catch {
+      Alert.alert('Erreur', 'Impossible d\'obtenir votre position');
+    }
+  };
+
   const isFormValid = pickupAddress && (!isNotSender || (senderName && senderPhone));
 
   return (
@@ -89,7 +117,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
             ...initialData,
             pickupAddress,
             pickupCoordinates,
-            meetingPoint,
+            helperCount,
             isNotSender,
             senderName,
             senderPhone,
@@ -104,6 +132,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
 
       {/* Address Input */}
       <View style={styles.addressSection}>
+        <Text style={styles.addressLabel}>Adresse de collecte</Text>
         <View style={styles.addressInputContainer}>
           <View style={styles.dotIndicator} />
           <View style={styles.inputWrapper}>
@@ -111,7 +140,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
               value={pickupAddress}
               onChangeText={setPickupAddress}
               onSelectAddress={handleSelectAddress}
-              placeholder="Adresse de collecte"
+              placeholder="Rechercher une adresse de collecte"
               iconText=""
             />
           </View>
@@ -120,71 +149,57 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
 
       {/* Content */}
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        {/* Current Location */}
-        <TouchableOpacity 
-          style={styles.locationButton} 
+        {/* GPS Current Location */}
+        <TouchableOpacity
+          style={styles.locationButton}
           activeOpacity={0.7}
-          onPress={() => onNavigate?.('mapPicker', { ...initialData, type: 'pickup' })}
+          onPress={handleGetCurrentLocation}
         >
           <View style={styles.locationIcon}>
             <Text style={styles.locationIconText}>📍</Text>
           </View>
           <View style={styles.locationInfo}>
             <Text style={styles.locationTitle}>Ma position actuelle</Text>
-            <Text style={styles.locationSubtitle}>Utiliser le GPS</Text>
+            <Text style={styles.locationSubtitle}>Remplir automatiquement via GPS</Text>
           </View>
         </TouchableOpacity>
 
-        {/* Meeting Point */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Où on se rencontre?</Text>
-          
-          <TouchableOpacity
-            style={[
-              styles.optionButton,
-              meetingPoint === 'vehicle' && styles.optionButtonActive,
-            ]}
-            onPress={() => setMeetingPoint('vehicle')}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[
-                styles.radioOuter,
-                meetingPoint === 'vehicle' && styles.radioOuterActive,
-              ]}
-            >
-              {meetingPoint === 'vehicle' && <View style={styles.radioInner} />}
-            </View>
-            <Text style={styles.optionText}>Près du véhicule</Text>
-          </TouchableOpacity>
+        {/* Map Picker */}
+        <TouchableOpacity
+          style={styles.locationButton}
+          activeOpacity={0.7}
+          onPress={() => onNavigate?.('mapPicker', {
+            ...initialData, type: 'pickup',
+            pickupAddress, pickupCoordinates, helperCount, isNotSender, senderName, senderPhone, pickupInstructions: instructions,
+          })}
+        >
+          <View style={styles.locationIcon}>
+            <Text style={styles.locationIconText}>🗺️</Text>
+          </View>
+          <View style={styles.locationInfo}>
+            <Text style={styles.locationTitle}>Utiliser la carte</Text>
+            <Text style={styles.locationSubtitle}>Choisir sur la carte interactive</Text>
+          </View>
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.optionButton,
-              meetingPoint === 'home' && styles.optionButtonActive,
+        {/* Helper */}
+        <View style={styles.section}>
+          <Dropdown
+            label="Besoin d'aide ?"
+            value={String(helperCount)}
+            onValueChange={(val) => setHelperCount(parseInt(val))}
+            options={[
+              { label: 'Non', value: '0' },
+              { label: '1 personne (+15 DT)', value: '1' },
+              { label: '2 personnes (+30 DT)', value: '2' },
             ]}
-            onPress={() => setMeetingPoint('home')}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[
-                styles.radioOuter,
-                meetingPoint === 'home' && styles.radioOuterActive,
-              ]}
-            >
-              {meetingPoint === 'home' && <View style={styles.radioInner} />}
-            </View>
-            <View style={styles.optionTextContainer}>
-              <Text style={styles.optionText}>Chez vous</Text>
-              <Text style={styles.optionSubtext}>Frais 15DT</Text>
-            </View>
-          </TouchableOpacity>
+          />
         </View>
 
         {/* Not Sender Toggle */}
         <View style={styles.section}>
           <View style={styles.toggleRow}>
-            <Text style={styles.toggleLabel}>Vous n'êtes pas l'expéditeur?</Text>
+            <Text style={styles.toggleLabel}>J'ai les coordonnées de l'expéditeur</Text>
             <TouchableOpacity
               style={[styles.toggle, isNotSender && styles.toggleActive]}
               onPress={() => setIsNotSender(!isNotSender)}
@@ -296,9 +311,17 @@ const styles = StyleSheet.create({
   },
   addressSection: {
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: 10,
+    paddingBottom: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#E9E9E9',
+  },
+  addressLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#666666',
+    letterSpacing: 0.5,
+    marginBottom: 8,
   },
   addressInputContainer: {
     flexDirection: 'row',

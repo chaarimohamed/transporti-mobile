@@ -11,6 +11,7 @@ interface InputProps {
   error?: string;
   icon?: React.ReactNode;
   isPassword?: boolean;
+  maxLength?: number;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -23,6 +24,7 @@ export const Input: React.FC<InputProps> = ({
   error,
   icon,
   isPassword = false,
+  maxLength,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -40,6 +42,7 @@ export const Input: React.FC<InputProps> = ({
           onChangeText={onChangeText}
           secureTextEntry={isPassword ? !showPassword : secureTextEntry}
           keyboardType={keyboardType}
+          maxLength={maxLength}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
         />

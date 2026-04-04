@@ -1,14 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
 import { useAuth } from '../../../contexts/AuthContext';
 
 interface SenderRegisterScreenProps {
-  onNavigate: (screen: string) => void;
+  onNavigate: (screen: string, params?: any) => void;
+  initialData?: any;
 }
 
-export const SenderRegisterScreen: React.FC<SenderRegisterScreenProps> = ({ onNavigate }) => {
+// Validation helpers (same rules as CarrierRegisterScreen)
+const isValidEmail = (val: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
+// Tunisian phone: 8 digits, optionally prefixed by +216 (with optional space/dash)
+const isValidPhone = (val: string) => /^(\+216[\s-]?)?\d{8}$/.test(val.replace(/\s/g, ''));
+// Strong password: min 8 chars, at least 1 uppercase, 1 lowercase, 1 digit, 1 special char
+const isStrongPassword = (val: string) =>
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(val);
+
+export const SenderRegisterScreen: React.FC<SenderRegisterScreenProps> = ({ onNavigate, initialData }) => {
   const { register } = useAuth();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -19,24 +28,69 @@ export const SenderRegisterScreen: React.FC<SenderRegisterScreenProps> = ({ onNa
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  // Restore form data when returning from Terms / Privacy screens
+  useEffect(() => {
+    if (initialData?.formData) {
+      const fd = initialData.formData;
+      if (fd.firstName !== undefined) setFirstName(fd.firstName);
+      if (fd.lastName !== undefined) setLastName(fd.lastName);
+      if (fd.phone !== undefined) setPhone(fd.phone);
+      if (fd.email !== undefined) setEmail(fd.email);
+      if (fd.password !== undefined) setPassword(fd.password);
+      if (fd.confirmPassword !== undefined) setConfirmPassword(fd.confirmPassword);
+      if (fd.acceptedTerms !== undefined) setAcceptedTerms(fd.acceptedTerms);
+    }
+  }, []);
+
+  const currentFormData = () => ({
+    firstName, lastName, phone, email, password, confirmPassword, acceptedTerms,
+  });
 
   const handleRegister = async () => {
-    // Clear previous errors
     setError('');
 
-    // Validate inputs
-    if (!firstName.trim() || !lastName.trim() || !phone.trim() || !email.trim() || !password.trim()) {
-      setError('Tous les champs sont obligatoires');
+    // Per-field validation
+    const errors: Record<string, string> = {};
+
+    if (!firstName.trim()) errors.firstName = 'Le prénom est obligatoire';
+    if (!lastName.trim()) errors.lastName = 'Le nom est obligatoire';
+
+    if (!phone.trim()) {
+      errors.phone = 'Le numéro de téléphone est obligatoire';
+    } else if (!isValidPhone(phone)) {
+      errors.phone = 'Numéro invalide — 8 chiffres requis (ex: +216 20 123 456)';
+    }
+
+    if (!email.trim()) {
+      errors.email = "L'email est obligatoire";
+    } else if (!isValidEmail(email)) {
+      errors.email = 'Adresse email invalide';
+    }
+
+    if (!password) {
+      errors.password = 'Le mot de passe est obligatoire';
+    } else if (!isStrongPassword(password)) {
+      errors.password = 'Min. 8 caractères avec majuscule, chiffre et caractère spécial';
+    }
+
+    if (!confirmPassword) {
+      errors.confirmPassword = 'Veuillez confirmer le mot de passe';
+    } else if (password !== confirmPassword) {
+      errors.confirmPassword = 'Les mots de passe ne correspondent pas';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setError('Veuillez corriger les erreurs ci-dessous');
       return;
     }
 
-    if (password !== confirmPassword) {
-      setError('Les mots de passe ne correspondent pas');
-      return;
-    }
+    setFieldErrors({});
 
     if (!acceptedTerms) {
-      setError('Vous devez accepter les conditions d\'utilisation');
+      setError("Vous devez accepter les conditions d'utilisation");
       return;
     }
 
@@ -52,7 +106,6 @@ export const SenderRegisterScreen: React.FC<SenderRegisterScreenProps> = ({ onNa
       });
 
       if (result.success) {
-        // Will auto-login and navigate to dashboard via AuthContext
         onNavigate('dashboard');
       } else {
         setError(result.error || 'Échec de l\'inscription');
@@ -92,17 +145,19 @@ export const SenderRegisterScreen: React.FC<SenderRegisterScreenProps> = ({ onNa
                 label="Prénom"
                 placeholder="Foulen"
                 value={firstName}
-                onChangeText={setFirstName}
+                onChangeText={(v) => { setFirstName(v); setFieldErrors(e => ({ ...e, firstName: '' })); }}
                 icon={<Text>👤</Text>}
               />
+              {fieldErrors.firstName ? <Text style={styles.fieldError}>{fieldErrors.firstName}</Text> : null}
             </View>
             <View style={styles.halfInput}>
               <Input
                 label="Nom"
                 placeholder="Ben Falten"
                 value={lastName}
-                onChangeText={setLastName}
+                onChangeText={(v) => { setLastName(v); setFieldErrors(e => ({ ...e, lastName: '' })); }}
               />
+              {fieldErrors.lastName ? <Text style={styles.fieldError}>{fieldErrors.lastName}</Text> : null}
             </View>
           </View>
 
@@ -110,35 +165,39 @@ export const SenderRegisterScreen: React.FC<SenderRegisterScreenProps> = ({ onNa
             label="Téléphone"
             placeholder="+216 XX XXX XXX"
             value={phone}
-            onChangeText={setPhone}
+            onChangeText={(v) => { setPhone(v); setFieldErrors(e => ({ ...e, phone: '' })); }}
             keyboardType="phone-pad"
             icon={<Text>📱</Text>}
           />
+          {fieldErrors.phone ? <Text style={styles.fieldError}>{fieldErrors.phone}</Text> : null}
 
           <Input
             label="Email"
             placeholder="foulen@exemple.com"
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(v) => { setEmail(v); setFieldErrors(e => ({ ...e, email: '' })); }}
             keyboardType="email-address"
             icon={<Text>✉️</Text>}
           />
+          {fieldErrors.email ? <Text style={styles.fieldError}>{fieldErrors.email}</Text> : null}
 
           <Input
             label="Mot de passe"
             placeholder="••••••••"
             value={password}
-            onChangeText={setPassword}
+            onChangeText={(v) => { setPassword(v); setFieldErrors(e => ({ ...e, password: '' })); }}
             isPassword
           />
+          {fieldErrors.password ? <Text style={styles.fieldError}>{fieldErrors.password}</Text> : null}
 
           <Input
             label="Confirmer mot de passe"
             placeholder="••••••••"
             value={confirmPassword}
-            onChangeText={setConfirmPassword}
+            onChangeText={(v) => { setConfirmPassword(v); setFieldErrors(e => ({ ...e, confirmPassword: '' })); }}
             isPassword
           />
+          {fieldErrors.confirmPassword ? <Text style={styles.fieldError}>{fieldErrors.confirmPassword}</Text> : null}
 
           <View style={styles.checkboxContainer}>
             <TouchableOpacity 
@@ -152,11 +211,11 @@ export const SenderRegisterScreen: React.FC<SenderRegisterScreenProps> = ({ onNa
                 J'accepte les{' '}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => onNavigate('termsAndConditions', { returnScreen: 'senderRegister' })}>
+            <TouchableOpacity onPress={() => onNavigate('termsAndConditions', { returnScreen: 'senderRegister', formData: currentFormData() })}>
               <Text style={styles.link}>Conditions générales</Text>
             </TouchableOpacity>
             <Text style={styles.checkboxLabel}>{' '}et la{' '}</Text>
-            <TouchableOpacity onPress={() => onNavigate('privacySecurity', { returnScreen: 'senderRegister' })}>
+            <TouchableOpacity onPress={() => onNavigate('privacySecurity', { returnScreen: 'senderRegister', formData: currentFormData() })}>
               <Text style={styles.link}>Politique de confidentialité</Text>
             </TouchableOpacity>
           </View>
@@ -231,6 +290,11 @@ const styles = StyleSheet.create({
   },
   halfInput: {
     flex: 1,
+  },
+  fieldError: {
+    color: '#D92D20',
+    fontSize: 12,
+    marginTop: 4,
   },
   checkboxContainer: {
     flexDirection: 'row',

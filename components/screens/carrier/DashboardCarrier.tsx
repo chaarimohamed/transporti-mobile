@@ -13,7 +13,6 @@ import {
   AppState,
 } from 'react-native';
 import { Card } from '../../ui/Card';
-import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import BottomNav from '../../ui/BottomNav';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -29,7 +28,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
   const { user, logout } = useAuth();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [stats, setStats] = useState({ assigned: 0, inProgress: 0, completed: 0 });
+  const [stats, setStats] = useState({ assigned: 0, applied: 0, inProgress: 0, completed: 0 });
   const [availableShipments, setAvailableShipments] = useState<Shipment[]>([]);
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -71,7 +70,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
       // Fetch stats, available shipments, completed shipments, and notifications in parallel
       const [statsResult, shipmentsResult, completedShipmentsResult, notifResult] = await Promise.all([
         shipmentService.getCarrierShipmentStats(),
-        shipmentService.getAvailableShipments('PENDING'), // Get all pending shipments (created by any sender)
+        shipmentService.getAvailableShipments('PENDING', user?.gouvernerat || undefined), // Filter by carrier's gouvernerat
         shipmentService.getMyShipments(), // Get carrier's shipments for earnings calculation
         notificationService.getUnreadCount(),
       ]);
@@ -84,12 +83,18 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
       } else {
         console.log('❌ Stats fetch failed:', statsResult.error);
         // Set default stats on error
-        setStats({ assigned: 0, inProgress: 0, completed: 0, total: 0 });
+        setStats({ assigned: 0, applied: 0, inProgress: 0, completed: 0, total: 0 });
       }
 
       if (shipmentsResult.success && shipmentsResult.shipments) {
+        const gouvernerat = user?.gouvernerat;
+        const filtered = gouvernerat
+          ? shipmentsResult.shipments.filter(s =>
+              s.from.toLowerCase().includes(gouvernerat.toLowerCase())
+            )
+          : shipmentsResult.shipments;
         // Show only first 3 shipments on dashboard
-        setAvailableShipments(shipmentsResult.shipments.slice(0, 3));
+        setAvailableShipments(filtered.slice(0, 3));
       }
 
       // Calculate earnings from completed shipments
@@ -204,15 +209,19 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
         }
       >
         {/* Dark KPI Card */}
-        <View style={styles.kpiCard}>
+        <TouchableOpacity
+          style={styles.kpiCard}
+          activeOpacity={0.8}
+          onPress={() => onNavigate?.('activeMissions')}
+        >
           <View style={styles.kpiContent}>
             <View>
-              <Text style={styles.kpiLabel}>Livraisons actives</Text>
+              <Text style={styles.kpiLabel}>Assignés</Text>
               <Text style={styles.kpiNumber}>{activeDeliveries}</Text>
             </View>
             <Text style={styles.truckIcon}>🚛</Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* Stats Grid */}
         <View style={styles.statsGrid}>
@@ -261,40 +270,37 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
             </Card>
           ) : (
             availableShipments.map((shipment) => (
-              <Card key={shipment.id} style={styles.missionCard}>
-                <View style={styles.missionHeader}>
-                  <Badge status="neutral" text={shipment.refNumber} />
-                  <View style={styles.dateTag}>
-                    <Text style={styles.calendarIcon}>📅</Text>
-                    <Text style={styles.dateText}>
-                      {new Date(shipment.createdAt).toLocaleDateString('fr-FR', {
-                        day: 'numeric',
-                        month: 'short',
-                      })}
-                    </Text>
+              <TouchableOpacity
+                key={shipment.id}
+                activeOpacity={0.8}
+                onPress={() => onNavigate?.('missionDetails', { id: shipment.id })}
+              >
+                <Card style={styles.missionCard}>
+                  <View style={styles.missionHeader}>
+                    <Badge status="neutral" text={shipment.refNumber} />
+                    <View style={styles.dateTag}>
+                      <Text style={styles.calendarIcon}>📅</Text>
+                      <Text style={styles.dateText}>
+                        {new Date(shipment.createdAt).toLocaleDateString('fr-FR', {
+                          day: 'numeric',
+                          month: 'short',
+                        })}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-                <View style={styles.missionRoute}>
-                  <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">{shipment.from}</Text>
-                  <Text style={styles.arrowIcon}>→</Text>
-                  <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">{shipment.to}</Text>
-                </View>
-                <Text style={styles.cargoText}>
-                  {shipment.cargo || shipment.description || 'Marchandise'}
-                </Text>
-                <View style={styles.missionFooter}>
-                  <Text style={styles.priceText}>{shipment.price} TND</Text>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    onPress={() => onNavigate?.('missionDetails', { shipment })}
-                  >
-                    <Text style={{ color: '#FFF', fontSize: 14, fontWeight: '600' }}>
-                      Voir détails
-                    </Text>
-                  </Button>
-                </View>
-              </Card>
+                  <View style={styles.missionRoute}>
+                    <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">{shipment.from}</Text>
+                    <Text style={styles.arrowIcon}>→</Text>
+                    <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">{shipment.to}</Text>
+                  </View>
+                  <Text style={styles.cargoText}>
+                    {shipment.cargo || shipment.description || 'Marchandise'}
+                  </Text>
+                  <View style={styles.missionFooter}>
+                    <Text style={styles.priceText}>{shipment.price} TND</Text>
+                  </View>
+                </Card>
+              </TouchableOpacity>
             ))
           )}
         </View>

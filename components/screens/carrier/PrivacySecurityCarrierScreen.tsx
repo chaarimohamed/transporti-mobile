@@ -11,11 +11,13 @@ import {
 interface PrivacySecurityCarrierScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
   returnScreen?: string;
+  formData?: any;
 }
 
 const PrivacySecurityCarrierScreen: React.FC<PrivacySecurityCarrierScreenProps> = ({
   onNavigate,
   returnScreen = 'profileCarrier',
+  formData,
 }) => {
   return (
     <SafeAreaView style={styles.container}>
@@ -23,7 +25,7 @@ const PrivacySecurityCarrierScreen: React.FC<PrivacySecurityCarrierScreenProps> 
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => onNavigate?.(returnScreen)}
+          onPress={() => onNavigate?.(returnScreen, formData ? { returnScreen, formData } : undefined)}
         >
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>

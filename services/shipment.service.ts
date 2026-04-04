@@ -45,6 +45,13 @@ export interface Shipment {
     totalReviews?: number;
     vehicleType?: string;
   };
+  // Only returned by the single-shipment detail endpoint (GET /api/shipments/:id)
+  // Not included in list responses to keep payloads small
+  packagePhotos?: string[];
+  helperCount?: number;
+  deliveryHelperCount?: number;
+  pickupMeetingPoint?: string;
+  deliveryMeetingPoint?: string;
 }
 
 export interface ShipmentStats {
@@ -55,9 +62,10 @@ export interface ShipmentStats {
 }
 
 export interface CarrierStats {
-  assigned: number;
-  inProgress: number;
-  completed: number;
+  assigned: number;   // CONFIRMED + IN_TRANSIT
+  applied: number;    // REQUESTED (applied, awaiting confirmation)
+  inProgress: number; // IN_TRANSIT only
+  completed: number;  // DELIVERED
   total: number;
 }
 
@@ -78,6 +86,23 @@ export interface CreateShipmentData {
   declaredValue?: number;
   insurance?: boolean;
   specialInstructions?: string;
+  packageFormat?: string;
+  // Pickup helper & meeting point
+  helperCount?: number;
+  pickupMeetingPoint?: string;
+  // Delivery helper & meeting point
+  deliveryHelperCount?: number;
+  deliveryMeetingPoint?: string;
+  // Sender contact (when not the logged-in user)
+  senderName?: string | null;
+  senderPhone?: string | null;
+  pickupInstructions?: string | null;
+  // Recipient contact
+  recipientName?: string | null;
+  recipientPhone?: string | null;
+  deliveryInstructions?: string | null;
+  // Package photos (base64 strings from Step 1)
+  packagePhotos?: string[];
 }
 
 /**
@@ -107,6 +132,27 @@ export const createShipment = async (data: CreateShipmentData): Promise<{ succes
       success: false,
       error: apiError.message,
     };
+  }
+};
+
+/**
+ * Upload package photos for an existing shipment.
+ * Uses a 2-minute timeout since photos can be large.
+ */
+export const uploadShipmentPhotos = async (
+  shipmentId: string,
+  photos: string[]
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const response = await apiClient.post(
+      API_ENDPOINTS.SHIPMENTS.PHOTOS(shipmentId),
+      { packagePhotos: photos },
+      { timeout: 120000 } // 2 min — photos can be large
+    );
+    return { success: response.data.success };
+  } catch (error) {
+    const apiError = handleApiError(error);
+    return { success: false, error: apiError.message };
   }
 };
 
@@ -142,11 +188,13 @@ export const getMyShipments = async (status?: string): Promise<{ success: boolea
 /**
  * Get all available shipments (for carriers)
  */
-export const getAvailableShipments = async (status?: string): Promise<{ success: boolean; shipments?: Shipment[]; error?: string }> => {
+export const getAvailableShipments = async (status?: string, gouvernerat?: string): Promise<{ success: boolean; shipments?: Shipment[]; error?: string }> => {
   try {
-    const url = status 
-      ? `${API_ENDPOINTS.SHIPMENTS.LIST}/available?status=${status}` 
-      : `${API_ENDPOINTS.SHIPMENTS.LIST}/available`;
+    const params = new URLSearchParams();
+    if (status) params.append('status', status);
+    if (gouvernerat) params.append('gouvernerat', gouvernerat);
+    const query = params.toString();
+    const url = `${API_ENDPOINTS.SHIPMENTS.LIST}/available${query ? `?${query}` : ''}`;
     
     const response = await apiClient.get<ApiResponse<Shipment[]>>(url);
 

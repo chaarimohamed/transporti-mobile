@@ -27,7 +27,7 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
   onNavigate,
   initialData,
 }) => {
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<{ uri: string; base64: string }[]>([]);
   const [pickupDate, setPickupDate] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [weightRange, setWeightRange] = useState('');
@@ -81,12 +81,15 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
-      quality: 0.8,
+      quality: 0.3,
       aspect: [4, 3],
+      base64: true,
     });
 
     if (!result.canceled && result.assets) {
-      const newPhotos = result.assets.map(asset => asset.uri);
+      const newPhotos = result.assets
+        .filter(asset => asset.base64)
+        .map(asset => ({ uri: asset.uri, base64: asset.base64! }));
       setPhotos([...photos, ...newPhotos]);
     }
   };
@@ -148,7 +151,7 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
 
             {photos.map((photo, index) => (
               <View key={index} style={styles.photoPreview}>
-                <Image source={{ uri: photo }} style={styles.photoImage} />
+                <Image source={{ uri: photo.uri }} style={styles.photoImage} />
                 <TouchableOpacity
                   style={styles.removePhotoButton}
                   onPress={() => handleRemovePhoto(index)}

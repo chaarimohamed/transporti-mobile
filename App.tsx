@@ -88,7 +88,7 @@ function AppContent() {
     if (user.role === 'sender') {
       switch (currentScreen) {
         case 'shipmentList':
-          return <ShipmentListScreen onNavigate={navigate} />;
+          return <ShipmentListScreen onNavigate={navigate} initialData={screenParams} />;
         case 'newShipment':
         case 'createShipmentStep1':
           return <CreateShipmentStep1 onNavigate={navigate} initialData={screenParams} />;
@@ -167,9 +167,9 @@ function AppContent() {
         case 'notificationSettingsCarrier':
           return <NotificationSettingsCarrierScreen onNavigate={navigate} />;
         case 'termsAndConditionsCarrier':
-          return <TermsAndConditionsCarrierScreen onNavigate={navigate} returnScreen={screenParams?.returnScreen} />;
+          return <TermsAndConditionsCarrierScreen onNavigate={navigate} returnScreen={screenParams?.returnScreen} formData={screenParams?.formData} />;
         case 'privacySecurityCarrier':
-          return <PrivacySecurityCarrierScreen onNavigate={navigate} returnScreen={screenParams?.returnScreen} />;
+          return <PrivacySecurityCarrierScreen onNavigate={navigate} returnScreen={screenParams?.returnScreen} formData={screenParams?.formData} />;
         default:
           return <DashboardCarrier onNavigate={navigate} />;
       }
@@ -192,21 +192,21 @@ function AppContent() {
       case 'senderRegister':
         return <SenderRegisterScreen onNavigate={navigate} />;
       case 'carrierRegister':
-        return <CarrierRegisterScreen onNavigate={navigate} />;
+        return <CarrierRegisterScreen onNavigate={navigate} initialData={screenParams} />;
       case 'carrierOnboarding2':
         return <CarrierOnboarding2Screen onNavigate={navigate} />;
       case 'carrierOnboarding3':
-        return <CarrierOnboarding3Screen onNavigate={navigate} />;
+        return <CarrierOnboarding3Screen onNavigate={navigate} initialData={screenParams} />;
       case 'carrierOnboarding4':
-        return <CarrierOnboarding4Screen onNavigate={navigate} />;
+        return <CarrierOnboarding4Screen onNavigate={navigate} initialData={screenParams} />;
       case 'termsAndConditions':
         return <TermsAndConditionsScreen onNavigate={navigate} returnScreen={screenParams?.returnScreen} />;
       case 'privacySecurity':
         return <PrivacySecurityScreen onNavigate={navigate} returnScreen={screenParams?.returnScreen} />;
       case 'termsAndConditionsCarrier':
-        return <TermsAndConditionsCarrierScreen onNavigate={navigate} returnScreen={screenParams?.returnScreen} />;
+        return <TermsAndConditionsCarrierScreen onNavigate={navigate} returnScreen={screenParams?.returnScreen} formData={screenParams?.formData} />;
       case 'privacySecurityCarrier':
-        return <PrivacySecurityCarrierScreen onNavigate={navigate} returnScreen={screenParams?.returnScreen} />;
+        return <PrivacySecurityCarrierScreen onNavigate={navigate} returnScreen={screenParams?.returnScreen} formData={screenParams?.formData} />;
       case 'verifyEmail':
         return (
           <View style={styles.dashboardContainer}>

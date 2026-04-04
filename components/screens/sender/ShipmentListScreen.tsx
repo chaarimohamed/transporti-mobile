@@ -17,10 +17,11 @@ import { Shipment } from '../../../services/shipment.service';
 
 interface ShipmentListScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
+  initialData?: { activeTab?: string };
 }
 
-const ShipmentListScreen: React.FC<ShipmentListScreenProps> = ({ onNavigate }) => {
-  const [activeTab, setActiveTab] = useState('Toutes');
+const ShipmentListScreen: React.FC<ShipmentListScreenProps> = ({ onNavigate, initialData }) => {
+  const [activeTab, setActiveTab] = useState(initialData?.activeTab ?? 'Toutes');
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

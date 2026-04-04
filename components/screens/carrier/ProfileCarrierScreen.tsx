@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,11 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Alert,
+  Image,
 } from 'react-native';
 import { useAuth } from '../../../contexts/AuthContext';
 import BottomNav from '../../ui/BottomNav';
+import * as authService from '../../../services/authService';
 
 interface ProfileCarrierScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
@@ -19,6 +21,15 @@ const ProfileCarrierScreen: React.FC<ProfileCarrierScreenProps> = ({
   onNavigate,
 }) => {
   const { user, logout } = useAuth();
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+
+  useEffect(() => {
+    authService.getProfilePhoto().then((res) => {
+      if (res.success && res.photoBase64) {
+        setPhotoUri(`data:image/jpeg;base64,${res.photoBase64}`);
+      }
+    });
+  }, []);
 
   const handleLogout = () => {
     Alert.alert(
@@ -81,9 +92,13 @@ const ProfileCarrierScreen: React.FC<ProfileCarrierScreenProps> = ({
       {/* Header with Profile Info */}
       <View style={styles.header}>
         <View style={styles.avatarContainer}>
-          <Text style={styles.avatarText}>
-            {user?.firstName?.[0]?.toUpperCase() || 'T'}
-          </Text>
+          {photoUri ? (
+            <Image source={{ uri: photoUri }} style={styles.avatarImage} />
+          ) : (
+            <Text style={styles.avatarText}>
+              {user?.firstName?.[0]?.toUpperCase() || 'T'}
+            </Text>
+          )}
         </View>
         <Text style={styles.name}>
           {user?.firstName || 'Transporteur'} {user?.lastName || ''}
@@ -169,6 +184,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
   },
   avatarText: {
     fontSize: 36,

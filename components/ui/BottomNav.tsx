@@ -20,15 +20,13 @@ const BottomNav: React.FC<BottomNavProps> = ({
   const senderItems = [
     { id: 'home', label: 'Accueil', icon: '🏠' },
     { id: 'shipments', label: 'Expéditions', icon: '📦' },
-    { id: 'notifications', label: 'Notifs', icon: '🔔' },
     { id: 'profile', label: 'Profil', icon: '👤' },
   ];
 
   const carrierItems = [
     { id: 'home', label: 'Accueil', icon: '🏠' },
-    { id: 'missions', label: 'Missions', icon: '🚛' },
-    { id: 'active', label: 'En cours', icon: '🕐' },
-    { id: 'notifications', label: 'Notifs', icon: '🔔' },
+    { id: 'missions', label: 'Opportunités', icon: '🚛' },
+    { id: 'active', label: 'Mes missions', icon: '🕐' },
     { id: 'history', label: 'Historique', icon: '📄' },
     { id: 'profile', label: 'Profil', icon: '👤' },
   ];
@@ -43,9 +41,6 @@ const BottomNav: React.FC<BottomNavProps> = ({
           break;
         case 'shipments':
           onNavigate?.('shipmentList');
-          break;
-        case 'notifications':
-          onNavigate?.('notificationListSender');
           break;
         case 'profile':
           onNavigate?.('profile');
@@ -63,9 +58,6 @@ const BottomNav: React.FC<BottomNavProps> = ({
           break;
         case 'active':
           onNavigate?.('activeMissions');
-          break;
-        case 'notifications':
-          onNavigate?.('notificationList');
           break;
         case 'history':
           onNavigate?.('paymentHistory');

@@ -31,10 +31,6 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
   const [width, setWidth] = useState(String(initialData?.dimensions?.width || ''));
   const [length, setLength] = useState(String(initialData?.dimensions?.length || ''));
   const [specialInstructions, setSpecialInstructions] = useState(initialData?.specialInstructions || '');
-  const [declaredValue, setDeclaredValue] = useState(
-    initialData?.declaredValue ? String(initialData.declaredValue) : ''
-  );
-  const [insurance, setInsurance] = useState(initialData?.insurance || false);
 
   const handleNext = () => {
     const data = {
@@ -42,8 +38,8 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
       format,
       dimensions: showDimensions ? { height, width, length } : null,
       specialInstructions,
-      declaredValue: declaredValue ? parseFloat(declaredValue) : 0,
-      insurance,
+      declaredValue: 0,
+      insurance: false,
     };
     onNavigate?.('createShipmentStep3', data);
   };
@@ -60,8 +56,8 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
             format,
             dimensions: showDimensions ? { height, width, length } : null,
             specialInstructions,
-            declaredValue: declaredValue ? parseFloat(declaredValue) : 0,
-            insurance,
+            declaredValue: 0,
+            insurance: false,
           })}
           style={styles.backButton}
         >
@@ -207,23 +203,7 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
           />
         </View>
 
-        {/* Declared Value */}
-        <View style={styles.section}>
-          <Text style={styles.label}>Valeur déclarée (TND)</Text>
-          <View style={styles.inputWithIcon}>
-            <Text style={styles.inputIconText}>💰</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Ex: 2500"
-              placeholderTextColor="#999"
-              value={declaredValue}
-              onChangeText={setDeclaredValue}
-              keyboardType="numeric"
-            />
-          </View>
-        </View>
-
-        {/* Insurance */}
+        {/* Insurance — always OFF */}
         <Card style={styles.insuranceCard}>
           <View style={styles.insuranceContent}>
             <View style={styles.insuranceIcon}>
@@ -231,18 +211,10 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
             </View>
             <View style={styles.insuranceInfo}>
               <Text style={styles.insuranceTitle}>Assurance</Text>
-              <Text style={styles.insuranceSubtitle}>
-                Recommandé pour valeur {'>'}500 TND
-              </Text>
+              <Text style={styles.insuranceSubtitle}>Non disponible pour le moment</Text>
             </View>
           </View>
-          <TouchableOpacity
-            style={[styles.toggle, insurance && styles.toggleActive]}
-            onPress={() => setInsurance(!insurance)}
-            activeOpacity={0.8}
-          >
-            <View style={[styles.toggleThumb, insurance && styles.toggleThumbActive]} />
-          </TouchableOpacity>
+          <Text style={styles.insuranceOffLabel}>Non</Text>
         </Card>
       </ScrollView>
 
@@ -254,8 +226,8 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
             format,
             dimensions: showDimensions ? { height, width, length } : null,
             specialInstructions,
-            declaredValue: declaredValue ? parseFloat(declaredValue) : 0,
-            insurance,
+            declaredValue: 0,
+            insurance: false,
           })}
           variant="outline"
           style={styles.backActionButton}
@@ -529,6 +501,11 @@ const styles = StyleSheet.create({
   insuranceSubtitle: {
     fontSize: 12,
     color: '#666666',
+  },
+  insuranceOffLabel: {
+    fontSize: 14,
+    color: '#999999',
+    fontWeight: '500',
   },
   toggle: {
     width: 48,

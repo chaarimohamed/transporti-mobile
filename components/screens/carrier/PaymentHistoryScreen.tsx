@@ -30,10 +30,10 @@ interface HistoryItem {
 const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
   onNavigate,
 }) => {
-  const [selectedFilter, setSelectedFilter] = useState('Tous');
+  const [selectedFilter, setSelectedFilter] = useState('Payées');
   const [loading, setLoading] = useState(true);
   const [missions, setMissions] = useState<Shipment[]>([]);
-  const [stats, setStats] = useState({ totalEarnings: 0, totalDeliveries: 0, successRate: 0 });
+  const [stats, setStats] = useState({ totalEarnings: 0, totalDeliveries: 0 });
 
   useEffect(() => {
     fetchPaymentHistory();
@@ -43,26 +43,18 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
     try {
       setLoading(true);
       
-      // Fetch all missions for the carrier
-      const result = await shipmentService.getMyShipments();
+      // Fetch only DELIVERED missions for billing history
+      const result = await shipmentService.getMyShipments('DELIVERED');
       
       if (result.success && result.shipments) {
         setMissions(result.shipments);
         
-        // Calculate stats
-        const deliveredMissions = result.shipments.filter(m => m.status === 'DELIVERED');
-        const totalEarnings = deliveredMissions.reduce((sum, m) => sum + m.price, 0);
-        const totalMissions = result.shipments.filter(m => 
-          m.status !== 'CANCELLED' && m.status !== 'PENDING'
-        ).length;
-        const successRate = totalMissions > 0 
-          ? Math.round((deliveredMissions.length / totalMissions) * 100) 
-          : 0;
+        // Calculate stats from delivered missions only
+        const totalEarnings = result.shipments.reduce((sum, m) => sum + m.price, 0);
         
         setStats({
           totalEarnings,
-          totalDeliveries: deliveredMissions.length,
-          successRate,
+          totalDeliveries: result.shipments.length,
         });
       }
     } catch (error) {
@@ -73,28 +65,17 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
   };
 
   const getFilteredMissions = () => {
-    let filtered = missions;
-
-    // Filter by status
-    if (selectedFilter === 'Payés') {
-      filtered = filtered.filter(m => m.status === 'DELIVERED');
-    } else if (selectedFilter === 'En attente') {
-      filtered = filtered.filter(m => m.status === 'IN_TRANSIT' || m.status === 'CONFIRMED');
-    } else if (selectedFilter === 'Problèmes') {
-      filtered = filtered.filter(m => m.status === 'CANCELLED');
-    }
-
-    // Filter by time period
+    // All missions are already DELIVERED — apply time/status filters
     const now = new Date();
     if (selectedFilter === 'Cette semaine') {
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      filtered = filtered.filter(m => new Date(m.updatedAt) >= weekAgo);
+      return missions.filter(m => new Date(m.updatedAt) >= weekAgo);
     } else if (selectedFilter === 'Ce mois') {
       const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      filtered = filtered.filter(m => new Date(m.updatedAt) >= monthStart);
+      return missions.filter(m => new Date(m.updatedAt) >= monthStart);
     }
-
-    return filtered;
+    // 'Payées' — return all (all are DELIVERED)
+    return missions;
   };
 
   const mapMissionToHistoryItem = (mission: Shipment): HistoryItem => {
@@ -122,7 +103,7 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
 
   const historyItems = getFilteredMissions().map(mapMissionToHistoryItem);
 
-  const filters = ['Tous', 'Cette semaine', 'Ce mois', 'Payés', 'En attente', 'Problèmes'];
+  const filters = ['Cette semaine', 'Ce mois', 'Payées'];
 
   const handleViewReceipt = (item: HistoryItem) => {
     if (onNavigate) {
@@ -209,13 +190,8 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
         >
           <Text style={styles.backIcon}>←</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Historique paiements</Text>
-        <TouchableOpacity
-          style={styles.filterButton}
-          onPress={handleFilterPress}
-        >
-          <Text style={styles.filterIcon}>⚙</Text>
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Facturation</Text>
+        <View style={styles.filterButton} />
       </View>
 
       {/* Filters */}
@@ -260,10 +236,6 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
             <View style={styles.statBox}>
               <Text style={styles.statValue}>{stats.totalDeliveries}</Text>
               <Text style={styles.statLabel}>Livraisons</Text>
-            </View>
-            <View style={styles.statBox}>
-              <Text style={styles.statValue}>{stats.successRate}%</Text>
-              <Text style={styles.statLabel}>Réussis</Text>
             </View>
           </View>
         </Card>

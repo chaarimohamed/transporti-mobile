@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,15 +7,24 @@ import {
   Animated,
 } from 'react-native';
 import { Button } from '../../ui/Button';
+import { updateProfile, uploadDocuments } from '../../../services/authService';
 
 interface CarrierOnboarding4ScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
+  initialData?: {
+    volume?: string;
+    palette?: boolean;
+    refrigere?: boolean;
+    [key: string]: any;
+  };
 }
 
 const CarrierOnboarding4Screen: React.FC<CarrierOnboarding4ScreenProps> = ({
   onNavigate,
+  initialData,
 }) => {
   const scaleAnim = new Animated.Value(0);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     Animated.spring(scaleAnim, {
@@ -26,7 +35,26 @@ const CarrierOnboarding4Screen: React.FC<CarrierOnboarding4ScreenProps> = ({
     }).start();
   }, []);
 
-  const handleStart = () => {
+  const handleStart = async () => {
+    try {
+      setIsSaving(true);
+
+      // 1. Save vehicle size collected on Onboarding2
+      if (initialData?.volume) {
+        await updateProfile({ vehicleSize: initialData.volume }).catch(() => {});
+      }
+
+      // 2. Upload encrypted identity documents collected on Onboarding3
+      const docs = initialData?.documents as { cinBase64?: string; permisBase64?: string } | undefined;
+      if (docs?.cinBase64 || docs?.permisBase64) {
+        await uploadDocuments({
+          cinBase64: docs.cinBase64,
+          permisBase64: docs.permisBase64,
+        }).catch(() => {}); // non-blocking — user can still proceed
+      }
+    } finally {
+      setIsSaving(false);
+    }
     onNavigate?.('dashboard');
   };
 
@@ -85,6 +113,7 @@ const CarrierOnboarding4Screen: React.FC<CarrierOnboarding4ScreenProps> = ({
             onPress={handleStart}
             size="lg"
             fullWidth
+            loading={isSaving}
           >
             Commencer
           </Button>

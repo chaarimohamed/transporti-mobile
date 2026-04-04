@@ -50,6 +50,8 @@ export const API_ENDPOINTS = {
     UPDATE_PROFILE: '/auth/profile',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
+    DOCUMENTS: '/auth/documents',
+    PROFILE_PHOTO: '/auth/profile-photo',
   },
   
   // Shipments (for Senders)
@@ -60,6 +62,7 @@ export const API_ENDPOINTS = {
     UPDATE: (id: string) => `/shipments/${id}`,
     DELETE: (id: string) => `/shipments/${id}`,
     STATS: '/shipments/stats',
+    PHOTOS: (id: string) => `/shipments/${id}/photos`,
   },
   
   // Missions (for Carriers)

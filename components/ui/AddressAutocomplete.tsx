@@ -30,6 +30,8 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   const [loading, setLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+  // When true, the current `value` change came from a programmatic selection — skip re-search
+  const justSelected = useRef(false);
 
   // Start a new session when component mounts
   useEffect(() => {
@@ -40,6 +42,12 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   useEffect(() => {
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
+    }
+
+    // If the change came from a programmatic selection, skip the search
+    if (justSelected.current) {
+      justSelected.current = false;
+      return;
     }
 
     if (value.length < 2) {
@@ -73,6 +81,8 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
     setLoading(false);
 
     if (addressDetails) {
+      // Mark as a programmatic change so the useEffect skips re-searching
+      justSelected.current = true;
       onChangeText(addressDetails.fullAddress);
       onSelectAddress(addressDetails);
     }

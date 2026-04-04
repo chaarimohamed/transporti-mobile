@@ -8,8 +8,10 @@ import {
   SafeAreaView,
   Alert,
   Platform,
+  Image,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -28,8 +30,8 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date(2000, 0, 1));
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const parseDateString = (str: string): Date => {
@@ -51,7 +53,6 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
   const populateForm = (u: any) => {
     setFirstName(u.firstName || '');
     setLastName(u.lastName || '');
-    setEmail(u.email || '');
     setPhone(u.phone || '');
     if (u.dateOfBirth) {
       setDateOfBirth(u.dateOfBirth);
@@ -64,13 +65,18 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
       setFirstName(user.firstName || '');
       setLastName(user.lastName || '');
       setDateOfBirth(user.dateOfBirth || '');
-      setEmail(user.email || '');
       setPhone(user.phone || '');
     }
+    // Load stored profile photo
+    authService.getProfilePhoto().then((res) => {
+      if (res.success && res.photoBase64) {
+        setPhotoUri(`data:image/jpeg;base64,${res.photoBase64}`);
+      }
+    });
   }, [user]);
 
   const handleSaveChanges = async () => {
-    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+    if (!firstName.trim() || !lastName.trim()) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs obligatoires');
       return;
     }
@@ -81,7 +87,6 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
       const result = await authService.updateProfile({
         firstName,
         lastName,
-        email,
         phone,
         ...(dateOfBirth && { dateOfBirth }),
       });
@@ -105,13 +110,61 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
     }
   };
 
+  const handleTakePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission refusée', "L'accès à la caméra est requis");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+      base64: true,
+    });
+    if (!result.canceled && result.assets[0]) {
+      const asset = result.assets[0];
+      setPhotoUri(asset.uri);
+      if (asset.base64) {
+        authService.uploadProfilePhoto(asset.base64).catch((e) =>
+          console.error('Photo upload failed:', e)
+        );
+      }
+    }
+  };
+
+  const handlePickFromGallery = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission refusée', "L'accès à la galerie est requis");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+      base64: true,
+    });
+    if (!result.canceled && result.assets[0]) {
+      const asset = result.assets[0];
+      setPhotoUri(asset.uri);
+      if (asset.base64) {
+        authService.uploadProfilePhoto(asset.base64).catch((e) =>
+          console.error('Photo upload failed:', e)
+        );
+      }
+    }
+  };
+
   const handleChangePhoto = () => {
     Alert.alert(
       'Changer la photo',
       'Choisissez une option',
       [
-        { text: 'Prendre une photo', onPress: () => {} },
-        { text: 'Choisir dans la galerie', onPress: () => {} },
+        { text: 'Prendre une photo', onPress: handleTakePhoto },
+        { text: 'Choisir dans la galerie', onPress: handlePickFromGallery },
         { text: 'Annuler', style: 'cancel' },
       ]
     );
@@ -140,7 +193,11 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
         <View style={styles.photoSection}>
           <View style={styles.photoContainer}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarIcon}>👤</Text>
+              {photoUri ? (
+                <Image source={{ uri: photoUri }} style={styles.avatarImage} />
+              ) : (
+                <Text style={styles.avatarIcon}>👤</Text>
+              )}
             </View>
           </View>
           <View style={styles.photoTextContainer}>
@@ -214,16 +271,6 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
             )}
           </View>
 
-          {/* Email */}
-          <Input
-            label="Email"
-            placeholder="ahmed.louati.999@gmail.com"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-
           {/* Phone Number */}
           <View style={styles.phoneContainer}>
             <Text style={styles.phoneLabel}>Numéro de téléphone</Text>
@@ -240,9 +287,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
                 />
               </View>
             </View>
-            <TouchableOpacity>
-              <Text style={styles.changeNumberLink}>Changer mon numéro</Text>
-            </TouchableOpacity>
+
           </View>
         </View>
 
@@ -322,6 +367,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#E9E9E9',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
   },
   avatarIcon: {
     fontSize: 40,

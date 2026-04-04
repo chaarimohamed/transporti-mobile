@@ -13,11 +13,13 @@ import {
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
+import { GOOGLE_MAPS_API_KEY } from '../../../config/google.config';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface MissionDetailsScreenProps {
-  route?: { params?: { id?: string; shipmentId?: string; fromInvitation?: boolean } };
+  route?: { params?: { id?: string; shipmentId?: string; fromInvitation?: boolean; returnScreen?: string } };
   onNavigate?: (screen: string, params?: any) => void;
 }
 
@@ -30,10 +32,14 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
                      route?.params?.shipmentId || 
                      route?.params?.shipment?.id;
   const fromInvitation = route?.params?.fromInvitation || false;
+  const returnScreen = route?.params?.returnScreen;
+  const { user } = useAuth();
   const [shipment, setShipment] = useState<Shipment | null>(route?.params?.shipment || null);
   const [loading, setLoading] = useState(!route?.params?.shipment);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [routeDistance, setRouteDistance] = useState<string | null>(null);
+  const [routeDuration, setRouteDuration] = useState<string | null>(null);
 
   useEffect(() => {
     if (shipmentId) {
@@ -51,6 +57,33 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
       setLoading(false);
     }
   }, [shipmentId]);
+
+  // Fetch real distance/duration once the shipment is loaded
+  useEffect(() => {
+    if (shipment?.from && shipment?.to) {
+      fetchRouteInfo(shipment.from, shipment.to);
+    }
+  }, [shipment?.id]);
+
+  const fetchRouteInfo = async (from: string, to: string) => {
+    try {
+      const url =
+        `https://maps.googleapis.com/maps/api/distancematrix/json` +
+        `?origins=${encodeURIComponent(from)}` +
+        `&destinations=${encodeURIComponent(to)}` +
+        `&key=${GOOGLE_MAPS_API_KEY}` +
+        `&language=fr`;
+      const response = await fetch(url);
+      const data = await response.json();
+      const element = data?.rows?.[0]?.elements?.[0];
+      if (element?.status === 'OK') {
+        setRouteDistance(element.distance.text);
+        setRouteDuration(element.duration.text);
+      }
+    } catch (err) {
+      console.error('Distance Matrix error:', err);
+    }
+  };
 
   const fetchShipmentDetails = async () => {
     if (!shipmentId) {
@@ -209,7 +242,7 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => onNavigate?.('missionList')}
+            onPress={() => onNavigate?.(returnScreen || 'missionList')}
             style={styles.backButton}
           >
             <Text style={styles.backIcon}>←</Text>
@@ -232,7 +265,7 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => onNavigate?.('missionList')}
+          onPress={() => onNavigate?.(returnScreen || 'missionList')}
           style={styles.backButton}
         >
           <Text style={styles.backIcon}>←</Text>
@@ -255,7 +288,6 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
               <Text style={styles.senderName}>
                 {shipment.sender ? `${shipment.sender.firstName} ${shipment.sender.lastName}` : 'Expéditeur'}
               </Text>
-              <Text style={styles.senderPhone}>{shipment.sender?.phone || '+216 XX XXX XXX'}</Text>
             </View>
           </View>
         </Card>
@@ -264,29 +296,31 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
         <Card style={styles.section}>
           <Text style={styles.sectionTitle}>Itinéraire</Text>
           <View style={styles.route}>
-            <View style={styles.routePoint}>
-              <View style={[styles.routeDot, styles.routeDotStart]} />
-              <View style={styles.routeInfo}>
-                <Text style={styles.routeLabel}>Départ</Text>
-                <Text style={styles.routeLocation}>{shipment.from}</Text>
-                <Text style={styles.routeTime}>
-                  {shipment.createdAt ? formatTime(shipment.createdAt) : 'Non spécifié'}
-                </Text>
+            {/* Left track column: ring → dots → pin */}
+            <View style={styles.routeTrackColumn}>
+              <View style={styles.routeDotStart}>
+                <View style={styles.routeDotStartInner} />
+              </View>
+              <View style={styles.routeConnector}>
+                <View style={styles.routeConnectorDot} />
+                <View style={styles.routeConnectorDot} />
+                <View style={styles.routeConnectorDot} />
+              </View>
+              <View style={styles.routePinWrapper}>
+                <View style={styles.routePinCircle} />
+                <View style={styles.routePinTip} />
               </View>
             </View>
 
-            <View style={styles.routeLine} />
-
-            <View style={styles.routePoint}>
-              <View style={[styles.routeDot, styles.routeDotEnd]} />
-              <View style={styles.routeInfo}>
+            {/* Right text column */}
+            <View style={styles.routeLocationsColumn}>
+              <View style={styles.routeLocationTop}>
+                <Text style={styles.routeLabel}>Départ</Text>
+                <Text style={styles.routeLocation}>{shipment.from}</Text>
+              </View>
+              <View style={styles.routeLocationBottom}>
                 <Text style={styles.routeLabel}>Arrivée</Text>
                 <Text style={styles.routeLocation}>{shipment.to}</Text>
-                <Text style={styles.routeTime}>
-                  {shipment.createdAt
-                    ? formatTime(new Date(new Date(shipment.createdAt).getTime() + 2.5 * 60 * 60 * 1000).toISOString())
-                    : 'Non spécifié'}
-                </Text>
               </View>
             </View>
           </View>
@@ -294,12 +328,12 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
           <View style={styles.routeMeta}>
             <View style={styles.metaItem}>
               <Text style={styles.metaLabel}>Distance</Text>
-              <Text style={styles.metaValue}>105 km</Text>
+              <Text style={styles.metaValue}>{routeDistance ?? 'N/A'}</Text>
             </View>
             <View style={styles.metaDivider} />
             <View style={styles.metaItem}>
               <Text style={styles.metaLabel}>Durée estimée</Text>
-              <Text style={styles.metaValue}>2h 30</Text>
+              <Text style={styles.metaValue}>{routeDuration ?? 'N/A'}</Text>
             </View>
           </View>
         </Card>
@@ -309,9 +343,34 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
           <Text style={styles.sectionTitle}>Cargaison</Text>
           <View style={styles.cargoInfo}>
             <Text style={styles.cargoType}>{shipment.cargo || shipment.description || 'Marchandise'}</Text>
-            <Text style={styles.cargoDate}>
-              Date d'enlèvement : {shipment.createdAt ? formatDate(shipment.createdAt) : 'Non spécifiée'}
-            </Text>
+
+            {/* Date de collecte — prominent badge */}
+            <View style={styles.collecteDateBadge}>
+              <Text style={styles.collecteDateLabel}>Date de collecte</Text>
+              <Text style={styles.collecteDateValue}>
+                {shipment.createdAt ? formatDate(shipment.createdAt) : 'Non spécifiée'}
+              </Text>
+            </View>
+
+            {/* Assistance info */}
+            {(shipment.helperCount ?? 0) > 0 && (
+              <View style={styles.assistanceRow}>
+                <Text style={styles.assistanceIcon}>💪</Text>
+                <Text style={styles.assistanceText}>
+                  Aide collect: {shipment.helperCount} personne{(shipment.helperCount ?? 0) > 1 ? 's' : ''}{' '}
+                  (+{(shipment.helperCount ?? 0) * 15} DT)
+                </Text>
+              </View>
+            )}
+            {(shipment.deliveryHelperCount ?? 0) > 0 && (
+              <View style={styles.assistanceRow}>
+                <Text style={styles.assistanceIcon}>💪</Text>
+                <Text style={styles.assistanceText}>
+                  Aide livraison: {shipment.deliveryHelperCount} personne{(shipment.deliveryHelperCount ?? 0) > 1 ? 's' : ''}{' '}
+                  (+{(shipment.deliveryHelperCount ?? 0) * 15} DT)
+                </Text>
+              </View>
+            )}
           </View>
         </Card>
 
@@ -348,25 +407,25 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
             )}
           </TouchableOpacity>
         </View>
-      ) : shipment.status === 'PENDING' || shipment.status === 'REQUESTED' ? (
-        /* Regular application buttons */
+      ) : shipment.status === 'REQUESTED' && shipment.requestedCarrierId === user?.id ? (
+        /* Carrier already applied — awaiting sender's decision */
+        <View style={styles.actionsContainer}>
+          <View style={styles.pendingResponseBadge}>
+            <Text style={styles.pendingResponseText}>⏳ En attente de réponse</Text>
+          </View>
+        </View>
+      ) : shipment.status === 'PENDING' ? (
+        /* Available mission — carrier can apply */
         <View style={styles.actionsContainer}>
           <TouchableOpacity
-            style={styles.refuseButton}
-            onPress={() => onNavigate?.('missionList')}
-            disabled={submitting}
-          >
-            <Text style={styles.refuseButtonText}>Refuser</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.acceptButton, submitting && styles.buttonDisabled]}
+            style={[styles.fullWidthButton, submitting && styles.buttonDisabled]}
             onPress={handleAcceptShipment}
             disabled={submitting}
           >
             {submitting ? (
               <ActivityIndicator size="small" color="#FFF" />
             ) : (
-              <Text style={styles.acceptButtonText}>Postuler</Text>
+              <Text style={styles.fullWidthButtonText}>Postuler</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -473,28 +532,73 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
   route: {
-    marginBottom: 16,
-  },
-  routePoint: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    marginBottom: 16,
+    minHeight: 80,
   },
-  routeDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginTop: 4,
-    marginRight: 12,
+  routeTrackColumn: {
+    width: 24,
+    marginRight: 14,
+    alignItems: 'center',
   },
   routeDotStart: {
-    backgroundColor: '#2E8B57',
-  },
-  routeDotEnd: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: '#1464F6',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  routeInfo: {
+  routeDotStartInner: {
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: '#FFFFFF',
+  },
+  routeConnector: {
     flex: 1,
-    paddingBottom: 16,
+    minHeight: 36,
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    paddingVertical: 4,
+  },
+  routeConnectorDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#D1D5DB',
+  },
+  routePinWrapper: {
+    alignItems: 'center',
+  },
+  routePinCircle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#FF6B6B',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  routePinTip: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 5,
+    borderRightWidth: 5,
+    borderTopWidth: 7,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: '#FF6B6B',
+    marginTop: -1,
+  },
+  routeLocationsColumn: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  routeLocationTop: {
+    paddingBottom: 8,
+  },
+  routeLocationBottom: {
+    paddingTop: 4,
   },
   routeLabel: {
     fontSize: 12,
@@ -505,18 +609,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#1A1A1A',
-    marginBottom: 2,
-  },
-  routeTime: {
-    fontSize: 13,
-    color: '#999999',
-  },
-  routeLine: {
-    width: 2,
-    height: 32,
-    backgroundColor: '#E9E9E9',
-    marginLeft: 5,
-    marginVertical: -8,
   },
   routeMeta: {
     flexDirection: 'row',
@@ -545,14 +637,43 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
   },
   cargoInfo: {
-    gap: 8,
+    gap: 10,
   },
   cargoType: {
     fontSize: 15,
     fontWeight: '600',
     color: '#1A1A1A',
   },
-  cargoDate: {
+  collecteDateBadge: {
+    backgroundColor: '#EFF6FF',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#1464F6',
+  },
+  collecteDateLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#1464F6',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  collecteDateValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#1A1A1A',
+  },
+  assistanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  assistanceIcon: {
+    fontSize: 14,
+  },
+  assistanceText: {
     fontSize: 13,
     color: '#666666',
   },
@@ -641,6 +762,21 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     opacity: 0.5,
+  },
+  pendingResponseBadge: {
+    flex: 1,
+    paddingVertical: 16,
+    borderRadius: 8,
+    backgroundColor: '#F5F3FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#8B5CF6',
+  },
+  pendingResponseText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#8B5CF6',
   },
   fullWidthButton: {
     flex: 1,

@@ -76,13 +76,27 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
     }
   };
 
+  // Maps every status to which timeline step (0=Créée, 1=En transit, 2=Livrée) is current
+  const STATUS_LEVEL: Record<string, number> = {
+    CANCELLED: 0, PENDING: 0, REQUESTED: 0, CONFIRMED: 0, HANDOVER_PENDING: 0,
+    IN_TRANSIT: 1, DELIVERED: 2,
+  };
+
   const getStepStatus = (stepIndex: number, currentStatus: string): 'completed' | 'active' | 'inactive' => {
-    const statusOrder = ['PENDING', 'IN_TRANSIT', 'DELIVERED'];
-    const currentIndex = statusOrder.indexOf(currentStatus);
-    
-    if (stepIndex <= currentIndex) return 'completed';
-    if (stepIndex === currentIndex + 1) return 'active';
+    const level = STATUS_LEVEL[currentStatus] ?? 0;
+    if (stepIndex < level) return 'completed';
+    if (stepIndex === level) return level === 2 ? 'completed' : 'active';
     return 'inactive';
+  };
+
+  const formatDateTime = (iso: string): string => {
+    const d = new Date(iso);
+    const day = d.getDate().toString().padStart(2, '0');
+    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+    const month = months[d.getMonth()];
+    const hh = d.getHours().toString().padStart(2, '0');
+    const mm = d.getMinutes().toString().padStart(2, '0');
+    return `${day} ${month}, ${hh}:${mm}`;
   };
 
   const handleCancelShipment = () => {
@@ -338,7 +352,15 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
           <View style={styles.timeline}>
             {['Créée', 'En transit', 'Livrée'].map((step, index) => {
               const stepStatus = getStepStatus(index, shipment.status);
+              const level = STATUS_LEVEL[shipment.status] ?? 0;
               const isLast = index === 2;
+
+              // Timestamps: step 0 always shows createdAt; the "current" step shows updatedAt
+              let timestamp: string | null = null;
+              if (stepStatus !== 'inactive') {
+                if (index === 0) timestamp = formatDateTime(shipment.createdAt);
+                else if (index === level) timestamp = formatDateTime(shipment.updatedAt);
+              }
 
               return (
                 <View key={step} style={styles.timelineItem}>
@@ -363,41 +385,162 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
                       />
                     )}
                   </View>
-                  <Text
-                    style={[
-                      styles.timelineText,
-                      stepStatus === 'completed' && styles.timelineTextCompleted,
-                      stepStatus === 'active' && styles.timelineTextActive,
-                    ]}
-                  >
-                    {step}
-                  </Text>
+                  <View style={styles.timelineContent}>
+                    <Text
+                      style={[
+                        styles.timelineText,
+                        stepStatus === 'completed' && styles.timelineTextCompleted,
+                        stepStatus === 'active' && styles.timelineTextActive,
+                      ]}
+                    >
+                      {step}
+                    </Text>
+                    {timestamp && (
+                      <Text style={styles.timelineTimestamp}>{timestamp}</Text>
+                    )}
+                  </View>
                 </View>
               );
             })}
           </View>
         </Card>
 
+        {/* Carrier Request (if REQUESTED status) */}
+        {shipment.status === 'REQUESTED' && shipment.requestedCarrierId && (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Candidature reçue</Text>
+            </View>
+            <Card style={styles.requestCard}>
+              <TouchableOpacity
+                activeOpacity={0.75}
+                onPress={() => shipment.requestedCarrier && onNavigate?.('transporterProfile', {
+                  transporter: shipment.requestedCarrier,
+                  shipmentId: shipment.id,
+                  shipment,
+                  shipmentStatus: shipment.status,
+                  returnScreen: 'shipmentDetails',
+                })}
+              >
+                <View style={styles.carrierProfileRow}>
+                  <View style={styles.carrierAvatar}>
+                    <Text style={styles.carrierAvatarText}>
+                      {shipment.requestedCarrier
+                        ? `${shipment.requestedCarrier.firstName[0]}${shipment.requestedCarrier.lastName[0]}`
+                        : '?'}
+                    </Text>
+                  </View>
+                  <View style={styles.carrierInfo}>
+                    <Text style={styles.carrierName}>
+                      {shipment.requestedCarrier
+                        ? `${shipment.requestedCarrier.firstName} ${shipment.requestedCarrier.lastName}`
+                        : 'Transporteur'}
+                    </Text>
+                    <View style={styles.carrierMeta}>
+                      <Text style={styles.carrierRating}>
+                        ⭐ {shipment.requestedCarrier?.averageRating && shipment.requestedCarrier.averageRating > 0
+                          ? shipment.requestedCarrier.averageRating.toFixed(1)
+                          : 'N/A'}
+                      </Text>
+                      {shipment.requestedCarrier?.gouvernerat && (
+                        <Text style={styles.carrierLocation}>  •  📍 {shipment.requestedCarrier.gouvernerat}</Text>
+                      )}
+                    </View>
+                  </View>
+                  <Text style={styles.profileArrow}>›</Text>
+                </View>
+              </TouchableOpacity>
+              <View style={styles.infoDivider} />
+              <View style={styles.requestActions}>
+                <TouchableOpacity
+                  style={styles.rejectButton}
+                  onPress={handleRejectCarrier}
+                  disabled={loading}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.rejectButtonText}>Refuser</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.acceptButton}
+                  onPress={handleAcceptCarrier}
+                  disabled={loading}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.acceptButtonText}>Accepter</Text>
+                </TouchableOpacity>
+              </View>
+            </Card>
+          </>
+        )}
+
+        {/* Carrier Info (if assigned) */}
+        {shipment.carrier && (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Transporteur</Text>
+            </View>
+            <TouchableOpacity
+              activeOpacity={0.75}
+              onPress={() => onNavigate?.('transporterProfile', {
+                transporter: shipment.carrier,
+                shipmentId: shipment.id,
+                shipment,
+                shipmentStatus: shipment.status,
+                returnScreen: 'shipmentDetails',
+              })}
+            >
+              <Card style={styles.carrierCard}>
+                <View style={styles.carrierAvatar}>
+                  <Text style={styles.carrierAvatarText}>
+                    {shipment.carrier.firstName[0]}{shipment.carrier.lastName[0]}
+                  </Text>
+                </View>
+                <View style={styles.carrierInfo}>
+                  <Text style={styles.carrierName}>
+                    {shipment.carrier.firstName} {shipment.carrier.lastName}
+                  </Text>
+                  <View style={styles.carrierMeta}>
+                    <Text style={styles.carrierRating}>
+                      ⭐ {shipment.carrier.averageRating && shipment.carrier.averageRating > 0
+                        ? shipment.carrier.averageRating.toFixed(1)
+                        : 'N/A'}
+                    </Text>
+                    {shipment.carrier.gouvernerat && (
+                      <Text style={styles.carrierLocation}>  •  📍 {shipment.carrier.gouvernerat}</Text>
+                    )}
+                  </View>
+                </View>
+                <Text style={styles.profileArrow}>›</Text>
+              </Card>
+            </TouchableOpacity>
+          </>
+        )}
+
         {/* Information Card */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Informations</Text>
         </View>
         <Card style={styles.infoCard}>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoIcon}>📍</Text>
-            <View style={styles.infoContent}>
-              <Text style={styles.infoLabel}>Départ</Text>
-              <Text style={styles.infoValue}>{shipment.from}</Text>
+          {/* Itinerary visual: green dot → line → blue dot */}
+          <View style={styles.itinerary}>
+            <View style={styles.itineraryRow}>
+              <View style={styles.itineraryDotCol}>
+                <View style={styles.dotGreen} />
+                <View style={styles.itineraryConnector} />
+              </View>
+              <View style={styles.itineraryTextContent}>
+                <Text style={styles.infoLabel}>Départ</Text>
+                <Text style={styles.infoValue}>{shipment.from}</Text>
+              </View>
             </View>
-          </View>
-
-          <View style={styles.infoDivider} />
-
-          <View style={styles.infoRow}>
-            <Text style={styles.infoIcon}>📍</Text>
-            <View style={styles.infoContent}>
-              <Text style={styles.infoLabel}>Arrivée</Text>
-              <Text style={styles.infoValue}>{shipment.to}</Text>
+            <View style={styles.itineraryRow}>
+              <View style={styles.itineraryDotCol}>
+                <View style={styles.dotBlue} />
+              </View>
+              <View style={styles.itineraryTextContent}>
+                <Text style={styles.infoLabel}>Arrivée</Text>
+                <Text style={styles.infoValue}>{shipment.to}</Text>
+              </View>
             </View>
           </View>
 
@@ -421,76 +564,6 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
             </View>
           </View>
         </Card>
-
-        {/* Carrier Request (if REQUESTED status) */}
-        {shipment.status === 'REQUESTED' && shipment.requestedCarrierId && (
-          <>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Demande de transporteur</Text>
-            </View>
-            <Card style={styles.requestCard}>
-              <View style={styles.requestHeader}>
-                <View style={styles.requestIcon}>
-                  <Text style={styles.requestIconText}>👤</Text>
-                </View>
-                <View style={styles.requestInfo}>
-                  <Text style={styles.requestTitle}>Un transporteur souhaite prendre cette expédition</Text>
-                  <Text style={styles.requestSubtitle}>En attente de votre décision</Text>
-                </View>
-              </View>
-
-              <TouchableOpacity
-                style={styles.viewApplicationButton}
-                onPress={() => onNavigate?.('applicationDetails', { shipment })}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.viewApplicationButtonText}>👁 Voir la candidature →</Text>
-              </TouchableOpacity>
-              
-              <View style={styles.requestActions}>
-                <TouchableOpacity 
-                  style={styles.rejectButton}
-                  onPress={handleRejectCarrier}
-                  disabled={loading}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.rejectButtonText}>Refuser</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.acceptButton}
-                  onPress={handleAcceptCarrier}
-                  disabled={loading}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.acceptButtonText}>Accepter</Text>
-                </TouchableOpacity>
-              </View>
-            </Card>
-          </>
-        )}
-
-        {/* Carrier Info (if assigned) */}
-        {shipment.carrier && (
-          <>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Transporteur</Text>
-            </View>
-            <Card style={styles.carrierCard}>
-              <View style={styles.carrierIcon}>
-                <Text style={styles.carrierIconText}>👤</Text>
-              </View>
-              <View style={styles.carrierInfo}>
-                <Text style={styles.carrierName}>
-                  {shipment.carrier.firstName} {shipment.carrier.lastName}
-                </Text>
-                <Text style={styles.carrierRating}>⭐ 4.8 (124 courses)</Text>
-              </View>
-              <TouchableOpacity style={styles.phoneButton}>
-                <Text style={styles.phoneIcon}>📞</Text>
-              </TouchableOpacity>
-            </Card>
-          </>
-        )}
 
         {/* Handover Confirmation (if HANDOVER_PENDING) */}
         {shipment.status === 'HANDOVER_PENDING' && (
@@ -608,6 +681,15 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 16,
   },
+  timelineContent: {
+    flex: 1,
+    paddingTop: 2,
+  },
+  timelineTimestamp: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 2,
+  },
   timelineLeft: {
     alignItems: 'center',
   },
@@ -702,19 +784,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
-    gap: 16,
+    gap: 14,
     marginBottom: 24,
   },
-  carrierIcon: {
+  carrierProfileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    marginBottom: 8,
+  },
+  carrierAvatar: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#E9E9E9',
+    backgroundColor: '#1464F6',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  carrierIconText: {
-    fontSize: 24,
+  carrierAvatarText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   carrierInfo: {
     flex: 1,
@@ -723,22 +813,58 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold',
     color: '#1A1A1A',
-    marginBottom: 2,
+    marginBottom: 4,
+  },
+  carrierMeta: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   carrierRating: {
     fontSize: 12,
     color: '#666666',
   },
-  phoneButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#1464F6' + '1A',
-    alignItems: 'center',
-    justifyContent: 'center',
+  carrierLocation: {
+    fontSize: 12,
+    color: '#666666',
   },
-  phoneIcon: {
-    fontSize: 20,
+  profileArrow: {
+    fontSize: 22,
+    color: '#AFAFAF',
+  },
+  itinerary: {
+    marginBottom: 4,
+  },
+  itineraryRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 14,
+  },
+  itineraryDotCol: {
+    alignItems: 'center',
+    width: 16,
+    paddingTop: 4,
+  },
+  itineraryConnector: {
+    width: 2,
+    height: 28,
+    backgroundColor: '#E9E9E9',
+    marginVertical: 4,
+  },
+  dotGreen: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#16A34A',
+  },
+  dotBlue: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#1464F6',
+  },
+  itineraryTextContent: {
+    flex: 1,
+    paddingBottom: 12,
   },
   requestCard: {
     padding: 16,

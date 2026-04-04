@@ -197,18 +197,36 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
 
         {/* Stats Grid */}
         <View style={styles.statsGrid}>
-          <Card style={styles.statCard}>
-            <Text style={styles.statNumber}>{stats.inProgress}</Text>
-            <Text style={styles.statLabel}>En cours</Text>
-          </Card>
-          <Card style={styles.statCard}>
-            <Text style={styles.statNumber}>{stats.pending}</Text>
-            <Text style={styles.statLabel}>En attente</Text>
-          </Card>
-          <Card style={styles.statCard}>
-            <Text style={styles.statNumber}>{stats.delivered}</Text>
-            <Text style={styles.statLabel}>Livrées</Text>
-          </Card>
+          <TouchableOpacity
+            activeOpacity={0.75}
+            onPress={() => onNavigate?.('shipmentList', { activeTab: 'En cours' })}
+            style={styles.statTouchable}
+          >
+            <Card style={styles.statCard}>
+              <Text style={styles.statNumber}>{stats.inProgress}</Text>
+              <Text style={styles.statLabel}>En cours</Text>
+            </Card>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.75}
+            onPress={() => onNavigate?.('shipmentList', { activeTab: 'En attente' })}
+            style={styles.statTouchable}
+          >
+            <Card style={styles.statCard}>
+              <Text style={styles.statNumber}>{stats.pending}</Text>
+              <Text style={styles.statLabel}>En attente</Text>
+            </Card>
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.75}
+            onPress={() => onNavigate?.('shipmentList', { activeTab: 'Livrées' })}
+            style={styles.statTouchable}
+          >
+            <Card style={styles.statCard}>
+              <Text style={styles.statNumber}>{stats.delivered}</Text>
+              <Text style={styles.statLabel}>Livrées</Text>
+            </Card>
+          </TouchableOpacity>
         </View>
 
         {/* Recent Shipments */}
@@ -246,41 +264,40 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
           ) : (
             shipments.map((shipment) => {
               const badge = getStatusBadge(shipment.status);
+              const isPendingOrRequested = shipment.status === 'PENDING' || shipment.status === 'REQUESTED';
               return (
-                <Card key={shipment.id} style={styles.shipmentCard}>
-                  <View style={styles.shipmentHeader}>
-                    <Text style={styles.shipmentId}>{shipment.refNumber}</Text>
-                    <Badge status={badge.status} text={badge.text} />
-                  </View>
-                  <View style={styles.shipmentRoute}>
-                    <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
-                      {shipment.from}
-                    </Text>
-                    <Text style={styles.arrowIcon}>→</Text>
-                    <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
-                      {shipment.to}
-                    </Text>
-                  </View>
-                  <View style={styles.shipmentFooter}>
-                    <Text style={styles.priceText}>{shipment.price} TND</Text>
-                    {(shipment.status === 'PENDING' || shipment.status === 'REQUESTED') && (
-                      <TouchableOpacity 
-                        activeOpacity={0.7}
-                        onPress={() => onNavigate?.('suggestedTransporters', { shipmentId: shipment.id, shipment })}
-                      >
-                        <Text style={styles.searchTransporterLink}>Chercher un transporteur →</Text>
-                      </TouchableOpacity>
-                    )}
-                    {(shipment.status === 'CONFIRMED' || shipment.status === 'HANDOVER_PENDING' || shipment.status === 'IN_TRANSIT' || shipment.status === 'DELIVERED') && (
-                      <TouchableOpacity 
-                        activeOpacity={0.7}
-                        onPress={() => onNavigate?.('shipmentDetails', { id: shipment.id })}
-                      >
-                        <Text style={styles.searchTransporterLink}>Voir détails →</Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                </Card>
+                <TouchableOpacity
+                  key={shipment.id}
+                  activeOpacity={0.75}
+                  onPress={() => onNavigate?.('shipmentDetails', { id: shipment.id })}
+                >
+                  <Card style={styles.shipmentCard}>
+                    <View style={styles.shipmentHeader}>
+                      <Text style={styles.shipmentId}>{shipment.refNumber}</Text>
+                      <Badge status={badge.status} text={badge.text} />
+                    </View>
+                    <View style={styles.shipmentRoute}>
+                      <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
+                        {shipment.from}
+                      </Text>
+                      <Text style={styles.arrowIcon}>→</Text>
+                      <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
+                        {shipment.to}
+                      </Text>
+                    </View>
+                    <View style={styles.shipmentFooter}>
+                      <Text style={styles.priceText}>{shipment.price} TND</Text>
+                      {isPendingOrRequested && (
+                        <TouchableOpacity
+                          activeOpacity={0.7}
+                          onPress={(e) => { e.stopPropagation?.(); onNavigate?.('suggestedTransporters', { shipmentId: shipment.id, shipment }); }}
+                        >
+                          <Text style={styles.searchTransporterLink}>Chercher un transporteur →</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </Card>
+                </TouchableOpacity>
               );
             })
           )}
@@ -388,8 +405,10 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 24,
   },
-  statCard: {
+  statTouchable: {
     flex: 1,
+  },
+  statCard: {
     alignItems: 'center',
     paddingVertical: 16,
   },

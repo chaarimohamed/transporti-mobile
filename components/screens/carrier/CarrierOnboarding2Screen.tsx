@@ -25,6 +25,7 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
     refrigere: false,
     volume: '',
   });
+  const [volumeError, setVolumeError] = useState(false);
 
   const volumeOptions = [
     { value: 'S', label: 'S — Petit véhicule', description: 'Caddy, Berlingo (~3m³)' },
@@ -41,11 +42,11 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
   };
 
   const handleNext = () => {
+    if (!selectedOptions.volume) {
+      setVolumeError(true);
+      return;
+    }
     onNavigate?.('carrierOnboarding3', selectedOptions);
-  };
-
-  const handleSkip = () => {
-    onNavigate?.('carrierOnboarding3');
   };
 
   return (
@@ -122,11 +123,11 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
           </TouchableOpacity>
 
           {/* Volume Option */}
-          <View style={styles.volumeCard}>
+          <View style={[styles.volumeCard, volumeError && styles.volumeCardError]}>
             <View style={styles.volumeHeader}>
               <Text style={styles.volumeIcon}>🚚</Text>
               <View style={styles.volumeHeaderText}>
-                <Text style={styles.volumeTitle}>Taille du véhicule</Text>
+                <Text style={styles.volumeTitle}>Taille du véhicule <Text style={styles.required}>*</Text></Text>
                 <Text style={styles.volumeSubtitle}>
                   Sélectionnez la catégorie correspondant à votre véhicule
                 </Text>
@@ -142,12 +143,10 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
                     selectedOptions.volume === option.value &&
                       styles.volumeOptionSelected,
                   ]}
-                  onPress={() =>
-                    setSelectedOptions(prev => ({
-                      ...prev,
-                      volume: option.value,
-                    }))
-                  }
+                  onPress={() => {
+                    setSelectedOptions(prev => ({ ...prev, volume: option.value }));
+                    setVolumeError(false);
+                  }}
                   activeOpacity={0.7}
                 >
                   <View style={styles.volumeRadio}>
@@ -172,6 +171,11 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
                 </TouchableOpacity>
               ))}
             </View>
+            {volumeError && (
+              <Text style={styles.volumeErrorText}>
+                Veuillez sélectionner la taille de votre véhicule
+              </Text>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -179,17 +183,10 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
       {/* Action Buttons */}
       <View style={styles.buttonContainer}>
         <Button
-          onPress={handleSkip}
-          variant="secondary"
-          size="lg"
-          style={styles.skipButton}
-        >
-          Passer
-        </Button>
-        <Button
           onPress={handleNext}
           size="lg"
           style={styles.nextButton}
+          disabled={!selectedOptions.volume}
         >
           Suivant
         </Button>
@@ -382,24 +379,32 @@ const styles = StyleSheet.create({
     color: '#666666',
     marginTop: 2,
   },
+  volumeCardError: {
+    borderColor: '#D92D20',
+    backgroundColor: 'rgba(217, 45, 32, 0.03)',
+  },
+  required: {
+    color: '#D92D20',
+  },
+  volumeErrorText: {
+    color: '#D92D20',
+    fontSize: 13,
+    marginTop: 8,
+    marginLeft: 4,
+  },
   buttonContainer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    flexDirection: 'row',
     padding: 24,
     paddingBottom: 32,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E9E9E9',
-    gap: 12,
-  },
-  skipButton: {
-    flex: 1,
   },
   nextButton: {
-    flex: 1,
+    width: '100%',
   },
 });
 

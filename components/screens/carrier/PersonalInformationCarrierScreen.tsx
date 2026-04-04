@@ -8,8 +8,10 @@ import {
   SafeAreaView,
   Alert,
   Platform,
+  Image,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
 import { Dropdown } from '../../ui/Dropdown';
@@ -29,10 +31,10 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date(2000, 0, 1));
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [gouvernorat, setGouvernorat] = useState('');
   const [vehicleType, setVehicleType] = useState('');
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const parseDateString = (str: string): Date => {
@@ -54,7 +56,6 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
   const populateForm = (u: any) => {
     setFirstName(u.firstName || '');
     setLastName(u.lastName || '');
-    setEmail(u.email || '');
     setPhone(u.phone || '');
     setGouvernorat(u.gouvernerat || '');
     setVehicleType(u.vehicleType || '');
@@ -71,6 +72,12 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
       if (result.success && result.user) {
         populateForm(result.user);
         if (updateUser) updateUser(result.user);
+      }
+    });
+    // Load stored profile photo
+    authService.getProfilePhoto().then((res) => {
+      if (res.success && res.photoBase64) {
+        setPhotoUri(`data:image/jpeg;base64,${res.photoBase64}`);
       }
     });
   }, []);
@@ -110,7 +117,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
   ];
 
   const handleSaveChanges = async () => {
-    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+    if (!firstName.trim() || !lastName.trim()) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs obligatoires');
       return;
     }
@@ -121,7 +128,6 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
       const result = await authService.updateProfile({
         firstName,
         lastName,
-        email,
         phone,
         ...(dateOfBirth && { dateOfBirth }),
         // BUG-05 fix: send carrier-specific fields so the backend persists them
@@ -148,13 +154,61 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
     }
   };
 
+  const handleTakePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission refusée', "L'accès à la caméra est requis");
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+      base64: true,
+    });
+    if (!result.canceled && result.assets[0]) {
+      const asset = result.assets[0];
+      setPhotoUri(asset.uri);
+      if (asset.base64) {
+        authService.uploadProfilePhoto(asset.base64).catch((e) =>
+          console.error('Photo upload failed:', e)
+        );
+      }
+    }
+  };
+
+  const handlePickFromGallery = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission refusée', "L'accès à la galerie est requis");
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+      base64: true,
+    });
+    if (!result.canceled && result.assets[0]) {
+      const asset = result.assets[0];
+      setPhotoUri(asset.uri);
+      if (asset.base64) {
+        authService.uploadProfilePhoto(asset.base64).catch((e) =>
+          console.error('Photo upload failed:', e)
+        );
+      }
+    }
+  };
+
   const handleChangePhoto = () => {
     Alert.alert(
       'Changer la photo',
       'Choisissez une option',
       [
-        { text: 'Prendre une photo', onPress: () => {} },
-        { text: 'Choisir dans la galerie', onPress: () => {} },
+        { text: 'Prendre une photo', onPress: handleTakePhoto },
+        { text: 'Choisir dans la galerie', onPress: handlePickFromGallery },
         { text: 'Annuler', style: 'cancel' },
       ]
     );
@@ -183,7 +237,11 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
         <View style={styles.photoSection}>
           <View style={styles.photoContainer}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarIcon}>👤</Text>
+              {photoUri ? (
+                <Image source={{ uri: photoUri }} style={styles.avatarImage} />
+              ) : (
+                <Text style={styles.avatarIcon}>👤</Text>
+              )}
             </View>
           </View>
           <View style={styles.photoTextContainer}>
@@ -257,16 +315,6 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
             )}
           </View>
 
-          {/* Email */}
-          <Input
-            label="Email"
-            placeholder="sami.benali@gmail.com"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-
           {/* Phone Number */}
           <View style={styles.phoneContainer}>
             <Text style={styles.phoneLabel}>Numéro de téléphone</Text>
@@ -283,9 +331,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
                 />
               </View>
             </View>
-            <TouchableOpacity>
-              <Text style={styles.changeNumberLink}>Changer mon numéro</Text>
-            </TouchableOpacity>
+
           </View>
 
           {/* Gouvernorat */}
@@ -383,6 +429,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 2,
     borderColor: '#E9E9E9',
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
   },
   avatarIcon: {
     fontSize: 40,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Card } from '../../ui/Card';
-import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import BottomNav from '../../ui/BottomNav';
+import { useAuth } from '../../../contexts/AuthContext';
 import * as shipmentService from '../../../services/shipment.service';
 import * as notificationService from '../../../services/notification.service';
 import { Shipment } from '../../../services/shipment.service';
@@ -21,6 +21,7 @@ interface MissionListScreenProps {
 }
 
 const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => {
+  const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState('Toutes');
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +50,6 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
         setError(shipmentsResult.error || 'Erreur de chargement');
       }
 
-      // Build set of shipment IDs where this carrier has a pending invitation
       if (notifResult.success && notifResult.notifications) {
         const ids = new Set<string>(
           notifResult.notifications
@@ -67,20 +67,37 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
     }
   };
 
-  const formatDistance = (from: string, to: string): string => {
-    // Simplified distance calculation (in real app, use geolocation)
-    return '105 km';
-  };
-
-  const formatDuration = (from: string, to: string): string => {
-    return '2h 30';
-  };
+  // ── Apply filter / sort ────────────────────────────────────────────────────
+  const displayedShipments = useMemo(() => {
+    let list = [...shipments];
+    switch (activeFilter) {
+      case 'Proches': {
+        const gov = user?.gouvernerat?.toLowerCase();
+        if (gov) {
+          list = list.filter(s => s.from.toLowerCase().includes(gov));
+        }
+        // secondary sort: date desc
+        list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        break;
+      }
+      case 'Date':
+        list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        break;
+      case 'Prix':
+        list.sort((a, b) => b.price - a.price);
+        break;
+      default:
+        // 'Toutes' — keep backend order (date desc)
+        break;
+    }
+    return list;
+  }, [shipments, activeFilter, user?.gouvernerat]);
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Missions</Text>
+        <Text style={styles.headerTitle}>Opportunités</Text>
         
         {/* Filters */}
         <ScrollView
@@ -128,69 +145,56 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
               <Text style={styles.retryText}>Réessayer</Text>
             </TouchableOpacity>
           </Card>
-        ) : shipments.length === 0 ? (
+        ) : displayedShipments.length === 0 ? (
           <Card style={styles.emptyCard}>
             <Text style={styles.emptyIcon}>📦</Text>
-            <Text style={styles.emptyText}>Aucune mission disponible</Text>
+            <Text style={styles.emptyText}>
+              {activeFilter === 'Proches'
+                ? 'Aucune mission dans votre région'
+                : 'Aucune mission disponible'}
+            </Text>
             <Text style={styles.emptySubtext}>
-              Revenez plus tard pour voir les nouvelles missions
+              {activeFilter === 'Proches'
+                ? 'Essayez le filtre « Toutes » pour voir toutes les missions'
+                : 'Revenez plus tard pour voir les nouvelles missions'}
             </Text>
           </Card>
         ) : (
-          shipments.map((shipment) => {
+          displayedShipments.map((shipment) => {
             const isInvited = invitedShipmentIds.has(shipment.id);
+            const isNew = !isInvited &&
+              shipment.createdAt &&
+              new Date(shipment.createdAt) >= new Date(Date.now() - 86400000);
             return (
-            <Card key={shipment.id} style={styles.missionCard}>
-              <View style={styles.missionHeader}>
-                <View style={styles.routeContainer}>
-                  <Text style={styles.routeText} numberOfLines={1}>
-                    {shipment.from} <Text style={styles.routeArrow}>→</Text> {shipment.to}
-                  </Text>
-                  <View style={styles.missionMeta}>
-                    <Text style={styles.metaText}>
-                      📍 {formatDistance(shipment.from, shipment.to)}
-                    </Text>
-                    <Text style={styles.metaText}>•</Text>
-                    <Text style={styles.metaText}>
-                      ⏱️ {formatDuration(shipment.from, shipment.to)}
-                    </Text>
+              <TouchableOpacity
+                key={shipment.id}
+                activeOpacity={0.85}
+                onPress={() => onNavigate?.('missionDetails', { id: shipment.id })}
+              >
+                <Card style={styles.missionCard}>
+                  <View style={styles.missionHeader}>
+                    <View style={styles.routeContainer}>
+                      <Text style={styles.routeText} numberOfLines={1}>
+                        {shipment.from} <Text style={styles.routeArrow}>→</Text> {shipment.to}
+                      </Text>
+                    </View>
+                    <Text style={styles.priceText}>{shipment.price} TND</Text>
                   </View>
-                </View>
-                <Text style={styles.priceText}>{shipment.price} TND</Text>
-              </View>
 
-              <View style={styles.badgesContainer}>
-                <Badge status="neutral" text={shipment.cargo || 'Marchandise'} />
-                {isInvited && <Badge status="warning" text="Invité" />}
-                {!isInvited && shipment.createdAt && new Date(shipment.createdAt) >= new Date(Date.now() - 86400000) && (
-                  <Badge status="warning" text="Nouveau" />
-                )}
-              </View>
+                  <View style={styles.badgesContainer}>
+                    <Badge status="neutral" text={shipment.cargo || 'Marchandise'} />
+                    {isInvited && <Badge status="warning" text="Invité 📬" />}
+                    {isNew && <Badge status="warning" text="Nouveau" />}
+                  </View>
 
-              <View style={styles.missionActions}>
-                <Button
-                  onPress={() => onNavigate?.('missionDetails', { id: shipment.id })}
-                  style={styles.detailsButton}
-                >
-                  <Text style={styles.detailsButtonText}>Détails</Text>
-                </Button>
-                {isInvited ? (
-                  <Button
-                    onPress={() => onNavigate?.('notificationList')}
-                    style={styles.invitedButton}
-                  >
-                    <Text style={styles.invitedButtonText}>Invitation reçue 📬</Text>
-                  </Button>
-                ) : (
-                  <Button
-                    onPress={() => onNavigate?.('missionDetails', { id: shipment.id })}
-                    style={styles.acceptButton}
-                  >
-                    <Text style={styles.acceptButtonText}>Postuler</Text>
-                  </Button>
-                )}
-              </View>
-            </Card>
+                  <Text style={styles.dateText}>
+                    📅 {new Date(shipment.createdAt).toLocaleDateString('fr-FR', {
+                      day: 'numeric',
+                      month: 'short',
+                    })}
+                  </Text>
+                </Card>
+              </TouchableOpacity>
             );
           })
         )}
@@ -276,15 +280,6 @@ const styles = StyleSheet.create({
   routeArrow: {
     color: '#999',
   },
-  missionMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  metaText: {
-    fontSize: 12,
-    color: '#666666',
-  },
   priceText: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -293,40 +288,12 @@ const styles = StyleSheet.create({
   badgesContainer: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 8,
   },
-  missionActions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  detailsButton: {
-    flex: 1,
-    backgroundColor: '#F6F6F6',
-    borderWidth: 0,
-  },
-  detailsButtonText: {
+  dateText: {
+    fontSize: 12,
     color: '#666666',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  acceptButton: {
-    flex: 1,
-  },
-  acceptButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  invitedButton: {
-    flex: 1,
-    backgroundColor: '#FFF3CD',
-    borderWidth: 1,
-    borderColor: '#FFC107',
-  },
-  invitedButtonText: {
-    color: '#856404',
-    fontSize: 13,
-    fontWeight: '600',
+    marginTop: 2,
   },
   loadingContainer: {
     padding: 40,

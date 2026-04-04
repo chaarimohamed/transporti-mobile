@@ -30,6 +30,15 @@ const TransporterProfileScreen: React.FC<TransporterProfileScreenProps> = ({
   const carrier: Carrier = initialData?.transporter;
   const shipmentId = initialData?.shipmentId;
   const shipmentStatus = initialData?.shipmentStatus;
+  const returnScreen: string = initialData?.returnScreen ?? 'suggestedTransporters';
+
+  const handleBack = () => {
+    if (returnScreen === 'shipmentDetails' && shipmentId) {
+      onNavigate?.('shipmentDetails', { id: shipmentId });
+    } else {
+      onNavigate?.('suggestedTransporters', { shipmentId, shipment: initialData?.shipment });
+    }
+  };
   const [isInviting, setIsInviting] = useState(false);
 
   // Contact info is visible only after both parties agreed (CONFIRMED, IN_TRANSIT, or DELIVERED)
@@ -40,7 +49,7 @@ const TransporterProfileScreen: React.FC<TransporterProfileScreenProps> = ({
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => onNavigate?.('suggestedTransporters')}
+            onPress={handleBack}
             style={styles.backButton}
             activeOpacity={0.7}
           >
@@ -98,7 +107,7 @@ const TransporterProfileScreen: React.FC<TransporterProfileScreenProps> = ({
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => onNavigate?.('suggestedTransporters')}
+          onPress={handleBack}
           style={styles.backButton}
           activeOpacity={0.7}
         >
@@ -286,9 +295,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
     gap: 4,
-  },
-  starIcon: {
-    fontSize: 16,
   },
   ratingText: {
     fontSize: 14,

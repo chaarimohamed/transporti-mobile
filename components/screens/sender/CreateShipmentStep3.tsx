@@ -55,12 +55,11 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
       else if (data.format === 'XL') basePrice += 80;
     }
 
-    // Meeting point fees
-    if (data?.meetingPoint === 'home') basePrice += 15;
-    if (data?.deliveryMeetingPoint === 'home') basePrice += 15;
-
-    // Insurance
-    if (data?.insurance) basePrice += 25;
+    // Helper fees
+    if (data?.helperCount === 1) basePrice += 15;
+    else if (data?.helperCount === 2) basePrice += 30;
+    if (data?.deliveryHelperCount === 1) basePrice += 15;
+    else if (data?.deliveryHelperCount === 2) basePrice += 30;
 
     return basePrice;
   }
@@ -79,25 +78,38 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
         packageFormat: initialData?.format || 'M',
         dimensions: initialData?.dimensions || null,
         specialInstructions: initialData?.specialInstructions || '',
-        declaredValue: initialData?.declaredValue || 0,
-        insurance: initialData?.insurance || false,
-        pickupMeetingPoint: initialData?.meetingPoint || 'vehicle',
-        deliveryMeetingPoint: initialData?.deliveryMeetingPoint || 'vehicle',
-        senderInfo: initialData?.isNotSender ? {
-          name: initialData?.senderName,
-          phone: initialData?.senderPhone,
-          instructions: initialData?.pickupInstructions,
-        } : null,
-        recipientInfo: initialData?.isNotRecipient ? {
-          name: initialData?.recipientName,
-          phone: initialData?.recipientPhone,
-          instructions: initialData?.deliveryInstructions,
-        } : null,
+        declaredValue: 0,
+        insurance: false,
+        // Pickup helper & meeting point
+        helperCount: initialData?.helperCount ?? 0,
+        pickupMeetingPoint: 'vehicle',
+        // Delivery helper & meeting point
+        deliveryHelperCount: initialData?.deliveryHelperCount ?? 0,
+        deliveryMeetingPoint: 'vehicle',
+        // Sender contact info (when not the logged-in user)
+        senderName: initialData?.isNotSender ? (initialData?.senderName || null) : null,
+        senderPhone: initialData?.isNotSender ? (initialData?.senderPhone || null) : null,
+        pickupInstructions: initialData?.pickupInstructions || null,
+        // Recipient contact info
+        recipientName: initialData?.isNotRecipient ? (initialData?.recipientName || null) : null,
+        recipientPhone: initialData?.isNotRecipient ? (initialData?.recipientPhone || null) : null,
+        deliveryInstructions: initialData?.deliveryInstructions || null,
       };
 
       const result = await shipmentService.createShipment(shipmentData);
 
       if (result.success && result.shipment) {
+        // Upload photos separately (avoids bloating the create request)
+        const photos: string[] = (initialData?.photos || [])
+          .map((p: any) => (typeof p === 'string' ? p : p.base64))
+          .filter(Boolean);
+        if (photos.length > 0) {
+          try {
+            await shipmentService.uploadShipmentPhotos(result.shipment.id, photos);
+          } catch (e) {
+            console.warn('Photo upload failed (non-fatal):', e);
+          }
+        }
         // Show success message and navigate to dashboard
         if (Platform.OS === 'web') {
           window.alert('✅ Expédition créée avec succès!');
@@ -205,18 +217,6 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
             <View style={styles.detailItem}>
               <Text style={styles.detailLabel}>Poids</Text>
               <Text style={styles.detailValue}>{initialData?.weightRange || 'N/A'}</Text>
-            </View>
-            <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Valeur</Text>
-              <Text style={styles.detailValue}>
-                {initialData?.declaredValue || 0} TND
-              </Text>
-            </View>
-            <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Assurance</Text>
-              <Text style={[styles.detailValue, styles.detailValueSuccess]}>
-                {initialData?.insurance ? 'Oui' : 'Non'}
-              </Text>
             </View>
           </View>
         </Card>

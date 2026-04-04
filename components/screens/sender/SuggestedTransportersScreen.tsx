@@ -88,7 +88,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
   };
 
   const handleInviteTransporter = (carrier: Carrier) => {
-    onNavigate?.('transporterProfile', { transporter: carrier, shipmentId, shipmentRefNumber: currentShipment?.refNumber });
+    onNavigate?.('transporterProfile', { transporter: carrier, shipmentId, shipment: currentShipment, shipmentRefNumber: currentShipment?.refNumber });
   };
 
   const handleAcceptCarrier = async (shipment: Shipment) => {
@@ -205,7 +205,11 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => onNavigate?.('dashboard')}
+          onPress={() =>
+            shipmentId
+              ? onNavigate?.('shipmentDetails', { id: shipmentId })
+              : onNavigate?.('dashboard')
+          }
           style={styles.backButton}
           activeOpacity={0.7}
         >
@@ -327,7 +331,17 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
             {carriers.map((carrier) => {
             const isInvited = invitedCarrierIds.has(carrier.id);
             return (
-            <Card key={carrier.id} style={[styles.transporterCard, isInvited && styles.transporterCardInvited]}>
+            <TouchableOpacity
+              key={carrier.id}
+              activeOpacity={0.75}
+              onPress={() => onNavigate?.('transporterProfile', {
+                transporter: carrier,
+                shipmentId,
+                shipment: currentShipment,
+                shipmentRefNumber: currentShipment?.refNumber,
+              })}
+            >
+            <Card style={[styles.transporterCard, isInvited && styles.transporterCardInvited]}>
               <View style={styles.cardContent}>
                 {/* Avatar */}
                 <View style={styles.avatar}>
@@ -355,7 +369,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
                     <View style={styles.ratingContainer}>
                       <Text style={styles.starIcon}>⭐</Text>
                       <Text style={styles.contactText}>
-                        {carrier.averageRating && carrier.averageRating > 0 
+                        {carrier.averageRating && carrier.averageRating > 0
                           ? `${carrier.averageRating.toFixed(1)} (${carrier.totalReviews || 0} avis)`
                           : 'Non évalué'
                         }
@@ -372,13 +386,14 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
               ) : (
               <TouchableOpacity
                 style={styles.inviteButton}
-                onPress={() => handleInviteTransporter(carrier)}
+                onPress={(e) => { e.stopPropagation?.(); handleInviteTransporter(carrier); }}
                 activeOpacity={0.7}
               >
                 <Text style={styles.inviteButtonText}>Inviter</Text>
               </TouchableOpacity>
               )}
             </Card>
+            </TouchableOpacity>
             );
           })}
           </View>
