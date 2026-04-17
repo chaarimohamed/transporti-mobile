@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start --tunnel",
-    "start:lan": "expo start",
+    "start": "bash scripts/start.sh",
+    "start:lan": "bash scripts/start.sh",
+    "start:tunnel": "EXPO_OFFLINE=1 NODE_OPTIONS=--dns-result-order=ipv4first expo start --tunnel --clear",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "eslint .",
-    "type-check": "tsc --noEmit"
+    "type-check": "node ./node_modules/typescript/bin/tsc --noEmit"
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",

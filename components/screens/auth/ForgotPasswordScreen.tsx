@@ -174,7 +174,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
                   placeholder="123456"
                   value={resetToken}
                   onChangeText={setResetToken}
-                  keyboardType="number-pad"
+                  keyboardType="numeric"
                   maxLength={6}
                   icon={<Text>🔑</Text>}
                 />

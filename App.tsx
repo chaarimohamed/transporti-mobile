@@ -55,7 +55,7 @@ type ScreenName = 'splash' | 'roleSelection' | 'login' | 'forgotPassword' | 'sen
 function AppContent() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<ScreenName>('splash');
-  const [userRole, setUserRole] = useState<'sender' | 'carrier' | null>(null);
+  const [, setUserRole] = useState<'sender' | 'carrier' | null>(null);
   const [screenParams, setScreenParams] = useState<any>(null);
 
   const navigate = (screen: string, params?: any) => {

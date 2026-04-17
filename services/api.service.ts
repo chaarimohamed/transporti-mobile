@@ -11,14 +11,24 @@ import * as storage from '../utils/storage';
  * - Error handling
  */
 
+const usesNgrok = (() => {
+  try {
+    return new URL(API_CONFIG.BASE_URL).hostname.includes('ngrok');
+  } catch {
+    return false;
+  }
+})();
+
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
   timeout: API_CONFIG.TIMEOUT,
   headers: {
     ...API_CONFIG.HEADERS,
-    // Required to bypass ngrok browser warning page in development
-    'ngrok-skip-browser-warning': 'true',
+    ...(usesNgrok && {
+      // Required only when the backend is exposed through ngrok.
+      'ngrok-skip-browser-warning': 'true',
+    }),
   },
 });
 
