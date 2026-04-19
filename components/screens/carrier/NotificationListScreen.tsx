@@ -121,7 +121,15 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
     // BUG-02 fix: fall back to notification.data.shipmentId when the top-level field is null
     const shipmentId = notification.shipmentId || notification.data?.shipmentId;
     if (shipmentId) {
-      onNavigate?.('missionDetails', { shipmentId });
+      if (notification.type === 'SHIPMENT_DELIVERED') {
+        onNavigate?.('shipmentFeedback', {
+          shipmentId,
+          returnScreen: 'missionDetails',
+          returnParams: { shipmentId },
+        });
+      } else {
+        onNavigate?.('missionDetails', { shipmentId });
+      }
     }
   };
 

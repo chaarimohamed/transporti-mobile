@@ -80,8 +80,17 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
     // Navigate based on notification type
     const shipmentId = notification.shipmentId || notification.data?.shipmentId;
     if (shipmentId) {
-      console.log('🚀 Navigating to shipmentDetails with ID:', shipmentId);
-      onNavigate?.('shipmentDetails', { id: shipmentId });
+      if (notification.type === 'SHIPMENT_DELIVERED') {
+        console.log('🚀 Navigating to shipmentFeedback with ID:', shipmentId);
+        onNavigate?.('shipmentFeedback', {
+          shipmentId,
+          returnScreen: 'shipmentDetails',
+          returnParams: { id: shipmentId },
+        });
+      } else {
+        console.log('🚀 Navigating to shipmentDetails with ID:', shipmentId);
+        onNavigate?.('shipmentDetails', { id: shipmentId });
+      }
     } else {
       console.log('⚠️ No shipmentId found in notification');
     }

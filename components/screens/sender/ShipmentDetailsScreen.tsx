@@ -594,6 +594,37 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
             </Card>
           </>
         )}
+        
+        {shipment.status === 'DELIVERED' && shipment.feedbackSummary?.canSubmit && (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Votre évaluation</Text>
+            </View>
+            <Card style={styles.feedbackCard}>
+              <Text style={styles.feedbackTitle}>
+                {shipment.feedbackSummary.hasSubmitted
+                  ? 'Votre avis a déjà été enregistré'
+                  : 'La livraison est terminée'}
+              </Text>
+              <Text style={styles.feedbackText}>
+                {shipment.feedbackSummary.hasSubmitted
+                  ? 'Vous pouvez ajuster votre note et votre commentaire sur ce transporteur.'
+                  : 'Évaluez le transporteur pour finaliser cette expédition côté expérience client.'}
+              </Text>
+              <Button
+                onPress={() => onNavigate?.('shipmentFeedback', {
+                  shipmentId: shipment.id,
+                  returnScreen: 'shipmentDetails',
+                  returnParams: { id: shipment.id },
+                })}
+                size="lg"
+                fullWidth
+              >
+                {shipment.feedbackSummary.hasSubmitted ? 'Modifier mon évaluation' : 'Évaluer le transporteur'}
+              </Button>
+            </Card>
+          </>
+        )}
       </ScrollView>
 
       {/* Bottom Actions */}
@@ -908,6 +939,25 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 14,
     alignItems: 'center',
+  },
+  feedbackCard: {
+    padding: 18,
+    marginBottom: 8,
+    backgroundColor: '#FFF7E8',
+    borderWidth: 1,
+    borderColor: '#F3D9A6',
+  },
+  feedbackTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#7C4A03',
+    marginBottom: 8,
+  },
+  feedbackText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#6B5A3D',
+    marginBottom: 14,
   },
   handoverButtonText: {
     color: '#FFFFFF',

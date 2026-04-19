@@ -19,7 +19,7 @@ import { Shipment } from '../../../services/shipment.service';
 import { useAuth } from '../../../contexts/AuthContext';
 
 interface MissionDetailsScreenProps {
-  route?: { params?: { id?: string; shipmentId?: string; fromInvitation?: boolean; returnScreen?: string } };
+  route?: { params?: { id?: string; shipmentId?: string; shipment?: Shipment; fromInvitation?: boolean; returnScreen?: string } };
   onNavigate?: (screen: string, params?: any) => void;
 }
 
@@ -383,6 +383,34 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
           </View>
         </Card>
       </ScrollView>
+      
+      {shipment.status === 'DELIVERED' && shipment.feedbackSummary?.canSubmit && (
+        <Card style={styles.feedbackCard}>
+          <Text style={styles.sectionTitle}>Votre évaluation</Text>
+          <Text style={styles.feedbackTitle}>
+            {shipment.feedbackSummary.hasSubmitted
+              ? 'Votre retour sur l\'expéditeur est déjà enregistré'
+              : 'La livraison est terminée'}
+          </Text>
+          <Text style={styles.feedbackText}>
+            {shipment.feedbackSummary.hasSubmitted
+              ? 'Vous pouvez encore ajuster votre note et votre commentaire si besoin.'
+              : 'Ajoutez une évaluation de l\'expéditeur maintenant que la mission est livrée.'}
+          </Text>
+          <TouchableOpacity
+            style={styles.fullWidthButton}
+            onPress={() => onNavigate?.('shipmentFeedback', {
+              shipmentId: shipment.id,
+              returnScreen: 'missionDetails',
+              returnParams: { shipmentId: shipment.id },
+            })}
+          >
+            <Text style={styles.fullWidthButtonText}>
+              {shipment.feedbackSummary.hasSubmitted ? 'Modifier mon évaluation' : 'Évaluer l\'expéditeur'}
+            </Text>
+          </TouchableOpacity>
+        </Card>
+      )}
 
       {/* Action Buttons - Show different buttons based on context */}
       {fromInvitation && shipment.status === 'PENDING' ? (
@@ -693,6 +721,25 @@ const styles = StyleSheet.create({
   priceLabel: {
     fontSize: 13,
     color: '#666666',
+  },
+  feedbackCard: {
+    marginBottom: 16,
+    padding: 16,
+    backgroundColor: '#FFF7E8',
+    borderWidth: 1,
+    borderColor: '#F3D9A6',
+  },
+  feedbackTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#7C4A03',
+    marginBottom: 8,
+  },
+  feedbackText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#6B5A3D',
+    marginBottom: 14,
   },
   counterOfferSection: {
     gap: 8,

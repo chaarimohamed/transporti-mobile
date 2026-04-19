@@ -69,6 +69,7 @@ export const API_ENDPOINTS = {
     GET: (id: string) => `/shipments/${id}`,
     UPDATE: (id: string) => `/shipments/${id}`,
     DELETE: (id: string) => `/shipments/${id}`,
+    FEEDBACK: (id: string) => `/shipments/${id}/feedback`,
     STATS: '/shipments/stats',
     PHOTOS: (id: string) => `/shipments/${id}/photos`,
   },

@@ -49,8 +49,10 @@ import PersonalInformationCarrierScreen from './components/screens/carrier/Perso
 import NotificationSettingsCarrierScreen from './components/screens/carrier/NotificationSettingsCarrierScreen';
 import TermsAndConditionsCarrierScreen from './components/screens/carrier/TermsAndConditionsCarrierScreen';
 import PrivacySecurityCarrierScreen from './components/screens/carrier/PrivacySecurityCarrierScreen';
+import ShipmentFeedbackScreen from './components/screens/shared/ShipmentFeedbackScreen';
+import ShipmentFeedbackSuccessScreen from './components/screens/shared/ShipmentFeedbackSuccessScreen';
 
-type ScreenName = 'splash' | 'roleSelection' | 'login' | 'forgotPassword' | 'senderRegister' | 'carrierRegister' | 'carrierOnboarding2' | 'carrierOnboarding3' | 'carrierOnboarding4' | 'verifyEmail' | 'dashboard' | 'shipmentList' | 'newShipment' | 'createShipmentStep1' | 'addressPickup' | 'addressDelivery' | 'mapPicker' | 'createShipmentStep2' | 'createShipmentStep3' | 'shipmentDetails' | 'missionList' | 'missionDetails' | 'activeMissions' | 'updateStatus' | 'notificationList' | 'applicationList' | 'applicationDetails' | 'applicationAccepted' | 'suggestedTransporters' | 'transporterProfile' | 'invitationSent' | 'paymentCodeInput' | 'paymentSuccess' | 'paymentError' | 'paymentBlocked' | 'paymentReceipt' | 'paymentHistory' | 'notifications' | 'notificationListSender' | 'profile' | 'notificationSettings' | 'personalInformation' | 'termsAndConditions' | 'privacySecurity' | 'profileCarrier' | 'personalInformationCarrier' | 'notificationSettingsCarrier' | 'termsAndConditionsCarrier' | 'privacySecurityCarrier';
+type ScreenName = 'splash' | 'roleSelection' | 'login' | 'forgotPassword' | 'senderRegister' | 'carrierRegister' | 'carrierOnboarding2' | 'carrierOnboarding3' | 'carrierOnboarding4' | 'verifyEmail' | 'dashboard' | 'shipmentList' | 'newShipment' | 'createShipmentStep1' | 'addressPickup' | 'addressDelivery' | 'mapPicker' | 'createShipmentStep2' | 'createShipmentStep3' | 'shipmentDetails' | 'missionList' | 'missionDetails' | 'activeMissions' | 'updateStatus' | 'notificationList' | 'applicationList' | 'applicationDetails' | 'applicationAccepted' | 'suggestedTransporters' | 'transporterProfile' | 'invitationSent' | 'paymentCodeInput' | 'paymentSuccess' | 'paymentError' | 'paymentBlocked' | 'paymentReceipt' | 'paymentHistory' | 'shipmentFeedback' | 'shipmentFeedbackSuccess' | 'notifications' | 'notificationListSender' | 'profile' | 'notificationSettings' | 'personalInformation' | 'termsAndConditions' | 'privacySecurity' | 'profileCarrier' | 'personalInformationCarrier' | 'notificationSettingsCarrier' | 'termsAndConditionsCarrier' | 'privacySecurityCarrier';
 
 function AppContent() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -119,6 +121,10 @@ function AppContent() {
         case 'notifications':
         case 'notificationListSender':
           return <NotificationListSenderScreen onNavigate={navigate} />;
+        case 'shipmentFeedback':
+          return <ShipmentFeedbackScreen route={{ params: screenParams }} onNavigate={navigate} />;
+        case 'shipmentFeedbackSuccess':
+          return <ShipmentFeedbackSuccessScreen route={{ params: screenParams }} onNavigate={navigate} />;
         case 'profile':
           return <ProfileSenderScreen onNavigate={navigate} />;
         case 'notificationSettings':
@@ -160,6 +166,10 @@ function AppContent() {
           return <PaymentReceiptScreen route={{ params: screenParams }} onNavigate={navigate} />;
         case 'paymentHistory':
           return <PaymentHistoryScreen onNavigate={navigate} />;
+        case 'shipmentFeedback':
+          return <ShipmentFeedbackScreen route={{ params: screenParams }} onNavigate={navigate} />;
+        case 'shipmentFeedbackSuccess':
+          return <ShipmentFeedbackSuccessScreen route={{ params: screenParams }} onNavigate={navigate} />;
         case 'profileCarrier':
           return <ProfileCarrierScreen onNavigate={navigate} />;
         case 'personalInformationCarrier':
