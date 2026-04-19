@@ -21,7 +21,7 @@ import { Shipment } from '../../../services/shipment.service';
 import * as notificationService from '../../../services/notification.service';
 
 interface DashboardCarrierProps {
-  onNavigate?: (screen: string) => void;
+  onNavigate?: (screen: string, params?: unknown) => void;
 }
 
 const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
@@ -83,7 +83,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
       } else {
         console.log('❌ Stats fetch failed:', statsResult.error);
         // Set default stats on error
-        setStats({ assigned: 0, applied: 0, inProgress: 0, completed: 0, total: 0 });
+        setStats({ assigned: 0, applied: 0, inProgress: 0, completed: 0 });
       }
 
       if (shipmentsResult.success && shipmentsResult.shipments) {
@@ -466,10 +466,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#1A1A1A',
+    flex: 1,
+    marginRight: 12,
   },
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 0,
     gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -488,9 +491,11 @@ const styles = StyleSheet.create({
   },
   missionCard: {
     marginBottom: 12,
+    overflow: 'hidden',
   },
   missionHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
@@ -499,6 +504,7 @@ const styles = StyleSheet.create({
   dateTag: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 0,
     gap: 4,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -518,12 +524,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginBottom: 8,
+    minWidth: 0,
   },
   locationText: {
     fontSize: 14,
     fontWeight: '600',
     color: '#1A1A1A',
     flex: 1,
+    minWidth: 0,
   },
   arrowIcon: {
     fontSize: 14,

@@ -1,14 +1,16 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleProp, StyleSheet, ViewStyle } from 'react-native';
 
 interface BadgeProps {
-  status: 'success' | 'warning' | 'error' | 'neutral' | 'info';
+  status?: 'success' | 'warning' | 'error' | 'neutral' | 'info';
+  variant?: 'success' | 'warning' | 'error' | 'neutral' | 'info';
   text: string;
+  style?: StyleProp<ViewStyle>;
 }
 
-const Badge: React.FC<BadgeProps> = ({ status, text }) => {
+const Badge: React.FC<BadgeProps> = ({ status, variant, text, style }) => {
   const getStyles = () => {
-    switch (status) {
+    switch (status || variant || 'neutral') {
       case 'success':
         return { backgroundColor: 'rgba(46, 139, 87, 0.1)', color: '#2E8B57' };
       case 'warning':
@@ -27,7 +29,7 @@ const Badge: React.FC<BadgeProps> = ({ status, text }) => {
   const customStyles = getStyles();
 
   return (
-    <View style={[styles.container, { backgroundColor: customStyles.backgroundColor }]}>
+    <View style={[styles.container, { backgroundColor: customStyles.backgroundColor }, style]}>
       <Text style={[styles.text, { color: customStyles.color }]}>{text}</Text>
     </View>
   );

@@ -14,7 +14,7 @@ import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 
 interface PaymentHistoryScreenProps {
-  onNavigate?: (screen: string, params?: any) => void;
+  onNavigate?: (screen: string, params?: unknown) => void;
 }
 
 interface HistoryItem {
@@ -318,6 +318,7 @@ const styles = StyleSheet.create({
   filterContent: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+    paddingRight: 24,
   },
   filterChip: {
     paddingHorizontal: 20,
@@ -396,6 +397,7 @@ const styles = StyleSheet.create({
   },
   cardHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
@@ -404,11 +406,15 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E9E9E9',
   },
   cardDate: {
+    flexShrink: 1,
     fontSize: 12,
     color: '#666666',
+    marginLeft: 8,
+    textAlign: 'right',
   },
   cardBody: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     padding: 16,
@@ -416,6 +422,8 @@ const styles = StyleSheet.create({
   },
   cardInfoSection: {
     flex: 1,
+    minWidth: 0,
+    paddingRight: 12,
   },
   orderIdText: {
     fontSize: 12,
@@ -426,14 +434,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#1A1A1A',
+    flexShrink: 1,
   },
   amountText: {
+    flexShrink: 0,
     fontSize: 18,
     fontWeight: '700',
     color: '#1A1A1A',
   },
   cardFooter: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -442,6 +453,9 @@ const styles = StyleSheet.create({
   paymentMethodContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    minWidth: 0,
+    paddingRight: 12,
   },
   cardIcon: {
     fontSize: 12,
@@ -450,10 +464,13 @@ const styles = StyleSheet.create({
   paymentMethodText: {
     fontSize: 12,
     color: '#666666',
+    flexShrink: 1,
   },
   viewReceiptContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 0,
+    marginTop: 8,
   },
   viewReceiptText: {
     fontSize: 12,

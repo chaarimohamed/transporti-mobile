@@ -16,7 +16,7 @@ import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 
 interface ActiveMissionsScreenProps {
-  onNavigate?: (screen: string, params?: any) => void;
+  onNavigate?: (screen: string, params?: unknown) => void;
 }
 
 // Which stat tile is active as a filter
@@ -281,19 +281,20 @@ const styles = StyleSheet.create({
   missionCard: { marginBottom: 16, padding: 16, borderLeftWidth: 4 },
   missionHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 12,
   },
-  missionRef: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+  missionRef: { flexDirection: 'row', alignItems: 'center', flex: 1, flexWrap: 'wrap', minWidth: 0 },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4 },
   statusText: { fontSize: 12, fontWeight: '600' },
   priceText: { fontSize: 16, fontWeight: 'bold', color: '#1A1A1A' },
-  routeContainer: { marginBottom: 12, gap: 4 },
-  routeText: { fontSize: 15, fontWeight: '600', color: '#1A1A1A' },
+  routeContainer: { marginBottom: 12, gap: 4, minWidth: 0 },
+  routeText: { fontSize: 15, fontWeight: '600', color: '#1A1A1A', flexShrink: 1 },
   routeArrow: { color: '#999' },
   cargoText: { fontSize: 13, color: '#666666' },
-  dateText: { fontSize: 13, color: '#666666' },
+  dateText: { fontSize: 13, color: '#666666', flexShrink: 1 },
   actionsContainer: { marginTop: 4 },
   updateButton: {},
   updateButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },

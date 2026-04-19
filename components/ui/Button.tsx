@@ -1,5 +1,5 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, StyleProp, ViewStyle } from 'react-native';
 
 interface ButtonProps {
   onPress?: () => void;
@@ -9,7 +9,7 @@ interface ButtonProps {
   fullWidth?: boolean;
   disabled?: boolean;
   loading?: boolean;
-  style?: ViewStyle | ViewStyle[];
+  style?: StyleProp<ViewStyle>;
 }
 
 export const Button: React.FC<ButtonProps> = ({

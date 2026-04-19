@@ -14,13 +14,18 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
-import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
-import { Input } from '../../ui/Input';
+import { openAndroidDatePicker } from '../../../utils/androidDatePicker';
+
+interface ShipmentStep1Data {
+  photos?: { uri: string; base64: string }[];
+  pickupDate?: string;
+  weightRange?: string;
+}
 
 interface CreateShipmentStep1Props {
-  onNavigate?: (screen: string, data?: any) => void;
-  initialData?: any;
+  onNavigate?: (screen: string, data?: ShipmentStep1Data) => void;
+  initialData?: ShipmentStep1Data;
 }
 
 const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
@@ -58,11 +63,23 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
     return `${day}/${month}/${year}`;
   };
 
-  const handleDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(Platform.OS === 'ios');
+  const handleDateChange = (_event: unknown, selectedDate?: Date) => {
     if (selectedDate) {
       setPickupDate(selectedDate);
     }
+  };
+
+  const handleOpenDatePicker = () => {
+    if (Platform.OS === 'android') {
+      openAndroidDatePicker({
+        value: pickupDate,
+        minimumDate: new Date(),
+        onConfirm: setPickupDate,
+      });
+      return;
+    }
+
+    setShowDatePicker(true);
   };
 
   const handleAddPhoto = async () => {
@@ -169,7 +186,7 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
           <Text style={styles.label}>Date de collecte</Text>
           <TouchableOpacity
             style={styles.pickerInputContainer}
-            onPress={() => setShowDatePicker(true)}
+            onPress={handleOpenDatePicker}
           >
             <Text style={styles.inputIcon}>📅</Text>
             <Text style={styles.pickerText}>
@@ -214,16 +231,6 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
             </TouchableOpacity>
           </Modal>
         )}
-        {showDatePicker && Platform.OS === 'android' && (
-          <DateTimePicker
-            value={pickupDate}
-            mode="date"
-            display="default"
-            onChange={handleDateChange}
-            minimumDate={new Date()}
-          />
-        )}
-
         {/* Weight Range */}
         <View style={styles.section}>
           <Text style={styles.label}>Poids estimé (kg)</Text>
@@ -463,6 +470,7 @@ const styles = StyleSheet.create({
   },
   pickerText: {
     flex: 1,
+    minWidth: 0,
     fontSize: 16,
     color: '#1A1A1A',
   },

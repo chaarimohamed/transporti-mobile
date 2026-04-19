@@ -17,7 +17,7 @@ import * as notificationService from '../../../services/notification.service';
 import { Shipment } from '../../../services/shipment.service';
 
 interface MissionListScreenProps {
-  onNavigate?: (screen: string, params?: any) => void;
+  onNavigate?: (screen: string, params?: unknown) => void;
 }
 
 const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => {
@@ -269,6 +269,7 @@ const styles = StyleSheet.create({
   },
   routeContainer: {
     flex: 1,
+    minWidth: 0,
     marginRight: 12,
   },
   routeText: {
@@ -287,6 +288,7 @@ const styles = StyleSheet.create({
   },
   badgesContainer: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
     marginBottom: 8,
   },
@@ -294,6 +296,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666666',
     marginTop: 2,
+    flexShrink: 1,
   },
   loadingContainer: {
     padding: 40,

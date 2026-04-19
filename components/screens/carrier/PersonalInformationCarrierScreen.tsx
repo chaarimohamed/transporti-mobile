@@ -17,9 +17,19 @@ import { Button } from '../../ui/Button';
 import { Dropdown } from '../../ui/Dropdown';
 import { useAuth } from '../../../contexts/AuthContext';
 import * as authService from '../../../services/authService';
+import { openAndroidDatePicker } from '../../../utils/androidDatePicker';
 
 interface PersonalInformationCarrierScreenProps {
-  onNavigate?: (screen: string, params?: any) => void;
+  onNavigate?: (screen: string, params?: unknown) => void;
+}
+
+interface CarrierInformationFormUser {
+  firstName?: string;
+  lastName?: string;
+  dateOfBirth?: string;
+  phone?: string;
+  gouvernerat?: string;
+  vehicleType?: string;
 }
 
 const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScreenProps> = ({
@@ -53,7 +63,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
     return `${day}/${month}/${year}`;
   };
 
-  const populateForm = (u: any) => {
+  const populateForm = (u: CarrierInformationFormUser) => {
     setFirstName(u.firstName || '');
     setLastName(u.lastName || '');
     setPhone(u.phone || '');
@@ -214,6 +224,23 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
     );
   };
 
+  const handleOpenDatePicker = () => {
+    if (Platform.OS === 'android') {
+      openAndroidDatePicker({
+        value: selectedDate,
+        minimumDate: new Date(1920, 0, 1),
+        maximumDate: new Date(),
+        onConfirm: (date) => {
+          setSelectedDate(date);
+          setDateOfBirth(formatDateToString(date));
+        },
+      });
+      return;
+    }
+
+    setShowDatePicker(true);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -281,7 +308,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
             <Text style={styles.dateLabel}>Date de naissance</Text>
             <TouchableOpacity
               style={styles.dateButton}
-              onPress={() => setShowDatePicker(true)}
+              onPress={handleOpenDatePicker}
               activeOpacity={0.7}
             >
               <Text style={dateOfBirth ? styles.dateButtonText : styles.dateButtonPlaceholder}>
@@ -297,7 +324,6 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
                 maximumDate={new Date()}
                 minimumDate={new Date(1920, 0, 1)}
                 onChange={(_, date) => {
-                  if (Platform.OS === 'android') setShowDatePicker(false);
                   if (date) {
                     setSelectedDate(date);
                     setDateOfBirth(formatDateToString(date));
@@ -415,6 +441,7 @@ const styles = StyleSheet.create({
   },
   photoSection: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
     marginBottom: 32,
   },
   photoContainer: {
@@ -443,6 +470,7 @@ const styles = StyleSheet.create({
   photoTextContainer: {
     flex: 1,
     justifyContent: 'center',
+    minWidth: 0,
   },
   photoDescription: {
     fontSize: 12,
@@ -460,10 +488,12 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
   },
   halfInput: {
     flex: 1,
+    flexBasis: 150,
   },
   phoneContainer: {
     marginTop: 8,
@@ -476,6 +506,7 @@ const styles = StyleSheet.create({
   },
   phoneRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   countryCode: {
@@ -494,6 +525,7 @@ const styles = StyleSheet.create({
   },
   phoneInput: {
     flex: 1,
+    minWidth: 0,
   },
   changeNumberLink: {
     fontSize: 14,
@@ -520,12 +552,16 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
   },
   dateButtonText: {
+    flex: 1,
     fontSize: 15,
     color: '#1A1A1A',
+    marginRight: 12,
   },
   dateButtonPlaceholder: {
+    flex: 1,
     fontSize: 15,
     color: '#AAAAAA',
+    marginRight: 12,
   },
   dateIcon: {
     fontSize: 18,

@@ -21,8 +21,8 @@ import { Shipment } from '../../../services/shipment.service';
 import * as notificationService from '../../../services/notification.service';
 
 interface DashboardSenderProps {
-  onNavigate?: (screen: string) => void;
-  initialData?: any;
+  onNavigate?: (screen: string, params?: unknown) => void;
+  initialData?: { refresh?: boolean } | null;
 }
 
 const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialData }) => {
@@ -446,14 +446,18 @@ const styles = StyleSheet.create({
   },
   shipmentHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
   },
   shipmentId: {
+    flex: 1,
     fontSize: 16,
     fontWeight: '600',
     color: '#1A1A1A',
+    marginRight: 12,
+    minWidth: 0,
   },
   shipmentRoute: {
     flexDirection: 'row',
@@ -472,6 +476,7 @@ const styles = StyleSheet.create({
   },
   shipmentFooter: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
@@ -484,6 +489,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#1464F6',
     fontWeight: '600',
+    marginTop: 8,
   },
   loadingContainer: {
     padding: 40,
