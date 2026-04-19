@@ -61,6 +61,36 @@ If the project is inside **OneDrive** and you are working from **WSL**, the reli
 1. move the repo to your WSL filesystem and run `npm install` there, or
 2. keep the repo where it is and run `npm install` from Windows PowerShell instead of WSL.
 
+## WSL2 mirrored networking (Windows + WSL)
+
+If you run Expo from WSL and connect with a physical phone, use mirrored mode:
+
+1. Create or edit `%USERPROFILE%/.wslconfig` on Windows:
+
+```ini
+[wsl2]
+networkingMode=mirrored
+
+[experimental]
+hostAddressLoopback=true
+```
+
+2. Restart WSL from PowerShell:
+
+```powershell
+wsl --shutdown
+```
+
+3. Allow inbound traffic to the WSL VM (PowerShell as Administrator):
+
+```powershell
+Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -DefaultInboundAction Allow
+```
+
+4. Keep the repo on the Linux filesystem (for example `~/transporti_v0`, not `/mnt/c/...`).
+
+5. Run `npm start` and verify Expo QR output uses your Windows LAN IP (`192.168.x.x` style). Use that same IP in `EXPO_PUBLIC_API_URL`.
+
 ## Choosing `EXPO_PUBLIC_API_URL`
 
 Use the backend base URL including `/api`.
@@ -91,5 +121,32 @@ If you use `npm run start:tunnel`, point `EXPO_PUBLIC_API_URL` to a backend URL 
 
 - your machine LAN IP when the phone is on the same network
 - or a separately deployed/public backend URL
+
+### Recommended iPhone tunnel workflow
+
+When LAN is blocked (AP isolation, strict router, corporate Wi-Fi), run both tunnels:
+
+1. Backend tunnel (writes the public API URL into `transporti-mobile/.env`):
+   ```bash
+   cd ../transporti-backend
+   npm run start:with-ngrok
+   ```
+2. Mobile tunnel:
+   ```bash
+   cd ../transporti-mobile
+   npm run start:tunnel
+   ```
+
+From monorepo root you can also run:
+
+```bash
+npm run start:backend:tunnel
+```
+
+and in another terminal:
+
+```bash
+npm run start:mobile:tunnel
+```
 
 The app no longer relies on a hardcoded ngrok backend URL, so each developer can use their own environment safely.

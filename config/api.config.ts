@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 
 /**
  * API Configuration
@@ -13,13 +13,40 @@ const normalizeApiUrl = (url: string) => {
   return trimmedUrl.endsWith('/api') ? trimmedUrl : `${trimmedUrl}/api`;
 };
 
+const getMetroHost = () => {
+  const scriptURL = NativeModules?.SourceCode?.scriptURL as string | undefined;
+
+  if (!scriptURL) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(scriptURL);
+    return parsed.hostname || null;
+  } catch {
+    const match = scriptURL.match(/https?:\/\/([^/:]+)/i);
+    return match?.[1] || null;
+  }
+};
+
 const getDevelopmentBaseUrl = () => {
+  if (Platform.OS === 'web') {
+    return 'http://localhost:3000/api';
+  }
+
+  // On physical devices, Metro usually serves from your LAN IP.
+  // Reuse that host so API calls target your machine instead of localhost on the phone.
+  const metroHost = getMetroHost();
+  if (metroHost && !['localhost', '127.0.0.1'].includes(metroHost)) {
+    return `http://${metroHost}:3000/api`;
+  }
+
   // Android emulator reaches the host machine through 10.0.2.2.
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:3000/api';
   }
 
-  // iOS simulator and local web can use localhost directly.
+  // iOS simulator can use localhost directly.
   return 'http://localhost:3000/api';
 };
 

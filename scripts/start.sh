@@ -1,54 +1,76 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Transporti – Start Mobile Only (auto-detects LAN IP)
-# Usage: npm run start:mobile  OR  bash transporti-mobile/scripts/start.sh
+# Transporti – Start Mobile Only (LAN or Tunnel)
+# Usage:
+#   bash transporti-mobile/scripts/start.sh            # LAN (default)
+#   bash transporti-mobile/scripts/start.sh lan        # LAN
+#   bash transporti-mobile/scripts/start.sh tunnel     # Tunnel
 # =============================================================================
 set -e
 
-detect_lan_ip() {
-  # Read cached value from root if available
-  ROOT_IP_FILE="$(dirname "$0")/../../.lan-ip"
-  if [ -f "$ROOT_IP_FILE" ]; then
-    cat "$ROOT_IP_FILE"
-    return
-  fi
-  # Linux
-  if command -v hostname &>/dev/null && hostname -I &>/dev/null 2>&1; then
-    ip=$(hostname -I 2>/dev/null | awk '{print $1}')
-    [ -n "$ip" ] && echo "$ip" && return
-  fi
-  # macOS
-  if command -v ipconfig &>/dev/null; then
-    for iface in en0 en1 en2; do
-      ip=$(ipconfig getifaddr "$iface" 2>/dev/null || true)
-      [ -n "$ip" ] && echo "$ip" && return
-    done
-  fi
-  if command -v ip &>/dev/null; then
-    ip=$(ip route get 1.1.1.1 2>/dev/null | awk '/src/{print $7}' | head -1)
-    [ -n "$ip" ] && echo "$ip" && return
-  fi
-  echo "localhost"
-}
+MODE="${1:-${START_MODE:-lan}}"
+MODE="$(echo "$MODE" | tr '[:upper:]' '[:lower:]')"
+if [ "$#" -gt 0 ]; then
+  shift
+fi
+EXTRA_ARGS=("$@")
+ROOT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 
-LAN_IP=$(detect_lan_ip)
-BACKEND_PORT=$(cat "$(dirname "$0")/../../.backend-port" 2>/dev/null || echo "3000")
+if [ "$MODE" != "lan" ] && [ "$MODE" != "tunnel" ]; then
+  echo "[mobile] Invalid mode: $MODE"
+  echo "[mobile] Use: lan | tunnel"
+  exit 1
+fi
 
-echo "[mobile] LAN IP: ${LAN_IP}"
-echo "[mobile] API URL: http://${LAN_IP}:${BACKEND_PORT}/api"
+echo "[mobile] mode: ${MODE}"
 
-# Update .env with current IP
 ENV_FILE="$(dirname "$0")/../.env"
-if [ -f "$ENV_FILE" ]; then
-  if sed --version &>/dev/null 2>&1; then
-    sed -i "s|EXPO_PUBLIC_API_URL=.*|EXPO_PUBLIC_API_URL=http://${LAN_IP}:${BACKEND_PORT}/api|" "$ENV_FILE"
-  else
-    sed -i '' "s|EXPO_PUBLIC_API_URL=.*|EXPO_PUBLIC_API_URL=http://${LAN_IP}:${BACKEND_PORT}/api|" "$ENV_FILE"
+CURRENT_API_URL=$(grep '^EXPO_PUBLIC_API_URL=' "$ENV_FILE" 2>/dev/null | cut -d'=' -f2- || true)
+
+if [ "$MODE" = "tunnel" ]; then
+  BACKEND_PUBLIC_URL=$(cat "$ROOT_DIR/.backend-public-url" 2>/dev/null || true)
+  if [ -n "$BACKEND_PUBLIC_URL" ] && [ -f "$ENV_FILE" ]; then
+    if sed --version &>/dev/null 2>&1; then
+      sed -i "s|EXPO_PUBLIC_API_URL=.*|EXPO_PUBLIC_API_URL=${BACKEND_PUBLIC_URL}|" "$ENV_FILE"
+    else
+      sed -i '' "s|EXPO_PUBLIC_API_URL=.*|EXPO_PUBLIC_API_URL=${BACKEND_PUBLIC_URL}|" "$ENV_FILE"
+    fi
+    CURRENT_API_URL="$BACKEND_PUBLIC_URL"
   fi
 fi
 
+if [ -n "$CURRENT_API_URL" ]; then
+  echo "[mobile] API URL from .env: ${CURRENT_API_URL}"
+else
+  echo "[mobile] WARNING: EXPO_PUBLIC_API_URL is not set in transporti-mobile/.env"
+  echo "[mobile] Set it to a reachable URL (for WSL mirrored mode, use your Windows LAN IP)."
+fi
+
 cd "$(dirname "$0")/.."
-EXPO_OFFLINE=1 \
-REACT_NATIVE_PACKAGER_HOSTNAME="$LAN_IP" \
-NODE_OPTIONS=--dns-result-order=ipv4first \
-npx expo start --lan --clear
+
+if [ "$MODE" = "tunnel" ]; then
+  attempt=1
+  max_attempts=3
+
+  while [ "$attempt" -le "$max_attempts" ]; do
+    echo "[mobile] Starting Expo tunnel (attempt ${attempt}/${max_attempts})..."
+
+    if NODE_OPTIONS=--dns-result-order=ipv4first npx expo start --tunnel --clear "${EXTRA_ARGS[@]}"; then
+      exit 0
+    fi
+
+    if [ "$attempt" -lt "$max_attempts" ]; then
+      echo "[mobile] Tunnel failed to start. Retrying in 3 seconds..."
+      sleep 3
+    fi
+
+    attempt=$((attempt + 1))
+  done
+
+  echo "[mobile] Tunnel could not be established after ${max_attempts} attempts."
+  echo "[mobile] If this keeps happening, keep using backend ngrok and retry Expo tunnel after a few seconds."
+  exit 1
+else
+  NODE_OPTIONS=--dns-result-order=ipv4first \
+  npx expo start --lan --clear "${EXTRA_ARGS[@]}"
+fi
