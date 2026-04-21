@@ -9,6 +9,7 @@ import {
   Linking,
   Alert,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#D92D20',
+    color: Colors.error,
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -265,7 +266,7 @@ const styles = StyleSheet.create({
   },
   ticketBanner: {
     width: '100%',
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,

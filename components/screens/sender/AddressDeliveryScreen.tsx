@@ -10,6 +10,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import * as Location from 'expo-location';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
@@ -295,7 +296,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -331,7 +332,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     marginTop: 4,
   },
   inputWrapper: {
@@ -343,7 +344,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#1464F6',
+    borderColor: Colors.primary,
     paddingHorizontal: 16,
     fontSize: 15,
     color: '#1A1A1A',
@@ -375,7 +376,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1464F6' + '1A',
+    backgroundColor: Colors.primary + '1A',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -418,8 +419,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   optionButtonActive: {
-    borderColor: '#1464F6',
-    backgroundColor: '#1464F6' + '0D',
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + '0D',
   },
   radioOuter: {
     width: 20,
@@ -432,13 +433,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   radioOuterActive: {
-    borderColor: '#1464F6',
+    borderColor: Colors.primary,
   },
   radioInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   optionText: {
     fontSize: 14,
@@ -472,7 +473,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   toggleActive: {
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   toggleThumb: {
     width: 16,

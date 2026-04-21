@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },

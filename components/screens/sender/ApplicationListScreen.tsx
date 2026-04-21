@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -91,7 +92,7 @@ const ApplicationListScreen: React.FC<ApplicationListScreenProps> = ({ onNavigat
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1464F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       </SafeAreaView>
@@ -217,7 +218,7 @@ const ApplicationListScreen: React.FC<ApplicationListScreenProps> = ({ onNavigat
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     backgroundColor: '#FFFFFF',
@@ -234,7 +235,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -300,7 +301,7 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     marginTop: 8,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   retryButtonText: {
     color: '#FFFFFF',
@@ -410,7 +411,7 @@ const styles = StyleSheet.create({
   infoValue: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1464F6',
+    color: Colors.primary,
   },
   notification: {
     flexDirection: 'row',
@@ -441,7 +442,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 12,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     borderRadius: 8,
   },
   viewButtonText: {

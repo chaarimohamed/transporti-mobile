@@ -35,7 +35,8 @@
           "locationAlwaysAndWhenInUsePermission": "Nous avons besoin de votre position pour vous aider à définir précisément les adresses de collecte et de livraison."
         }
       ],
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-font"
     ]
   }
 }

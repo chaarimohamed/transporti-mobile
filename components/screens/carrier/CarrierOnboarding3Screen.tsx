@@ -10,6 +10,7 @@ import {
   Image,
   Platform,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import * as ImagePicker from 'expo-image-picker';
 import { Button } from '../../ui/Button';
 
@@ -227,10 +228,10 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFFFFF' },
   scrollContent: { flexGrow: 1, padding: 24, paddingBottom: 120 },
   progressContainer: { marginTop: 32, marginBottom: 24 },
-  backButton: { width: 32, height: 32, borderRadius: 16, backgroundColor: '#F6F6F6', justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
+  backButton: { width: 32, height: 32, borderRadius: 16, backgroundColor: Colors.background, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
   backIcon: { fontSize: 20, color: '#1A1A1A' },
   progressBar: { height: 4, backgroundColor: '#E9E9E9', borderRadius: 2, overflow: 'hidden', marginBottom: 8 },
-  progressFill: { height: '100%', backgroundColor: '#1464F6' },
+  progressFill: { height: '100%', backgroundColor: Colors.primary },
   progressText: { fontSize: 12, color: '#666666', textAlign: 'center' },
   header: { marginBottom: 24 },
   title: { fontSize: 24, fontWeight: '600', color: '#444444', marginBottom: 8 },
@@ -240,16 +241,16 @@ const styles = StyleSheet.create({
   docCard: { borderWidth: 1, borderColor: '#E9E9E9', borderRadius: 16, overflow: 'hidden', backgroundColor: '#FCFCFC' },
   docCardHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', padding: 16, paddingBottom: 12 },
   docLabel: { fontSize: 14, fontWeight: '600', color: '#1A1A1A', marginBottom: 2 },
-  required: { color: '#D92D20' },
+  required: { color: Colors.error },
   docDescription: { fontSize: 12, color: '#888888' },
   doneBadge: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#2E8B57', justifyContent: 'center', alignItems: 'center' },
   doneBadgeText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
   // upload zone
-  uploadZone: { marginHorizontal: 16, height: 140, borderRadius: 12, borderWidth: 2, borderStyle: 'dashed', borderColor: '#1464F6', backgroundColor: '#F0F7FF', overflow: 'hidden', justifyContent: 'center', alignItems: 'center' },
+  uploadZone: { marginHorizontal: 16, height: 140, borderRadius: 12, borderWidth: 2, borderStyle: 'dashed', borderColor: Colors.primary, backgroundColor: '#F0F7FF', overflow: 'hidden', justifyContent: 'center', alignItems: 'center' },
   uploadZoneWithPhoto: { borderStyle: 'solid', borderColor: '#2E8B57', backgroundColor: '#000' },
   uploadZoneInner: { alignItems: 'center', gap: 4 },
   uploadIcon: { fontSize: 32, marginBottom: 4 },
-  uploadHint: { fontSize: 14, fontWeight: '500', color: '#1464F6' },
+  uploadHint: { fontSize: 14, fontWeight: '500', color: Colors.primary },
   uploadFormats: { fontSize: 11, color: '#888888', marginTop: 2 },
   preview: { width: '100%', height: '100%' },
   previewOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingVertical: 6, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center' },
@@ -259,11 +260,11 @@ const styles = StyleSheet.create({
   quickBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, gap: 6 },
   quickBtnDivider: { width: 1, backgroundColor: '#EEEEEE' },
   quickBtnIcon: { fontSize: 16 },
-  quickBtnText: { fontSize: 13, fontWeight: '500', color: '#1464F6' },
+  quickBtnText: { fontSize: 13, fontWeight: '500', color: Colors.primary },
   // info
   infoContainer: { flexDirection: 'row', marginTop: 20, padding: 14, backgroundColor: '#F0F7FF', borderRadius: 12, alignItems: 'flex-start' },
   infoIcon: { fontSize: 16, marginRight: 8, marginTop: 1 },
-  infoText: { flex: 1, fontSize: 12, color: '#1464F6', lineHeight: 18 },
+  infoText: { flex: 1, fontSize: 12, color: Colors.primary, lineHeight: 18 },
   // buttons
   buttonContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, flexDirection: 'row', padding: 24, paddingBottom: 32, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#E9E9E9', gap: 12 },
   skipButton: { flex: 1 },

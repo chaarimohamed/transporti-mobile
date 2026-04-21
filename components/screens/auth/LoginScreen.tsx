@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
+import { AppIcon } from '../../ui/Icon';
 import { useAuth } from '../../../contexts/AuthContext';
+import { Colors, Fonts, FontSizes, Radius, Shadows } from '../../../theme';
 
 interface LoginScreenProps {
-  onNavigate: (screen: string) => void;
+  onNavigate: (screen: string, params?: Record<string, unknown>) => void;
 }
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
@@ -50,8 +52,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <View style={styles.logo}>
-            <Text style={styles.logoIcon}>🚚</Text>
+            <AppIcon name="truck" size={32} color={Colors.navy} />
           </View>
+          <Text style={styles.appName}>Transporti</Text>
         </View>
 
         <View style={styles.form}>
@@ -59,7 +62,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
 
           {error ? (
             <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>⚠️ {error}</Text>
+              <AppIcon name="alert-triangle" size={16} color={Colors.error} />
+              <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
 
@@ -70,7 +74,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
-              icon={<Text>✉️</Text>}
+              icon={<AppIcon name="map-pin" size={18} color={Colors.textMuted} />}
             />
 
             <View>
@@ -127,7 +131,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
   },
   content: {
     padding: 24,
@@ -138,42 +142,52 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   logo: {
-    width: 64,
-    height: 64,
-    backgroundColor: '#1464F6',
-    borderRadius: 16,
+    width: 72,
+    height: 72,
+    backgroundColor: Colors.primary,
+    borderRadius: Radius.lg,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 12,
+    ...Shadows.primaryGlow,
   },
-  logoIcon: {
-    fontSize: 32,
+  appName: {
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.xl,
+    color: Colors.navy,
+    letterSpacing: -0.3,
   },
   form: {
     gap: 24,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#444',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.xl,
+    color: Colors.charcoal,
     textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 12,
-    color: '#666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     textAlign: 'center',
     marginBottom: 8,
   },
   errorContainer: {
-    backgroundColor: '#FEE',
-    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Colors.errorSurface,
+    borderRadius: Radius.sm,
     padding: 12,
     marginBottom: 8,
   },
   errorText: {
-    color: '#D92D20',
-    fontSize: 14,
-    textAlign: 'center',
+    fontFamily: Fonts.regular,
+    color: Colors.error,
+    fontSize: FontSizes.sm,
+    flex: 1,
   },
   inputs: {
     gap: 16,
@@ -183,9 +197,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   forgotText: {
-    fontSize: 14,
-    color: '#1464F6',
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+    color: Colors.accent,
   },
   footer: {
     flexDirection: 'row',
@@ -193,13 +207,14 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   footerText: {
-    color: '#666',
-    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.textSecondary,
+    fontSize: FontSizes.sm,
   },
   link: {
-    color: '#1464F6',
-    fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
+    color: Colors.primary,
+    fontSize: FontSizes.sm,
   },
   legalFooter: {
     flexDirection: 'row',
@@ -209,14 +224,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   legalText: {
-    fontSize: 12,
-    color: '#999999',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textMuted,
     lineHeight: 18,
   },
   legalLink: {
-    fontSize: 12,
-    color: '#1464F6',
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.xs,
+    color: Colors.accent,
     lineHeight: 18,
   },
 });

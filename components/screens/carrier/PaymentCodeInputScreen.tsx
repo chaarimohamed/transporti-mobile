@@ -10,6 +10,7 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -240,7 +241,7 @@ const PaymentCodeInputScreen: React.FC<PaymentCodeInputScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -256,7 +257,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -285,7 +286,7 @@ const styles = StyleSheet.create({
   orderCard: {
     marginBottom: 20,
     borderLeftWidth: 4,
-    borderLeftColor: '#1464F6',
+    borderLeftColor: Colors.primary,
     padding: 16,
   },
   orderHeader: {
@@ -336,7 +337,7 @@ const styles = StyleSheet.create({
   amountValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#1464F6',
+    color: Colors.primary,
   },
   instructionBanner: {
     flexDirection: 'row',
@@ -355,12 +356,12 @@ const styles = StyleSheet.create({
   instructionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1464F6',
+    color: Colors.primary,
     marginBottom: 4,
   },
   instructionSubtitle: {
     fontSize: 12,
-    color: '#1464F6',
+    color: Colors.primary,
     lineHeight: 18,
   },
   codeInputSection: {
@@ -390,7 +391,7 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
   },
   codeInputFilled: {
-    borderColor: '#1464F6',
+    borderColor: Colors.primary,
     backgroundColor: '#EBF2FE',
   },
   codeHint: {

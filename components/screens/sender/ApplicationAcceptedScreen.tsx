@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Button } from '../../ui/Button';
 import { Shipment } from '../../../services/shipment.service';
 
@@ -117,7 +118,7 @@ const ApplicationAcceptedScreen: React.FC<ApplicationAcceptedScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     backgroundColor: '#FFFFFF',
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },

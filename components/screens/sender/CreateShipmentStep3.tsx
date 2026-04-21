@@ -10,6 +10,7 @@ import {
   Alert,
   Platform,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import * as shipmentService from '../../../services/shipment.service';
@@ -259,7 +260,7 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     backgroundColor: '#FFFFFF',
@@ -308,7 +309,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   scrollView: {
     flex: 1,
@@ -384,7 +385,7 @@ const styles = StyleSheet.create({
   priceCard: {
     padding: 20,
     marginBottom: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   priceRow: {
     flexDirection: 'row',
@@ -400,7 +401,7 @@ const styles = StyleSheet.create({
   priceValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1464F6',
+    color: Colors.primary,
   },
   priceNote: {
     fontSize: 12,
@@ -425,8 +426,8 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   checkboxActive: {
-    borderColor: '#1464F6',
-    backgroundColor: '#1464F6',
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary,
   },
   checkmark: {
     color: '#FFFFFF',
@@ -440,7 +441,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   termsLink: {
-    color: '#1464F6',
+    color: Colors.primary,
     fontWeight: '600',
   },
   bottomActions: {

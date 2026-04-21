@@ -10,6 +10,7 @@ import {
   Alert,
   Platform,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -168,7 +169,7 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1464F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       </SafeAreaView>
@@ -394,7 +395,7 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -410,7 +411,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -456,7 +457,7 @@ const styles = StyleSheet.create({
   priceText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1464F6',
+    color: Colors.primary,
   },
   cargoText: {
     fontSize: 14,
@@ -487,7 +488,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     borderWidth: 2,
     borderColor: '#E9E9E9',
     justifyContent: 'center',
@@ -499,8 +500,8 @@ const styles = StyleSheet.create({
     borderColor: '#2E8B57',
   },
   timelineIconCurrent: {
-    backgroundColor: '#1464F6',
-    borderColor: '#1464F6',
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   stepIcon: {
     fontSize: 20,
@@ -542,11 +543,11 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 13,
-    color: '#1464F6',
+    color: Colors.primary,
     fontStyle: 'italic',
   },
   actionButton: {
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderRadius: 6,
@@ -658,7 +659,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#D92D20',
+    color: Colors.error,
     marginBottom: 16,
     textAlign: 'center',
   },

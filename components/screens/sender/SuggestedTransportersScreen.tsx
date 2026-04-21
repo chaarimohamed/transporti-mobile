@@ -10,6 +10,7 @@ import {
   Alert,
   Platform,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -193,7 +194,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1464F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>Recherche des transporteurs...</Text>
         </View>
       </SafeAreaView>
@@ -260,7 +261,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
                               ? `${appCarrier.firstName} ${appCarrier.lastName}`
                               : `Transporteur #${application.requestedCarrierId?.slice(0, 6)}`}
                           </Text>
-                          {appCarrier && <Text style={{ fontSize: 12, color: '#1464F6' }}>›</Text>}
+                          {appCarrier && <Text style={{ fontSize: 12, color: Colors.primary }}>›</Text>}
                         </View>
                         <View style={styles.applicationMeta}>
                           <Text style={styles.starIcon}>⭐</Text>
@@ -418,7 +419,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     backgroundColor: '#FFFFFF',
@@ -435,7 +436,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -505,7 +506,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -545,7 +546,7 @@ const styles = StyleSheet.create({
   applicationPrice: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1464F6',
+    color: Colors.primary,
   },
   applicationActions: {
     flexDirection: 'row',
@@ -555,7 +556,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -569,7 +570,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: '#D92D20',
+    borderColor: Colors.error,
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
@@ -577,7 +578,7 @@ const styles = StyleSheet.create({
   rejectButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#D92D20',
+    color: Colors.error,
   },
   buttonDisabled: {
     opacity: 0.5,
@@ -612,7 +613,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -649,7 +650,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1464F6',
+    color: Colors.primary,
   },
   ratingRow: {
     flexDirection: 'row',
@@ -684,7 +685,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: '#1464F6',
+    borderColor: Colors.primary,
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
@@ -692,7 +693,7 @@ const styles = StyleSheet.create({
   inviteButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1464F6',
+    color: Colors.primary,
   },
   transporterCardInvited: {
     opacity: 0.85,

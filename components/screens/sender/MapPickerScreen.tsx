@@ -9,6 +9,7 @@ import {
   Alert,
   Platform,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { WebView } from 'react-native-webview';
 import * as Location from 'expo-location';
 import { Button } from '../../ui/Button';
@@ -174,7 +175,7 @@ const MapPickerScreen: React.FC<MapPickerScreenProps> = ({
           icon: {
             path: google.maps.SymbolPath.CIRCLE,
             scale: 10,
-            fillColor: '#1464F6',
+            fillColor: Colors.primary,
             fillOpacity: 1,
             strokeColor: '#FFFFFF',
             strokeWeight: 3,
@@ -248,7 +249,7 @@ const MapPickerScreen: React.FC<MapPickerScreenProps> = ({
       <View style={styles.addressCard}>
         {loadingAddress ? (
           <View style={styles.addressLoading}>
-            <ActivityIndicator size="small" color="#1464F6" />
+            <ActivityIndicator size="small" color={Colors.primary} />
             <Text style={styles.addressLoadingText}>Récupération de l'adresse...</Text>
           </View>
         ) : (
@@ -263,7 +264,7 @@ const MapPickerScreen: React.FC<MapPickerScreenProps> = ({
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1464F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>Chargement de la carte...</Text>
         </View>
       ) : (
@@ -402,7 +403,7 @@ const styles = StyleSheet.create({
   },
   instructionsText: {
     fontSize: 13,
-    color: '#1464F6',
+    color: Colors.primary,
     lineHeight: 18,
   },
   bottomActions: {

@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -124,7 +125,7 @@ const ShipmentListScreen: React.FC<ShipmentListScreenProps> = ({ onNavigate, ini
       >
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#1464F6" />
+            <ActivityIndicator size="large" color={Colors.primary} />
             <Text style={styles.loadingText}>Chargement...</Text>
           </View>
         ) : error ? (
@@ -193,7 +194,7 @@ const ShipmentListScreen: React.FC<ShipmentListScreenProps> = ({ onNavigate, ini
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     backgroundColor: '#FFFFFF',
@@ -223,7 +224,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1A1A1A',
   },
   tabInactive: {
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   tabText: {
     fontSize: 14,
@@ -288,7 +289,7 @@ const styles = StyleSheet.create({
   detailsLink: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1464F6',
+    color: Colors.primary,
   },
   loadingContainer: {
     padding: 40,
@@ -303,19 +304,19 @@ const styles = StyleSheet.create({
   errorCard: {
     padding: 20,
     alignItems: 'center',
-    backgroundColor: '#FEF2F2',
+    backgroundColor: Colors.errorSurface,
     borderColor: '#FCA5A5',
   },
   errorText: {
     fontSize: 14,
-    color: '#D92D20',
+    color: Colors.error,
     marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#D92D20',
+    backgroundColor: Colors.error,
     borderRadius: 6,
   },
   retryText: {

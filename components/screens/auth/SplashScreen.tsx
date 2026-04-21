@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Colors, Fonts, FontSizes, Radius, Shadows } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 
 interface SplashScreenProps {
   onNavigate: (screen: string) => void;
@@ -15,9 +17,15 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onNavigate }) => {
     <View style={styles.container}>
       <View style={styles.content}>
         <View style={styles.logo}>
-          <Text style={styles.logoIcon}>🚚</Text>
+          <AppIcon name="truck" size={44} color={Colors.navy} />
         </View>
-        <Text style={styles.title}>Transporti.tn</Text>
+        <Text style={styles.title}>Transporti</Text>
+        <Text style={styles.tagline}>Connectez. Transportez. Gagnez.</Text>
+      </View>
+      <View style={styles.footer}>
+        <View style={styles.dot} />
+        <View style={[styles.dot, styles.dotActive]} />
+        <View style={styles.dot} />
       </View>
     </View>
   );
@@ -26,34 +34,52 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onNavigate }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.navy,
     justifyContent: 'center',
     alignItems: 'center',
   },
   content: {
     alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
   },
   logo: {
-    width: 96,
-    height: 96,
-    backgroundColor: '#fff',
-    borderRadius: 24,
+    width: 100,
+    height: 100,
+    backgroundColor: Colors.primary,
+    borderRadius: Radius.xl,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  logoIcon: {
-    fontSize: 48,
+    marginBottom: 28,
+    ...Shadows.primaryGlow,
   },
   title: {
-    color: '#fff',
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontFamily: Fonts.bold,
+    color: Colors.cream,
+    fontSize: FontSizes.display,
     letterSpacing: -0.5,
+    marginBottom: 8,
+  },
+  tagline: {
+    fontFamily: Fonts.regular,
+    color: Colors.primaryLight,
+    fontSize: FontSizes.sm,
+    letterSpacing: 0.5,
+    opacity: 0.85,
+  },
+  footer: {
+    flexDirection: 'row',
+    gap: 6,
+    paddingBottom: 48,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.navyMid,
+  },
+  dotActive: {
+    width: 18,
+    backgroundColor: Colors.primary,
   },
 });

@@ -5,6 +5,8 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
+import { Colors, Fonts, FontSizes, Shadows } from '../../theme';
+import { AppIcon } from './Icon';
 
 interface BottomNavProps {
   active?: string;
@@ -18,17 +20,17 @@ const BottomNav: React.FC<BottomNavProps> = ({
   onNavigate,
 }) => {
   const senderItems = [
-    { id: 'home', label: 'Accueil', icon: '🏠' },
-    { id: 'shipments', label: 'Expéditions', icon: '📦' },
-    { id: 'profile', label: 'Profil', icon: '👤' },
+    { id: 'home', label: 'Accueil', icon: 'home' as const },
+    { id: 'shipments', label: 'Expéditions', icon: 'package' as const },
+    { id: 'profile', label: 'Profil', icon: 'profile' as const },
   ];
 
   const carrierItems = [
-    { id: 'home', label: 'Accueil', icon: '🏠' },
-    { id: 'missions', label: 'Opportunités', icon: '🚛' },
-    { id: 'active', label: 'Mes missions', icon: '🕐' },
-    { id: 'history', label: 'Historique', icon: '📄' },
-    { id: 'profile', label: 'Profil', icon: '👤' },
+    { id: 'home', label: 'Accueil', icon: 'home' as const },
+    { id: 'missions', label: 'Opportunités', icon: 'truck' as const },
+    { id: 'active', label: 'Missions', icon: 'route' as const },
+    { id: 'history', label: 'Historique', icon: 'history' as const },
+    { id: 'profile', label: 'Profil', icon: 'profile' as const },
   ];
 
   const items = role === 'sender' ? senderItems : carrierItems;
@@ -78,13 +80,16 @@ const BottomNav: React.FC<BottomNavProps> = ({
         return (
           <TouchableOpacity
             key={item.id}
-            style={styles.item}
+            style={[styles.item, isActive && styles.itemActive]}
             onPress={() => handleNavigate(item.id)}
             activeOpacity={0.7}
           >
-            <Text style={[styles.icon, isActive && styles.activeIcon]}>
-              {item.icon}
-            </Text>
+            {isActive && <View style={styles.activeIndicator} />}
+            <AppIcon
+              name={item.icon}
+              size={22}
+              color={isActive ? Colors.primary : Colors.textMuted}
+            />
             <Text style={[styles.label, isActive && styles.activeLabel]}>
               {item.label}
             </Text>
@@ -101,36 +106,42 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#E9E9E9',
+    borderTopColor: Colors.borderLight,
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'flex-end',
     height: 84,
     paddingBottom: 24,
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
+    ...Shadows.sm,
   },
   item: {
     flex: 1,
     alignItems: 'center',
-    gap: 4,
-    width: 64,
+    gap: 3,
+    paddingTop: 8,
+    position: 'relative',
   },
-  icon: {
-    fontSize: 24,
-    opacity: 0.6,
+  itemActive: {
+    // intentionally empty — indicator handles the visual
   },
-  activeIcon: {
-    opacity: 1,
+  activeIndicator: {
+    position: 'absolute',
+    top: 0,
+    width: 24,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: Colors.primary,
   },
   label: {
-    fontSize: 10,
-    fontWeight: '500',
-    color: '#666666',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.xs,
+    color: Colors.textMuted,
   },
   activeLabel: {
-    color: '#1464F6',
+    color: Colors.primary,
   },
 });
 

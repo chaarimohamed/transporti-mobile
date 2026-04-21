@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import { Colors } from '../../../theme';
 
 interface TermsAndConditionsCarrierScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
@@ -208,7 +209,7 @@ const TermsAndConditionsCarrierScreen: React.FC<TermsAndConditionsCarrierScreenP
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -246,7 +247,7 @@ const PaymentReceiptScreen: React.FC<PaymentReceiptScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -262,7 +263,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -298,7 +299,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   receiptHeaderBanner: {
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     padding: 24,
     alignItems: 'center',
   },
@@ -381,7 +382,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   rightCircle: {
     position: 'absolute',
@@ -390,7 +391,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   spacer: {
     height: 8,

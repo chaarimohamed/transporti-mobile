@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Button } from '../../ui/Button';
 
 interface CarrierOnboarding2ScreenProps {
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   progressText: {
     fontSize: 12,
@@ -265,7 +266,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FCFCFC',
   },
   optionCardSelected: {
-    borderColor: '#1464F6',
+    borderColor: Colors.primary,
     backgroundColor: 'rgba(20, 100, 246, 0.05)',
   },
   checkbox: {
@@ -281,7 +282,7 @@ const styles = StyleSheet.create({
   checkboxChecked: {
     width: 12,
     height: 12,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     borderRadius: 2,
   },
   optionIcon: {
@@ -344,7 +345,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   volumeOptionSelected: {
-    borderColor: '#1464F6',
+    borderColor: Colors.primary,
     backgroundColor: 'rgba(20, 100, 246, 0.05)',
   },
   volumeRadio: {
@@ -360,7 +361,7 @@ const styles = StyleSheet.create({
   volumeRadioChecked: {
     width: 10,
     height: 10,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     borderRadius: 5,
   },
   volumeOptionTextContainer: {
@@ -372,7 +373,7 @@ const styles = StyleSheet.create({
   },
   volumeOptionTextSelected: {
     fontWeight: '500',
-    color: '#1464F6',
+    color: Colors.primary,
   },
   volumeOptionDescription: {
     fontSize: 12,
@@ -380,14 +381,14 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   volumeCardError: {
-    borderColor: '#D92D20',
+    borderColor: Colors.error,
     backgroundColor: 'rgba(217, 45, 32, 0.03)',
   },
   required: {
-    color: '#D92D20',
+    color: Colors.error,
   },
   volumeErrorText: {
-    color: '#D92D20',
+    color: Colors.error,
     fontSize: 13,
     marginTop: 8,
     marginLeft: 4,

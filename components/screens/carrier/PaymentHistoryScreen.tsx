@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import Badge from '../../ui/Badge';
 import * as shipmentService from '../../../services/shipment.service';
@@ -173,7 +174,7 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1464F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       </SafeAreaView>
@@ -268,7 +269,7 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -324,7 +325,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 24,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     marginRight: 8,
     height: 40,
     justifyContent: 'center',
@@ -349,7 +350,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   statsCard: {
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     marginBottom: 24,
     padding: 24,
   },
@@ -475,12 +476,12 @@ const styles = StyleSheet.create({
   viewReceiptText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#1464F6',
+    color: Colors.primary,
     marginRight: 2,
   },
   chevronIcon: {
     fontSize: 16,
-    color: '#1464F6',
+    color: Colors.primary,
   },
   endOfHistoryContainer: {
     alignItems: 'center',

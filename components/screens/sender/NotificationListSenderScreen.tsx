@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import * as notificationService from '../../../services/notification.service';
 import BottomNav from '../../ui/BottomNav';
 
@@ -127,16 +128,16 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
       case 'SHIPMENT_IN_TRANSIT':
         return {
           bg: 'rgba(20, 100, 246, 0.1)',
-          text: '#1464F6',
+          text: Colors.primary,
         };
       case 'REQUEST_REJECTED':
         return {
           bg: 'rgba(217, 45, 32, 0.1)',
-          text: '#D92D20',
+          text: Colors.error,
         };
       default:
         return {
-          bg: '#F6F6F6',
+          bg: Colors.background,
           text: '#666666',
         };
     }
@@ -163,7 +164,7 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1464F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       </SafeAreaView>
@@ -246,7 +247,7 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     paddingHorizontal: 24,

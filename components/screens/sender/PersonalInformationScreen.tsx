@@ -10,6 +10,7 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { Input } from '../../ui/Input';
@@ -331,7 +332,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -347,7 +348,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -384,7 +385,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -413,7 +414,7 @@ const styles = StyleSheet.create({
   },
   changePhotoLink: {
     fontSize: 14,
-    color: '#1464F6',
+    color: Colors.primary,
     fontWeight: '600',
   },
   form: {
@@ -462,7 +463,7 @@ const styles = StyleSheet.create({
   },
   changeNumberLink: {
     fontSize: 14,
-    color: '#1464F6',
+    color: Colors.primary,
     fontWeight: '600',
     marginTop: 8,
     textAlign: 'right',
@@ -506,7 +507,7 @@ const styles = StyleSheet.create({
   },
   dateConfirmText: {
     fontSize: 14,
-    color: '#1464F6',
+    color: Colors.primary,
     fontWeight: '600',
   },
   buttonContainer: {

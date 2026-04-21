@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -149,7 +150,7 @@ const ShipmentFeedbackScreen: React.FC<ShipmentFeedbackScreenProps> = ({ route, 
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.stateContainer}>
-          <ActivityIndicator size="large" color="#1464F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.stateText}>Chargement de l'évaluation...</Text>
         </View>
       </SafeAreaView>
@@ -297,7 +298,7 @@ const ShipmentFeedbackScreen: React.FC<ShipmentFeedbackScreenProps> = ({ route, 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -316,7 +317,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   backIcon: {
     fontSize: 20,

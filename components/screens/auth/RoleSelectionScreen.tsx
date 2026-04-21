@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
+import { AppIcon } from '../../ui/Icon';
+import { Colors, Fonts, FontSizes, Radius, Shadows } from '../../../theme';
 
 interface RoleSelectionScreenProps {
   onNavigate: (screen: string) => void;
@@ -22,17 +24,17 @@ export const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onNavi
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <View style={styles.logo}>
-          <Text style={styles.logoIcon}>🚚</Text>
+          <AppIcon name="truck" size={40} color={Colors.navy} />
         </View>
         <Text style={styles.title}>Bienvenue sur Transporti</Text>
         <Text style={styles.subtitle}>Choisissez votre profil pour continuer</Text>
       </View>
 
       <View style={styles.cards}>
-        <TouchableOpacity onPress={() => handleRoleSelection('sender')} activeOpacity={0.9}>
+        <TouchableOpacity onPress={() => handleRoleSelection('sender')} activeOpacity={0.88}>
           <Card style={styles.roleCard}>
             <View style={styles.roleIcon}>
-              <Text style={styles.roleEmoji}>📦</Text>
+              <AppIcon name="package" size={36} color={Colors.primary} />
             </View>
             <Text style={styles.roleTitle}>Expéditeur</Text>
             <Text style={styles.roleDescription}>
@@ -41,10 +43,10 @@ export const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onNavi
           </Card>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => handleRoleSelection('carrier')} activeOpacity={0.9}>
+        <TouchableOpacity onPress={() => handleRoleSelection('carrier')} activeOpacity={0.88}>
           <Card style={styles.roleCard}>
-            <View style={styles.roleIcon}>
-              <Text style={styles.roleEmoji}>🚛</Text>
+            <View style={[styles.roleIcon, styles.roleIconCarrier]}>
+              <AppIcon name="truck" size={36} color={Colors.accent} />
             </View>
             <Text style={styles.roleTitle}>Transporteur</Text>
             <Text style={styles.roleDescription}>
@@ -67,7 +69,7 @@ export const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onNavi
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
   },
   content: {
     padding: 24,
@@ -78,27 +80,26 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   logo: {
-    width: 80,
-    height: 80,
-    backgroundColor: '#1464F6',
-    borderRadius: 20,
+    width: 88,
+    height: 88,
+    backgroundColor: Colors.primary,
+    borderRadius: Radius.xl,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
-  },
-  logoIcon: {
-    fontSize: 40,
+    ...Shadows.primaryGlow,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#444',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.xxl,
+    color: Colors.navy,
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 16,
-    color: '#666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
   cards: {
@@ -106,29 +107,30 @@ const styles = StyleSheet.create({
   },
   roleCard: {
     alignItems: 'center',
-    padding: 24,
+    padding: 28,
   },
   roleIcon: {
     width: 80,
     height: 80,
-    backgroundColor: '#F0F7FF',
-    borderRadius: 20,
+    backgroundColor: Colors.primarySurface,
+    borderRadius: Radius.xl,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
   },
-  roleEmoji: {
-    fontSize: 40,
+  roleIconCarrier: {
+    backgroundColor: 'rgba(245, 169, 98, 0.12)',
   },
   roleTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#444',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.md,
+    color: Colors.charcoal,
     marginBottom: 8,
   },
   roleDescription: {
-    fontSize: 14,
-    color: '#666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -138,12 +140,13 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   footerText: {
-    color: '#666',
-    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.textSecondary,
+    fontSize: FontSizes.sm,
   },
   link: {
-    color: '#1464F6',
-    fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
+    color: Colors.primary,
+    fontSize: FontSizes.sm,
   },
 });
