@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   Animated,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Button } from '../../ui/Button';
 import { updateProfile, uploadDocuments } from '../../../services/authService';
 
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   progressText: {
     fontSize: 12,

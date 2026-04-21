@@ -9,6 +9,7 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -176,7 +177,9 @@ const PaymentErrorScreen: React.FC<PaymentErrorScreenProps> = ({
             {code.map((digit, index) => (
               <TextInput
                 key={index}
-                ref={ref => (inputRefs.current[index] = ref)}
+                ref={(ref) => {
+                  inputRefs.current[index] = ref;
+                }}
                 style={[styles.codeInput, styles.codeInputError]}
                 value={digit}
                 onChangeText={value => handleCodeChange(index, value)}
@@ -228,7 +231,7 @@ const PaymentErrorScreen: React.FC<PaymentErrorScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   scrollContent: {
     flexGrow: 1,
@@ -244,7 +247,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -278,12 +281,12 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#D92D20',
+    color: Colors.error,
     marginBottom: 4,
   },
   errorSubtitle: {
     fontSize: 12,
-    color: '#D92D20',
+    color: Colors.error,
     lineHeight: 18,
   },
   codeInputSection: {
@@ -323,9 +326,9 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
   },
   codeInputError: {
-    borderColor: '#D92D20',
+    borderColor: Colors.error,
     backgroundColor: '#FCE4E4',
-    color: '#D92D20',
+    color: Colors.error,
   },
   errorMessageRow: {
     flexDirection: 'row',
@@ -334,11 +337,11 @@ const styles = StyleSheet.create({
   },
   errorMessageIcon: {
     fontSize: 12,
-    color: '#D92D20',
+    color: Colors.error,
   },
   errorMessage: {
     fontSize: 12,
-    color: '#D92D20',
+    color: Colors.error,
   },
   buttonContainer: {
     position: 'absolute',

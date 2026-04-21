@@ -2,6 +2,7 @@ import { GOOGLE_MAPS_API_KEY, GOOGLE_PLACES_CONFIG } from '../config/google.conf
 
 const PLACES_AUTOCOMPLETE_URL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
 const PLACES_DETAILS_URL = 'https://maps.googleapis.com/maps/api/place/details/json';
+const PLACEHOLDER_GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
 
 export interface GoogleSuggestion {
   place_id: string;
@@ -78,7 +79,7 @@ class GooglePlacesService {
       return [];
     }
 
-    if (GOOGLE_MAPS_API_KEY === 'YOUR_GOOGLE_MAPS_API_KEY') {
+    if (GOOGLE_MAPS_API_KEY.trim() === PLACEHOLDER_GOOGLE_MAPS_API_KEY) {
       console.warn('Google Maps API key not configured. Please update config/google.config.ts');
       return [];
     }
@@ -115,7 +116,7 @@ class GooglePlacesService {
 
   // Get full place details including coordinates when user selects
   async retrieveAddress(placeId: string): Promise<AddressDetails | null> {
-    if (GOOGLE_MAPS_API_KEY === 'YOUR_GOOGLE_MAPS_API_KEY') {
+    if (GOOGLE_MAPS_API_KEY.trim() === PLACEHOLDER_GOOGLE_MAPS_API_KEY) {
       console.warn('Google Maps API key not configured. Please update config/google.config.ts');
       return null;
     }

@@ -10,15 +10,24 @@ import {
   Platform,
   Image,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { Input } from '../../ui/Input';
 import { Button } from '../../ui/Button';
 import { useAuth } from '../../../contexts/AuthContext';
 import * as authService from '../../../services/authService';
+import { openAndroidDatePicker } from '../../../utils/androidDatePicker';
 
 interface PersonalInformationScreenProps {
-  onNavigate?: (screen: string, params?: any) => void;
+  onNavigate?: (screen: string, params?: unknown) => void;
+}
+
+interface PersonalInformationFormUser {
+  firstName?: string;
+  lastName?: string;
+  dateOfBirth?: string;
+  phone?: string;
 }
 
 const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
@@ -50,7 +59,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
     return `${day}/${month}/${year}`;
   };
 
-  const populateForm = (u: any) => {
+  const populateForm = (u: PersonalInformationFormUser) => {
     setFirstName(u.firstName || '');
     setLastName(u.lastName || '');
     setPhone(u.phone || '');
@@ -62,10 +71,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
 
   useEffect(() => {
     if (user) {
-      setFirstName(user.firstName || '');
-      setLastName(user.lastName || '');
-      setDateOfBirth(user.dateOfBirth || '');
-      setPhone(user.phone || '');
+      populateForm(user);
     }
     // Load stored profile photo
     authService.getProfilePhoto().then((res) => {
@@ -170,6 +176,23 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
     );
   };
 
+  const handleOpenDatePicker = () => {
+    if (Platform.OS === 'android') {
+      openAndroidDatePicker({
+        value: selectedDate,
+        minimumDate: new Date(1920, 0, 1),
+        maximumDate: new Date(),
+        onConfirm: (date) => {
+          setSelectedDate(date);
+          setDateOfBirth(formatDateToString(date));
+        },
+      });
+      return;
+    }
+
+    setShowDatePicker(true);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -237,7 +260,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
             <Text style={styles.dateLabel}>Date de naissance</Text>
             <TouchableOpacity
               style={styles.dateButton}
-              onPress={() => setShowDatePicker(true)}
+              onPress={handleOpenDatePicker}
               activeOpacity={0.7}
             >
               <Text style={dateOfBirth ? styles.dateButtonText : styles.dateButtonPlaceholder}>
@@ -253,7 +276,6 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
                 maximumDate={new Date()}
                 minimumDate={new Date(1920, 0, 1)}
                 onChange={(_, date) => {
-                  if (Platform.OS === 'android') setShowDatePicker(false);
                   if (date) {
                     setSelectedDate(date);
                     setDateOfBirth(formatDateToString(date));
@@ -310,7 +332,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -326,7 +348,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -353,6 +375,7 @@ const styles = StyleSheet.create({
   },
   photoSection: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
     marginBottom: 32,
   },
   photoContainer: {
@@ -362,7 +385,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -381,6 +404,7 @@ const styles = StyleSheet.create({
   photoTextContainer: {
     flex: 1,
     justifyContent: 'center',
+    minWidth: 0,
   },
   photoDescription: {
     fontSize: 12,
@@ -390,7 +414,7 @@ const styles = StyleSheet.create({
   },
   changePhotoLink: {
     fontSize: 14,
-    color: '#1464F6',
+    color: Colors.primary,
     fontWeight: '600',
   },
   form: {
@@ -398,10 +422,12 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
   },
   halfInput: {
     flex: 1,
+    flexBasis: 150,
   },
   phoneContainer: {
     marginTop: 8,
@@ -414,6 +440,7 @@ const styles = StyleSheet.create({
   },
   phoneRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   countryCode: {
@@ -432,10 +459,11 @@ const styles = StyleSheet.create({
   },
   phoneInput: {
     flex: 1,
+    minWidth: 0,
   },
   changeNumberLink: {
     fontSize: 14,
-    color: '#1464F6',
+    color: Colors.primary,
     fontWeight: '600',
     marginTop: 8,
     textAlign: 'right',
@@ -458,12 +486,16 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
   },
   dateButtonText: {
+    flex: 1,
     fontSize: 15,
     color: '#1A1A1A',
+    marginRight: 12,
   },
   dateButtonPlaceholder: {
+    flex: 1,
     fontSize: 15,
     color: '#AAAAAA',
+    marginRight: 12,
   },
   dateIcon: {
     fontSize: 18,
@@ -475,7 +507,7 @@ const styles = StyleSheet.create({
   },
   dateConfirmText: {
     fontSize: 14,
-    color: '#1464F6',
+    color: Colors.primary,
     fontWeight: '600',
   },
   buttonContainer: {

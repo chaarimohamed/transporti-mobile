@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -16,7 +17,7 @@ import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 
 interface ActiveMissionsScreenProps {
-  onNavigate?: (screen: string, params?: any) => void;
+  onNavigate?: (screen: string, params?: unknown) => void;
 }
 
 // Which stat tile is active as a filter
@@ -88,9 +89,9 @@ const ActiveMissionsScreen: React.FC<ActiveMissionsScreenProps> = ({ onNavigate 
       case 'DELIVERED':
         return { text: 'Livrée', borderColor: '#10B981', bgColor: '#ECFDF5' };
       case 'CANCELLED':
-        return { text: 'Annulée', borderColor: '#EF4444', bgColor: '#FEF2F2' };
+        return { text: 'Annulée', borderColor: '#EF4444', bgColor: Colors.errorSurface };
       default:
-        return { text: status, borderColor: '#999', bgColor: '#F6F6F6' };
+        return { text: status, borderColor: '#999', bgColor: Colors.background };
     }
   };
 
@@ -144,7 +145,7 @@ const ActiveMissionsScreen: React.FC<ActiveMissionsScreenProps> = ({ onNavigate 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#1464F6" />
+            <ActivityIndicator size="large" color={Colors.primary} />
             <Text style={styles.loadingText}>Chargement...</Text>
           </View>
         ) : error ? (
@@ -240,7 +241,7 @@ const ActiveMissionsScreen: React.FC<ActiveMissionsScreenProps> = ({ onNavigate 
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F6F6F6' },
+  container: { flex: 1, backgroundColor: Colors.background },
   header: {
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
@@ -258,7 +259,7 @@ const styles = StyleSheet.create({
   statsContainer: { flexDirection: 'row', gap: 12 },
   statCard: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -281,19 +282,20 @@ const styles = StyleSheet.create({
   missionCard: { marginBottom: 16, padding: 16, borderLeftWidth: 4 },
   missionHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 12,
   },
-  missionRef: { flexDirection: 'row', alignItems: 'center', flex: 1 },
+  missionRef: { flexDirection: 'row', alignItems: 'center', flex: 1, flexWrap: 'wrap', minWidth: 0 },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4 },
   statusText: { fontSize: 12, fontWeight: '600' },
   priceText: { fontSize: 16, fontWeight: 'bold', color: '#1A1A1A' },
-  routeContainer: { marginBottom: 12, gap: 4 },
-  routeText: { fontSize: 15, fontWeight: '600', color: '#1A1A1A' },
+  routeContainer: { marginBottom: 12, gap: 4, minWidth: 0 },
+  routeText: { fontSize: 15, fontWeight: '600', color: '#1A1A1A', flexShrink: 1 },
   routeArrow: { color: '#999' },
   cargoText: { fontSize: 13, color: '#666666' },
-  dateText: { fontSize: 13, color: '#666666' },
+  dateText: { fontSize: 13, color: '#666666', flexShrink: 1 },
   actionsContainer: { marginTop: 4 },
   updateButton: {},
   updateButtonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
@@ -302,14 +304,14 @@ const styles = StyleSheet.create({
   errorCard: {
     padding: 20,
     alignItems: 'center',
-    backgroundColor: '#FEF2F2',
+    backgroundColor: Colors.errorSurface,
     borderColor: '#FCA5A5',
   },
-  errorText: { fontSize: 14, color: '#D92D20', marginBottom: 12, textAlign: 'center' },
+  errorText: { fontSize: 14, color: Colors.error, marginBottom: 12, textAlign: 'center' },
   retryButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#D92D20',
+    backgroundColor: Colors.error,
     borderRadius: 6,
   },
   retryText: { color: '#FFF', fontSize: 14, fontWeight: '600' },
@@ -318,7 +320,7 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 16, fontWeight: '600', color: '#333', marginBottom: 4 },
   emptySubtext: { fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 16 },
   browseButton: {
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,

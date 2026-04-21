@@ -1,15 +1,16 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle, TextStyle } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, StyleProp, ViewStyle } from 'react-native';
+import { Colors, Fonts, FontSizes, Radius, Shadows } from '../../theme';
 
 interface ButtonProps {
   onPress?: () => void;
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
   disabled?: boolean;
   loading?: boolean;
-  style?: ViewStyle | ViewStyle[];
+  style?: StyleProp<ViewStyle>;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -32,12 +33,13 @@ export const Button: React.FC<ButtonProps> = ({
         styles[`size_${size}`],
         fullWidth && styles.fullWidth,
         (disabled || loading) && styles.disabled,
+        variant === 'primary' && !disabled && !loading && Shadows.primaryGlow,
         style,
       ]}
-      activeOpacity={0.7}
+      activeOpacity={0.82}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? '#fff' : '#1464F6'} />
+        <ActivityIndicator color={variant === 'primary' ? Colors.navy : Colors.primary} />
       ) : (
         <Text style={[styles.text, styles[`text_${variant}`]]}>{children}</Text>
       )}
@@ -47,28 +49,31 @@ export const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 12,
+    borderRadius: Radius.md,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
   },
   primary: {
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   secondary: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: Colors.primarySurface,
   },
   outline: {
     backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#1464F6',
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+  },
+  ghost: {
+    backgroundColor: 'transparent',
   },
   size_sm: {
     paddingVertical: 10,
     paddingHorizontal: 16,
   },
   size_md: {
-    paddingVertical: 12,
+    paddingVertical: 13,
     paddingHorizontal: 20,
   },
   size_lg: {
@@ -79,19 +84,24 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.45,
   },
   text: {
-    fontWeight: '600',
-    fontSize: 16,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
+    letterSpacing: 0.2,
   },
   text_primary: {
-    color: '#fff',
+    color: Colors.navy,
   },
   text_secondary: {
-    color: '#444444',
+    color: Colors.primary,
   },
   text_outline: {
-    color: '#1464F6',
+    color: Colors.primary,
+  },
+  text_ghost: {
+    color: Colors.charcoal,
   },
 });
+

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
+import * as SplashScreenNative from 'expo-splash-screen';
+import { Colors } from './theme';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SplashScreen } from './components/screens/auth/SplashScreen';
 import { RoleSelectionScreen } from './components/screens/auth/RoleSelectionScreen';
@@ -49,20 +52,31 @@ import PersonalInformationCarrierScreen from './components/screens/carrier/Perso
 import NotificationSettingsCarrierScreen from './components/screens/carrier/NotificationSettingsCarrierScreen';
 import TermsAndConditionsCarrierScreen from './components/screens/carrier/TermsAndConditionsCarrierScreen';
 import PrivacySecurityCarrierScreen from './components/screens/carrier/PrivacySecurityCarrierScreen';
+import ShipmentFeedbackScreen from './components/screens/shared/ShipmentFeedbackScreen';
+import ShipmentFeedbackSuccessScreen from './components/screens/shared/ShipmentFeedbackSuccessScreen';
 
-type ScreenName = 'splash' | 'roleSelection' | 'login' | 'forgotPassword' | 'senderRegister' | 'carrierRegister' | 'carrierOnboarding2' | 'carrierOnboarding3' | 'carrierOnboarding4' | 'verifyEmail' | 'dashboard' | 'shipmentList' | 'newShipment' | 'createShipmentStep1' | 'addressPickup' | 'addressDelivery' | 'mapPicker' | 'createShipmentStep2' | 'createShipmentStep3' | 'shipmentDetails' | 'missionList' | 'missionDetails' | 'activeMissions' | 'updateStatus' | 'notificationList' | 'applicationList' | 'applicationDetails' | 'applicationAccepted' | 'suggestedTransporters' | 'transporterProfile' | 'invitationSent' | 'paymentCodeInput' | 'paymentSuccess' | 'paymentError' | 'paymentBlocked' | 'paymentReceipt' | 'paymentHistory' | 'notifications' | 'notificationListSender' | 'profile' | 'notificationSettings' | 'personalInformation' | 'termsAndConditions' | 'privacySecurity' | 'profileCarrier' | 'personalInformationCarrier' | 'notificationSettingsCarrier' | 'termsAndConditionsCarrier' | 'privacySecurityCarrier';
+type ScreenName = 'splash' | 'roleSelection' | 'login' | 'forgotPassword' | 'senderRegister' | 'carrierRegister' | 'carrierOnboarding2' | 'carrierOnboarding3' | 'carrierOnboarding4' | 'verifyEmail' | 'dashboard' | 'shipmentList' | 'newShipment' | 'createShipmentStep1' | 'addressPickup' | 'addressDelivery' | 'mapPicker' | 'createShipmentStep2' | 'createShipmentStep3' | 'shipmentDetails' | 'missionList' | 'missionDetails' | 'activeMissions' | 'updateStatus' | 'notificationList' | 'applicationList' | 'applicationDetails' | 'applicationAccepted' | 'suggestedTransporters' | 'transporterProfile' | 'invitationSent' | 'paymentCodeInput' | 'paymentSuccess' | 'paymentError' | 'paymentBlocked' | 'paymentReceipt' | 'paymentHistory' | 'shipmentFeedback' | 'shipmentFeedbackSuccess' | 'notifications' | 'notificationListSender' | 'profile' | 'notificationSettings' | 'personalInformation' | 'termsAndConditions' | 'privacySecurity' | 'profileCarrier' | 'personalInformationCarrier' | 'notificationSettingsCarrier' | 'termsAndConditionsCarrier' | 'privacySecurityCarrier';
+
+SplashScreenNative.preventAutoHideAsync();
 
 function AppContent() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const [currentScreen, setCurrentScreen] = useState<ScreenName>('splash');
-  const [userRole, setUserRole] = useState<'sender' | 'carrier' | null>(null);
+  const [, setUserRole] = useState<'sender' | 'carrier' | null>(null);
   const [screenParams, setScreenParams] = useState<any>(null);
 
-  const navigate = (screen: string, params?: any) => {
-    console.log('🚀 Navigate called:', { screen, params, currentScreen });
-    setCurrentScreen(screen as ScreenName);
-    setScreenParams(params);
-  };
+  const [fontsLoaded] = useFonts({
+    Poppins_400Regular,
+    Poppins_500Medium,
+    Poppins_600SemiBold,
+    Poppins_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreenNative.hideAsync();
+    }
+  }, [fontsLoaded]);
 
   // Reset to login when user logs out
   useEffect(() => {
@@ -71,11 +85,21 @@ function AppContent() {
     }
   }, [isAuthenticated, isLoading]);
 
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  const navigate = (screen: string, params?: any) => {
+    console.log('🚀 Navigate called:', { screen, params, currentScreen });
+    setCurrentScreen(screen as ScreenName);
+    setScreenParams(params);
+  };
+
   // Show loading spinner while checking for saved session
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1464F6" />
+        <ActivityIndicator size="large" color={Colors.primary} />
         <Text style={styles.loadingText}>Chargement...</Text>
       </View>
     );
@@ -119,6 +143,10 @@ function AppContent() {
         case 'notifications':
         case 'notificationListSender':
           return <NotificationListSenderScreen onNavigate={navigate} />;
+        case 'shipmentFeedback':
+          return <ShipmentFeedbackScreen route={{ params: screenParams }} onNavigate={navigate} />;
+        case 'shipmentFeedbackSuccess':
+          return <ShipmentFeedbackSuccessScreen route={{ params: screenParams }} onNavigate={navigate} />;
         case 'profile':
           return <ProfileSenderScreen onNavigate={navigate} />;
         case 'notificationSettings':
@@ -160,6 +188,10 @@ function AppContent() {
           return <PaymentReceiptScreen route={{ params: screenParams }} onNavigate={navigate} />;
         case 'paymentHistory':
           return <PaymentHistoryScreen onNavigate={navigate} />;
+        case 'shipmentFeedback':
+          return <ShipmentFeedbackScreen route={{ params: screenParams }} onNavigate={navigate} />;
+        case 'shipmentFeedbackSuccess':
+          return <ShipmentFeedbackSuccessScreen route={{ params: screenParams }} onNavigate={navigate} />;
         case 'profileCarrier':
           return <ProfileCarrierScreen onNavigate={navigate} />;
         case 'personalInformationCarrier':
@@ -246,22 +278,23 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.navy,
     justifyContent: 'center',
     alignItems: 'center',
   },
   loadingText: {
     marginTop: 16,
-    fontSize: 16,
-    color: '#666666',
+    fontSize: 15,
+    fontFamily: 'Poppins_400Regular',
+    color: Colors.cream,
   },
   dashboardContainer: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -272,7 +305,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 80,
     height: 80,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -282,13 +315,14 @@ const styles = StyleSheet.create({
     fontSize: 40,
   },
   dashboardText: {
+    fontFamily: 'Poppins_700Bold',
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#444',
+    color: Colors.charcoal,
     marginBottom: 8,
   },
   dashboardSubtext: {
-    fontSize: 16,
-    color: '#666',
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 15,
+    color: Colors.textSecondary,
   },
 });

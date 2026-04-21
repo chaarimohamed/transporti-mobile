@@ -10,6 +10,7 @@ import {
   Modal,
   Platform,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Picker } from '@react-native-picker/picker';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
@@ -249,7 +250,7 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     backgroundColor: '#FFFFFF',
@@ -298,7 +299,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   scrollView: {
     flex: 1,
@@ -330,7 +331,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#1464F6',
+    borderColor: Colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 14,
     gap: 12,
@@ -374,7 +375,7 @@ const styles = StyleSheet.create({
   },
   pickerDoneButton: {
     fontSize: 16,
-    color: '#1464F6',
+    color: Colors.primary,
     fontWeight: '600',
   },
   picker: {
@@ -398,8 +399,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   checkboxActive: {
-    borderColor: '#1464F6',
-    backgroundColor: '#1464F6',
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary,
   },
   checkmark: {
     color: '#FFFFFF',
@@ -482,7 +483,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1464F6' + '1A',
+    backgroundColor: Colors.primary + '1A',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -516,7 +517,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   toggleActive: {
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   toggleThumb: {
     width: 16,

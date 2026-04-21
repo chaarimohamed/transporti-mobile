@@ -11,16 +11,22 @@ import {
   Alert,
   Modal,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
-import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
-import { Input } from '../../ui/Input';
+import { openAndroidDatePicker } from '../../../utils/androidDatePicker';
+
+interface ShipmentStep1Data {
+  photos?: { uri: string; base64: string }[];
+  pickupDate?: string;
+  weightRange?: string;
+}
 
 interface CreateShipmentStep1Props {
-  onNavigate?: (screen: string, data?: any) => void;
-  initialData?: any;
+  onNavigate?: (screen: string, data?: ShipmentStep1Data) => void;
+  initialData?: ShipmentStep1Data;
 }
 
 const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
@@ -58,11 +64,23 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
     return `${day}/${month}/${year}`;
   };
 
-  const handleDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(Platform.OS === 'ios');
+  const handleDateChange = (_event: unknown, selectedDate?: Date) => {
     if (selectedDate) {
       setPickupDate(selectedDate);
     }
+  };
+
+  const handleOpenDatePicker = () => {
+    if (Platform.OS === 'android') {
+      openAndroidDatePicker({
+        value: pickupDate,
+        minimumDate: new Date(),
+        onConfirm: setPickupDate,
+      });
+      return;
+    }
+
+    setShowDatePicker(true);
   };
 
   const handleAddPhoto = async () => {
@@ -169,7 +187,7 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
           <Text style={styles.label}>Date de collecte</Text>
           <TouchableOpacity
             style={styles.pickerInputContainer}
-            onPress={() => setShowDatePicker(true)}
+            onPress={handleOpenDatePicker}
           >
             <Text style={styles.inputIcon}>📅</Text>
             <Text style={styles.pickerText}>
@@ -214,16 +232,6 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
             </TouchableOpacity>
           </Modal>
         )}
-        {showDatePicker && Platform.OS === 'android' && (
-          <DateTimePicker
-            value={pickupDate}
-            mode="date"
-            display="default"
-            onChange={handleDateChange}
-            minimumDate={new Date()}
-          />
-        )}
-
         {/* Weight Range */}
         <View style={styles.section}>
           <Text style={styles.label}>Poids estimé (kg)</Text>
@@ -306,7 +314,7 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     backgroundColor: '#FFFFFF',
@@ -355,7 +363,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   scrollView: {
     flex: 1,
@@ -385,14 +393,14 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderStyle: 'dashed',
-    borderColor: '#1464F6',
-    backgroundColor: '#1464F6' + '0D', // 5% opacity
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary + '0D', // 5% opacity
     alignItems: 'center',
     justifyContent: 'center',
   },
   addPhotoIcon: {
     fontSize: 32,
-    color: '#1464F6',
+    color: Colors.primary,
   },
   photoPreview: {
     width: 80,
@@ -418,7 +426,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#D92D20',
+    backgroundColor: Colors.error,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
@@ -463,6 +471,7 @@ const styles = StyleSheet.create({
   },
   pickerText: {
     flex: 1,
+    minWidth: 0,
     fontSize: 16,
     color: '#1A1A1A',
   },
@@ -500,7 +509,7 @@ const styles = StyleSheet.create({
   },
   pickerDoneButton: {
     fontSize: 16,
-    color: '#1464F6',
+    color: Colors.primary,
     fontWeight: '600',
   },
   picker: {

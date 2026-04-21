@@ -9,6 +9,7 @@ import {
   Alert,
   Image,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { useAuth } from '../../../contexts/AuthContext';
 import BottomNav from '../../ui/BottomNav';
 import * as authService from '../../../services/authService';
@@ -146,7 +147,7 @@ const ProfileSenderScreen: React.FC<ProfileSenderScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     paddingTop: 72,
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     borderWidth: 4,
     borderColor: '#FFFFFF',
     justifyContent: 'center',
@@ -250,7 +251,7 @@ const styles = StyleSheet.create({
   logoutText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#D92D20',
+    color: Colors.error,
   },
 });
 

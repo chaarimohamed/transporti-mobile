@@ -10,6 +10,7 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -19,7 +20,7 @@ import { Shipment } from '../../../services/shipment.service';
 import { useAuth } from '../../../contexts/AuthContext';
 
 interface MissionDetailsScreenProps {
-  route?: { params?: { id?: string; shipmentId?: string; fromInvitation?: boolean; returnScreen?: string } };
+  route?: { params?: { id?: string; shipmentId?: string; shipment?: Shipment; fromInvitation?: boolean; returnScreen?: string } };
   onNavigate?: (screen: string, params?: any) => void;
 }
 
@@ -230,7 +231,7 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1464F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       </SafeAreaView>
@@ -383,6 +384,34 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
           </View>
         </Card>
       </ScrollView>
+      
+      {shipment.status === 'DELIVERED' && shipment.feedbackSummary?.canSubmit && (
+        <Card style={styles.feedbackCard}>
+          <Text style={styles.sectionTitle}>Votre évaluation</Text>
+          <Text style={styles.feedbackTitle}>
+            {shipment.feedbackSummary.hasSubmitted
+              ? 'Votre retour sur l\'expéditeur est déjà enregistré'
+              : 'La livraison est terminée'}
+          </Text>
+          <Text style={styles.feedbackText}>
+            {shipment.feedbackSummary.hasSubmitted
+              ? 'Vous pouvez encore ajuster votre note et votre commentaire si besoin.'
+              : 'Ajoutez une évaluation de l\'expéditeur maintenant que la mission est livrée.'}
+          </Text>
+          <TouchableOpacity
+            style={styles.fullWidthButton}
+            onPress={() => onNavigate?.('shipmentFeedback', {
+              shipmentId: shipment.id,
+              returnScreen: 'missionDetails',
+              returnParams: { shipmentId: shipment.id },
+            })}
+          >
+            <Text style={styles.fullWidthButtonText}>
+              {shipment.feedbackSummary.hasSubmitted ? 'Modifier mon évaluation' : 'Évaluer l\'expéditeur'}
+            </Text>
+          </TouchableOpacity>
+        </Card>
+      )}
 
       {/* Action Buttons - Show different buttons based on context */}
       {fromInvitation && shipment.status === 'PENDING' ? (
@@ -449,7 +478,7 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -465,7 +494,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -508,7 +537,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -545,7 +574,7 @@ const styles = StyleSheet.create({
     width: 18,
     height: 18,
     borderRadius: 9,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -650,12 +679,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#1464F6',
+    borderLeftColor: Colors.primary,
   },
   collecteDateLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#1464F6',
+    color: Colors.primary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 2,
@@ -687,12 +716,31 @@ const styles = StyleSheet.create({
   priceAmount: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#1464F6',
+    color: Colors.primary,
     marginBottom: 4,
   },
   priceLabel: {
     fontSize: 13,
     color: '#666666',
+  },
+  feedbackCard: {
+    marginBottom: 16,
+    padding: 16,
+    backgroundColor: '#FFF7E8',
+    borderWidth: 1,
+    borderColor: '#F3D9A6',
+  },
+  feedbackTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#7C4A03',
+    marginBottom: 8,
+  },
+  feedbackText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#6B5A3D',
+    marginBottom: 14,
   },
   counterOfferSection: {
     gap: 8,
@@ -738,7 +786,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 16,
     borderRadius: 8,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -751,7 +799,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 16,
     borderRadius: 8,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -782,7 +830,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 16,
     borderRadius: 8,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -809,7 +857,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#D92D20',
+    color: Colors.error,
     marginBottom: 16,
     textAlign: 'center',
   },

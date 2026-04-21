@@ -15,13 +15,15 @@ import {
 import { Card } from '../../ui/Card';
 import Badge from '../../ui/Badge';
 import BottomNav from '../../ui/BottomNav';
+import { AppIcon } from '../../ui/Icon';
+import { Colors, Fonts, FontSizes, Radius, Shadows } from '../../../theme';
 import { useAuth } from '../../../contexts/AuthContext';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 import * as notificationService from '../../../services/notification.service';
 
 interface DashboardCarrierProps {
-  onNavigate?: (screen: string) => void;
+  onNavigate?: (screen: string, params?: unknown) => void;
 }
 
 const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
@@ -83,7 +85,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
       } else {
         console.log('❌ Stats fetch failed:', statsResult.error);
         // Set default stats on error
-        setStats({ assigned: 0, applied: 0, inProgress: 0, completed: 0, total: 0 });
+        setStats({ assigned: 0, applied: 0, inProgress: 0, completed: 0 });
       }
 
       if (shipmentsResult.success && shipmentsResult.shipments) {
@@ -161,7 +163,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1464F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       </SafeAreaView>
@@ -182,7 +184,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
             activeOpacity={0.7}
             onPress={() => onNavigate?.('notificationList')}
           >
-            <Text style={styles.bellIcon}>🔔</Text>
+            <AppIcon name={unreadCount > 0 ? 'bell-active' : 'bell'} size={22} color={Colors.charcoal} />
             {unreadCount > 0 && (
               <View style={styles.notificationBadge}>
                 <Text style={styles.notificationBadgeText}>
@@ -196,7 +198,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
             activeOpacity={0.7}
             onPress={handleLogout}
           >
-            <Text style={styles.logoutIcon}>🚪</Text>
+            <AppIcon name="logout" size={20} color={Colors.error} />
           </TouchableOpacity>
         </View>
       </View>
@@ -208,7 +210,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        {/* Dark KPI Card */}
+        {/* KPI Hero Card */}
         <TouchableOpacity
           style={styles.kpiCard}
           activeOpacity={0.8}
@@ -219,20 +221,20 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
               <Text style={styles.kpiLabel}>Assignés</Text>
               <Text style={styles.kpiNumber}>{activeDeliveries}</Text>
             </View>
-            <Text style={styles.truckIcon}>🚛</Text>
+            <AppIcon name="truck" size={48} color="rgba(235,185,95,0.35)" />
           </View>
         </TouchableOpacity>
 
         {/* Stats Grid */}
         <View style={styles.statsGrid}>
           <Card style={styles.statCard}>
-            <Text style={styles.statIcon}>💰</Text>
+            <AppIcon name="wallet" size={28} color={Colors.primary} />
             <Text style={styles.statNumber}>{totalEarnings.toLocaleString()}</Text>
             <Text style={styles.statLabel}>TND</Text>
             <Text style={styles.statSubLabel}>Ce mois</Text>
           </Card>
           <Card style={styles.statCard}>
-            <Text style={styles.statIcon}>📦</Text>
+            <AppIcon name="check-circle" size={28} color={Colors.success} />
             <Text style={styles.statNumber}>{stats.completed}</Text>
             <Text style={styles.statLabel}>Livraisons</Text>
             <Text style={styles.statSubLabel}>Total</Text>
@@ -248,25 +250,24 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
               activeOpacity={0.7}
               onPress={() => onNavigate?.('missionList')}
             >
-              <Text style={styles.filterIcon}>🔍</Text>
+              <AppIcon name="search" size={14} color={Colors.textSecondary} />
               <Text style={styles.filterText}>Voir tout</Text>
             </TouchableOpacity>
           </View>
 
           {error ? (
             <Card style={styles.errorCard}>
-              <Text style={styles.errorText}>⚠️ {error}</Text>
+              <AppIcon name="alert-triangle" size={20} color={Colors.error} />
+              <Text style={styles.errorText}>{error}</Text>
               <TouchableOpacity onPress={fetchDashboardData} style={styles.retryButton}>
                 <Text style={styles.retryText}>Réessayer</Text>
               </TouchableOpacity>
             </Card>
           ) : availableShipments.length === 0 ? (
             <Card style={styles.emptyCard}>
-              <Text style={styles.emptyIcon}>📦</Text>
+              <AppIcon name="truck" size={40} color={Colors.primaryLight} />
               <Text style={styles.emptyText}>Aucune mission disponible</Text>
-              <Text style={styles.emptySubtext}>
-                Revenez plus tard pour voir les nouvelles missions
-              </Text>
+              <Text style={styles.emptySubtext}>Revenez plus tard pour voir les nouvelles missions</Text>
             </Card>
           ) : (
             availableShipments.map((shipment) => (
@@ -279,7 +280,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
                   <View style={styles.missionHeader}>
                     <Badge status="neutral" text={shipment.refNumber} />
                     <View style={styles.dateTag}>
-                      <Text style={styles.calendarIcon}>📅</Text>
+                      <AppIcon name="calendar" size={12} color={Colors.textInverse} />
                       <Text style={styles.dateText}>
                         {new Date(shipment.createdAt).toLocaleDateString('fr-FR', {
                           day: 'numeric',
@@ -289,8 +290,9 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
                     </View>
                   </View>
                   <View style={styles.missionRoute}>
+                    <AppIcon name="map-pin" size={14} color={Colors.primary} />
                     <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">{shipment.from}</Text>
-                    <Text style={styles.arrowIcon}>→</Text>
+                    <AppIcon name="arrow-right" size={14} color={Colors.textMuted} />
                     <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">{shipment.to}</Text>
                   </View>
                   <Text style={styles.cargoText}>
@@ -315,14 +317,12 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
-  scrollView: {
-    flex: 1,
-  },
+  scrollView: { flex: 1 },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100, // Space for BottomNav
+    paddingBottom: 100,
   },
   header: {
     flexDirection: 'row',
@@ -333,75 +333,66 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   greeting: {
-    fontSize: 16,
-    color: '#666666',
-    marginBottom: 4,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
+    marginBottom: 2,
   },
   name: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.xl,
+    color: Colors.navy,
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
   },
   bellButton: {
     width: 44,
     height: 44,
-    backgroundColor: '#FCFCFC',
+    backgroundColor: Colors.surface,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
+    borderColor: Colors.border,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-  },
-  bellIcon: {
-    fontSize: 20,
   },
   notificationBadge: {
     position: 'absolute',
     top: -4,
     right: -4,
-    backgroundColor: '#DC2626',
+    backgroundColor: Colors.error,
     borderRadius: 10,
     minWidth: 20,
     height: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 6,
+    paddingHorizontal: 4,
     borderWidth: 2,
-    borderColor: '#F6F6F6',
+    borderColor: Colors.background,
   },
   notificationBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.xs,
+    color: Colors.textInverse,
   },
   logoutButton: {
     width: 44,
     height: 44,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: Colors.errorSurface,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: '#FCA5A5',
+    borderColor: 'rgba(217, 45, 32, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoutIcon: {
-    fontSize: 20,
-  },
   kpiCard: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 16,
+    backgroundColor: Colors.navy,
+    borderRadius: Radius.lg,
     padding: 24,
     marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    ...Shadows.lg,
   },
   kpiContent: {
     flexDirection: 'row',
@@ -409,19 +400,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   kpiLabel: {
-    fontSize: 14,
-    color: '#FFFFFF',
-    opacity: 0.8,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.primaryLight,
     marginBottom: 8,
   },
   kpiNumber: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  truckIcon: {
-    fontSize: 48,
-    opacity: 0.5,
+    fontFamily: Fonts.bold,
+    fontSize: 40,
+    color: Colors.primary,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -432,30 +419,24 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingVertical: 20,
-  },
-  statIcon: {
-    fontSize: 32,
-    marginBottom: 8,
+    gap: 4,
   },
   statNumber: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 4,
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.xxl,
+    color: Colors.navy,
   },
   statLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 2,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.charcoal,
   },
   statSubLabel: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textMuted,
   },
-  section: {
-    marginBottom: 16,
-  },
+  section: { marginBottom: 16 },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -463,75 +444,71 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.md,
+    color: Colors.navy,
+    flex: 1,
+    marginRight: 12,
   },
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 5,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: '#FCFCFC',
-    borderRadius: 20,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.full,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
-  },
-  filterIcon: {
-    fontSize: 14,
+    borderColor: Colors.border,
   },
   filterText: {
-    fontSize: 14,
-    color: '#666666',
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   missionCard: {
     marginBottom: 12,
+    overflow: 'hidden',
   },
   missionHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
   },
-
   dateTag: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
     paddingHorizontal: 10,
     paddingVertical: 4,
-    backgroundColor: '#1464F6',
-    borderRadius: 12,
-  },
-  calendarIcon: {
-    fontSize: 12,
+    backgroundColor: Colors.navy,
+    borderRadius: Radius.sm,
   },
   dateText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#FFFFFF',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.xs,
+    color: Colors.textInverse,
   },
   missionRoute: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
     marginBottom: 8,
+    minWidth: 0,
   },
   locationText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.charcoal,
     flex: 1,
-  },
-  arrowIcon: {
-    fontSize: 14,
-    color: '#1464F6',
+    minWidth: 0,
   },
   cargoText: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     marginBottom: 12,
   },
   missionFooter: {
@@ -540,62 +517,60 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   priceText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.base,
+    color: Colors.navy,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F6F6F6',
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 14,
-    color: '#666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   errorCard: {
     padding: 20,
     alignItems: 'center',
-    backgroundColor: '#FEF2F2',
-    borderColor: '#FCA5A5',
+    backgroundColor: Colors.errorSurface,
+    borderColor: 'rgba(217,45,32,0.2)',
     marginBottom: 16,
   },
   errorText: {
-    fontSize: 14,
-    color: '#D92D20',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.error,
     marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#D92D20',
-    borderRadius: 6,
+    backgroundColor: Colors.error,
+    borderRadius: Radius.sm,
   },
   retryText: {
-    color: '#FFF',
-    fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
+    color: Colors.textInverse,
+    fontSize: FontSizes.sm,
   },
   emptyCard: {
     padding: 40,
     alignItems: 'center',
-  },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: 12,
+    gap: 8,
   },
   emptyText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
+    color: Colors.charcoal,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
 });

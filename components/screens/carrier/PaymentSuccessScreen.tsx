@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -51,6 +52,15 @@ const PaymentSuccessScreen: React.FC<PaymentSuccessScreenProps> = ({
     }).start();
     // Mission status already updated to DELIVERED by confirmDelivery API
   }, []);
+
+  const handleOpenFeedback = () => {
+    if (shipmentId && onNavigate) {
+      onNavigate('shipmentFeedback', {
+        shipmentId,
+        returnScreen: 'activeMissions',
+      });
+    }
+  };
 
   const handleViewReceipt = () => {
     if (onNavigate) {
@@ -143,19 +153,19 @@ const PaymentSuccessScreen: React.FC<PaymentSuccessScreenProps> = ({
 
         {/* Action Buttons */}
         <Button
-          onPress={handleViewReceipt}
+          onPress={handleOpenFeedback}
           size="lg"
           fullWidth
         >
-          Voir le récapitulatif
+          Évaluer l'expéditeur
         </Button>
         <Button
-          onPress={handleBackToMissions}
+          onPress={handleViewReceipt}
           variant="secondary"
           size="lg"
           fullWidth
         >
-          Retour aux missions
+          Voir le récapitulatif
         </Button>
 
         {/* Notification Badge */}
@@ -187,7 +197,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },

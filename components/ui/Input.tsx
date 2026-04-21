@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { Colors, Fonts, FontSizes, Radius } from '../../theme';
 
 interface InputProps {
   label?: string;
@@ -62,36 +63,36 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#444444',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+    color: Colors.charcoal,
     marginBottom: 8,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: 12,
-    borderWidth: 1,
+    backgroundColor: Colors.backgroundAlt,
+    borderRadius: Radius.md,
+    borderWidth: 1.5,
     borderColor: 'transparent',
     paddingHorizontal: 16,
   },
   focused: {
-    borderColor: '#1464F6',
-    backgroundColor: '#fff',
+    borderColor: Colors.primary,
+    backgroundColor: Colors.surface,
   },
   error: {
-    borderColor: '#FF3B30',
+    borderColor: Colors.error,
   },
   icon: {
-    marginRight: 12,
-    color: '#666',
+    marginRight: 10,
   },
   input: {
     flex: 1,
-    paddingVertical: 14,
-    fontSize: 16,
-    color: '#333',
+    paddingVertical: 13,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
   },
   eyeIcon: {
     padding: 8,
@@ -100,8 +101,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   errorText: {
-    fontSize: 12,
-    color: '#FF3B30',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.error,
     marginTop: 4,
     marginLeft: 4,
   },

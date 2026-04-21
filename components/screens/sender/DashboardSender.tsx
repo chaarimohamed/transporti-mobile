@@ -15,14 +15,16 @@ import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import BottomNav from '../../ui/BottomNav';
+import { AppIcon } from '../../ui/Icon';
+import { Colors, Fonts, FontSizes, Radius, Shadows } from '../../../theme';
 import { useAuth } from '../../../contexts/AuthContext';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 import * as notificationService from '../../../services/notification.service';
 
 interface DashboardSenderProps {
-  onNavigate?: (screen: string) => void;
-  initialData?: any;
+  onNavigate?: (screen: string, params?: unknown) => void;
+  initialData?: { refresh?: boolean } | null;
 }
 
 const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialData }) => {
@@ -166,7 +168,7 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
             activeOpacity={0.7}
             onPress={() => onNavigate?.('notificationListSender')}
           >
-            <Text style={styles.bellIcon}>🔔</Text>
+            <AppIcon name={unreadCount > 0 ? 'bell-active' : 'bell'} size={22} color={Colors.charcoal} />
             {unreadCount > 0 && (
               <View style={styles.notificationBadge}>
                 <Text style={styles.notificationBadgeText}>
@@ -180,7 +182,7 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
             activeOpacity={0.7}
             onPress={handleLogout}
           >
-            <Text style={styles.logoutIcon}>🚪</Text>
+            <AppIcon name="logout" size={20} color={Colors.error} />
           </TouchableOpacity>
         </View>
       </View>
@@ -190,9 +192,10 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
         <Button
           onPress={() => onNavigate?.('newShipment')}
           style={styles.ctaButton}
+          fullWidth
+          size="lg"
         >
-          <Text style={styles.ctaButtonIcon}>➕</Text>
-          <Text style={styles.ctaButtonText}>Nouvelle expédition</Text>
+          Nouvelle expédition
         </Button>
 
         {/* Stats Grid */}
@@ -243,7 +246,7 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
 
           {loading ? (
             <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color="#1464F6" />
+              <ActivityIndicator size="large" color={Colors.primary} />
               <Text style={styles.loadingText}>Chargement...</Text>
             </View>
           ) : error ? (
@@ -255,11 +258,9 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
             </Card>
           ) : shipments.length === 0 ? (
             <Card style={styles.emptyCard}>
-              <Text style={styles.emptyIcon}>📦</Text>
+              <AppIcon name="package" size={40} color={Colors.primaryLight} />
               <Text style={styles.emptyText}>Aucune expédition</Text>
-              <Text style={styles.emptySubtext}>
-                Créez votre première expédition
-              </Text>
+              <Text style={styles.emptySubtext}>Créez votre première expédition</Text>
             </Card>
           ) : (
             shipments.map((shipment) => {
@@ -277,10 +278,11 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
                       <Badge status={badge.status} text={badge.text} />
                     </View>
                     <View style={styles.shipmentRoute}>
+                      <AppIcon name="map-pin" size={14} color={Colors.primary} />
                       <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
                         {shipment.from}
                       </Text>
-                      <Text style={styles.arrowIcon}>→</Text>
+                      <AppIcon name="arrow-right" size={14} color={Colors.textMuted} />
                       <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
                         {shipment.to}
                       </Text>
@@ -313,14 +315,14 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100, // Space for BottomNav
+    paddingBottom: 100,
   },
   header: {
     flexDirection: 'row',
@@ -331,74 +333,60 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   greeting: {
-    fontSize: 16,
-    color: '#666666',
-    marginBottom: 4,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
+    marginBottom: 2,
   },
   name: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.xl,
+    color: Colors.navy,
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
   },
   bellButton: {
     width: 44,
     height: 44,
-    backgroundColor: '#FCFCFC',
+    backgroundColor: Colors.surface,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
+    borderColor: Colors.border,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-  },
-  bellIcon: {
-    fontSize: 20,
   },
   notificationBadge: {
     position: 'absolute',
     top: -4,
     right: -4,
-    backgroundColor: '#DC2626',
+    backgroundColor: Colors.error,
     borderRadius: 10,
     minWidth: 20,
     height: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 6,
+    paddingHorizontal: 4,
   },
   notificationBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
+    color: Colors.textInverse,
+    fontSize: FontSizes.xs,
   },
   logoutButton: {
     width: 44,
     height: 44,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: Colors.errorSurface,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: '#FCA5A5',
+    borderColor: 'rgba(217, 45, 32, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoutIcon: {
-    fontSize: 20,
-  },
   ctaButton: {
     marginBottom: 24,
-  },
-  ctaButtonIcon: {
-    fontSize: 18,
-    color: '#FFFFFF',
-  },
-  ctaButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
   },
   statsGrid: {
     flexDirection: 'row',
@@ -413,14 +401,15 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   statNumber: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.xxl,
+    color: Colors.navy,
     marginBottom: 4,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
   },
   section: {
     marginBottom: 16,
@@ -432,58 +421,61 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.md,
+    color: Colors.navy,
   },
   seeAllLink: {
-    fontSize: 14,
-    color: '#1464F6',
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+    color: Colors.accent,
   },
   shipmentCard: {
     marginBottom: 12,
   },
   shipmentHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 12,
   },
   shipmentId: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    flex: 1,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
+    color: Colors.charcoal,
+    marginRight: 12,
+    minWidth: 0,
   },
   shipmentRoute: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
     marginBottom: 12,
   },
   locationText: {
     flex: 1,
-    fontSize: 14,
-    color: '#666666',
-  },
-  arrowIcon: {
-    fontSize: 14,
-    color: '#1464F6',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   shipmentFooter: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   priceText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.base,
+    color: Colors.navy,
   },
   searchTransporterLink: {
-    fontSize: 13,
-    color: '#1464F6',
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.accent,
+    marginTop: 8,
   },
   loadingContainer: {
     padding: 40,
@@ -492,49 +484,48 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 14,
-    color: '#666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   errorCard: {
     padding: 20,
     alignItems: 'center',
-    backgroundColor: '#FEF2F2',
-    borderColor: '#FCA5A5',
+    backgroundColor: Colors.errorSurface,
+    borderColor: 'rgba(217,45,32,0.2)',
   },
   errorText: {
-    fontSize: 14,
-    color: '#D92D20',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.error,
     marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#D92D20',
-    borderRadius: 6,
+    backgroundColor: Colors.error,
+    borderRadius: Radius.sm,
   },
   retryText: {
-    color: '#FFF',
-    fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
+    color: Colors.textInverse,
+    fontSize: FontSizes.sm,
   },
   emptyCard: {
     padding: 40,
     alignItems: 'center',
-  },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: 12,
+    gap: 8,
   },
   emptyText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
+    color: Colors.charcoal,
   },
   emptySubtext: {
-    fontSize: 14,
-    color: '#666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
 });
 

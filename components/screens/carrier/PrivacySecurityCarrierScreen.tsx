@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import { Colors } from '../../../theme';
 
 interface PrivacySecurityCarrierScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
@@ -136,7 +137,7 @@ const PrivacySecurityCarrierScreen: React.FC<PrivacySecurityCarrierScreenProps> 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -223,7 +224,7 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: 14,
-    color: '#1464F6',
+    color: Colors.primary,
     marginBottom: 8,
   },
   footer: {

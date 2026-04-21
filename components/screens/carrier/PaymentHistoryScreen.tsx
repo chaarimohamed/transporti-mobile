@@ -8,13 +8,14 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import Badge from '../../ui/Badge';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 
 interface PaymentHistoryScreenProps {
-  onNavigate?: (screen: string, params?: any) => void;
+  onNavigate?: (screen: string, params?: unknown) => void;
 }
 
 interface HistoryItem {
@@ -173,7 +174,7 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1464F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       </SafeAreaView>
@@ -268,7 +269,7 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -318,12 +319,13 @@ const styles = StyleSheet.create({
   filterContent: {
     paddingHorizontal: 16,
     paddingVertical: 12,
+    paddingRight: 24,
   },
   filterChip: {
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 24,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     marginRight: 8,
     height: 40,
     justifyContent: 'center',
@@ -348,7 +350,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   statsCard: {
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     marginBottom: 24,
     padding: 24,
   },
@@ -396,6 +398,7 @@ const styles = StyleSheet.create({
   },
   cardHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
@@ -404,11 +407,15 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E9E9E9',
   },
   cardDate: {
+    flexShrink: 1,
     fontSize: 12,
     color: '#666666',
+    marginLeft: 8,
+    textAlign: 'right',
   },
   cardBody: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     padding: 16,
@@ -416,6 +423,8 @@ const styles = StyleSheet.create({
   },
   cardInfoSection: {
     flex: 1,
+    minWidth: 0,
+    paddingRight: 12,
   },
   orderIdText: {
     fontSize: 12,
@@ -426,14 +435,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#1A1A1A',
+    flexShrink: 1,
   },
   amountText: {
+    flexShrink: 0,
     fontSize: 18,
     fontWeight: '700',
     color: '#1A1A1A',
   },
   cardFooter: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
@@ -442,6 +454,9 @@ const styles = StyleSheet.create({
   paymentMethodContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    minWidth: 0,
+    paddingRight: 12,
   },
   cardIcon: {
     fontSize: 12,
@@ -450,20 +465,23 @@ const styles = StyleSheet.create({
   paymentMethodText: {
     fontSize: 12,
     color: '#666666',
+    flexShrink: 1,
   },
   viewReceiptContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 0,
+    marginTop: 8,
   },
   viewReceiptText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#1464F6',
+    color: Colors.primary,
     marginRight: 2,
   },
   chevronIcon: {
     fontSize: 16,
-    color: '#1464F6',
+    color: Colors.primary,
   },
   endOfHistoryContainer: {
     alignItems: 'center',

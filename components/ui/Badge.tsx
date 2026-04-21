@@ -1,33 +1,35 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleProp, StyleSheet, ViewStyle } from 'react-native';
+import { Colors, Fonts, FontSizes, Radius } from '../../theme';
 
 interface BadgeProps {
-  status: 'success' | 'warning' | 'error' | 'neutral' | 'info';
+  status?: 'success' | 'warning' | 'error' | 'neutral' | 'info';
+  variant?: 'success' | 'warning' | 'error' | 'neutral' | 'info';
   text: string;
+  style?: StyleProp<ViewStyle>;
 }
 
-const Badge: React.FC<BadgeProps> = ({ status, text }) => {
+const Badge: React.FC<BadgeProps> = ({ status, variant, text, style }) => {
   const getStyles = () => {
-    switch (status) {
+    switch (status || variant || 'neutral') {
       case 'success':
-        return { backgroundColor: 'rgba(46, 139, 87, 0.1)', color: '#2E8B57' };
+        return { backgroundColor: Colors.successSurface, color: Colors.success };
       case 'warning':
-        return { backgroundColor: 'rgba(255, 179, 71, 0.1)', color: '#FFB347' };
+        return { backgroundColor: Colors.warningSurface, color: Colors.warning };
       case 'error':
-        return { backgroundColor: 'rgba(217, 45, 32, 0.1)', color: '#D92D20' };
-      case 'neutral':
-        return { backgroundColor: '#E9E9E9', color: '#666666' };
+        return { backgroundColor: Colors.errorSurface, color: Colors.error };
       case 'info':
-        return { backgroundColor: 'rgba(20, 100, 246, 0.1)', color: '#1464F6' };
+        return { backgroundColor: Colors.primarySurface, color: Colors.primaryDark };
+      case 'neutral':
       default:
-        return { backgroundColor: '#E9E9E9', color: '#666666' };
+        return { backgroundColor: Colors.backgroundAlt, color: Colors.textSecondary };
     }
   };
 
   const customStyles = getStyles();
 
   return (
-    <View style={[styles.container, { backgroundColor: customStyles.backgroundColor }]}>
+    <View style={[styles.container, { backgroundColor: customStyles.backgroundColor }, style]}>
       <Text style={[styles.text, { color: customStyles.color }]}>{text}</Text>
     </View>
   );
@@ -35,13 +37,15 @@ const Badge: React.FC<BadgeProps> = ({ status, text }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 20,
+    borderRadius: Radius.full,
+    alignSelf: 'flex-start',
   },
   text: {
-    fontSize: 12,
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.xs,
+    letterSpacing: 0.2,
   },
 });
 

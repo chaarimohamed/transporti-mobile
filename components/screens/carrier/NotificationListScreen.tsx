@@ -10,6 +10,7 @@ import {
   RefreshControl,
   Alert,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -121,7 +122,15 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
     // BUG-02 fix: fall back to notification.data.shipmentId when the top-level field is null
     const shipmentId = notification.shipmentId || notification.data?.shipmentId;
     if (shipmentId) {
-      onNavigate?.('missionDetails', { shipmentId });
+      if (notification.type === 'SHIPMENT_DELIVERED') {
+        onNavigate?.('shipmentFeedback', {
+          shipmentId,
+          returnScreen: 'missionDetails',
+          returnParams: { shipmentId },
+        });
+      } else {
+        onNavigate?.('missionDetails', { shipmentId });
+      }
     }
   };
 
@@ -163,7 +172,7 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1464F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       </SafeAreaView>
@@ -260,7 +269,7 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     paddingHorizontal: 24,
@@ -295,20 +304,20 @@ const styles = StyleSheet.create({
   errorCard: {
     padding: 20,
     alignItems: 'center',
-    backgroundColor: '#FEF2F2',
+    backgroundColor: Colors.errorSurface,
     borderColor: '#FCA5A5',
     marginBottom: 16,
   },
   errorText: {
     fontSize: 14,
-    color: '#D92D20',
+    color: Colors.error,
     marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    backgroundColor: '#D92D20',
+    backgroundColor: Colors.error,
     borderRadius: 6,
   },
   retryText: {
@@ -351,7 +360,7 @@ const styles = StyleSheet.create({
     height: 40,
     lineHeight: 40,
     textAlign: 'center',
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     borderRadius: 20,
     overflow: 'hidden',
   },
@@ -386,7 +395,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   declineButton: {
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     borderWidth: 1,
     borderColor: '#E9E9E9',
   },
@@ -396,7 +405,7 @@ const styles = StyleSheet.create({
     color: '#666666',
   },
   acceptButton: {
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   acceptButtonText: {
     fontSize: 14,
@@ -404,7 +413,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   viewDetailsButton: {
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   viewDetailsButtonText: {
     fontSize: 14,
@@ -419,7 +428,7 @@ const styles = StyleSheet.create({
   viewButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1464F6',
+    color: Colors.primary,
   },
 });
 

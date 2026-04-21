@@ -1,178 +1,152 @@
-# Transporti - Mobile App
+# Transporti Mobile
 
-A React Native mobile application for messaging and chat with rating features, built for both iOS and Android platforms.
+Expo/React Native client for the Transporti sender and carrier flows.
 
-## 🚀 Features
+## Quick start
 
-### Screens
-- **M1**: Conversation List - View all active conversations
-- **M2**: Active Chat - Real-time messaging interface
-- **M3**: Read-Only Chat - View archived conversations
-- **M4**: Conversation Details - User and trip information
-
-### Features
-- **F1**: Rating Modal - Rate your experience
-- **F2**: Rating Success - Confirmation screen
-- **F3**: Push Notification - Notification simulation
-- **F4**: Received Ratings - View all ratings
-- **F5**: Rating Detail - Detailed rating view
-- **F6**: Error Toast - Error notifications
-
-## 📋 Prerequisites
-
-Before you begin, ensure you have the following installed:
-
-- **Node.js** (v16 or newer)
-- **npm** or **yarn**
-- **Expo CLI**: `npm install -g expo-cli`
-
-### For iOS Development:
-- **macOS** required
-- **Xcode** (latest version)
-- **iOS Simulator** or physical iOS device
-- **CocoaPods**: `sudo gem install cocoapods`
-
-### For Android Development:
-- **Android Studio**
-- **Android SDK** (API level 21 or higher)
-- **Android Emulator** or physical Android device
-- **Java Development Kit (JDK)**
-
-## 🛠️ Installation
-
-1. **Clone or navigate to the project directory:**
-   ```bash
-   cd /mnt/c/Users/chaar/OneDrive/Bureau/transporti
-   ```
-
-2. **Install dependencies:**
+1. Install dependencies:
    ```bash
    npm install
    ```
+2. Copy `.env.example` to `.env` and set `EXPO_PUBLIC_API_URL`.
+3. Start Expo on your local network:
+   ```bash
+   npm start
+   ```
 
-## 🏃 Running the App
+## Install location matters
 
-### Start Metro Bundler:
+If you are using **WSL**, do **not** run `npm install` from a Windows-mounted OneDrive path such as:
+
 ```bash
-npm start
+/mnt/c/Users/your-user/OneDrive/...
 ```
 
-This will open Expo Developer Tools in your browser.
+That setup commonly breaks npm package installs with errors like `ENOTEMPTY`, `rename`, or partially written `node_modules` folders.
 
-### Run on iOS:
+Use one of these workflows instead:
+
+| Workflow | Recommended command location |
+| --- | --- |
+| Windows checkout under `C:\Users\...` or `OneDrive` | Run `npm install` from **PowerShell / CMD** |
+| WSL development | Keep the repo in your **WSL home** such as `~/projects/transporti_v0` |
+
+## Recovering from `ENOTEMPTY` during `npm install`
+
+If you already hit an error like:
+
+```text
+ENOTEMPTY: directory not empty, rename '.../node_modules/expo' -> '.../node_modules/.expo-xxxx'
+```
+
+clean the partial install, then rerun the install from a supported location/shell:
+
+### PowerShell
+
+```powershell
+Remove-Item -Recurse -Force .\node_modules
+Remove-Item -Recurse -Force .\package-lock.json
+npm install
+```
+
+### Bash
+
 ```bash
-npm run ios
+rm -rf node_modules package-lock.json
+npm install
 ```
 
-Or press `i` in the Expo Developer Tools.
+If the project is inside **OneDrive** and you are working from **WSL**, the reliable fix is to either:
 
-### Run on Android:
+1. move the repo to your WSL filesystem and run `npm install` there, or
+2. keep the repo where it is and run `npm install` from Windows PowerShell instead of WSL.
+
+## WSL2 mirrored networking (Windows + WSL)
+
+If you run Expo from WSL and connect with a physical phone, use mirrored mode:
+
+1. Create or edit `%USERPROFILE%/.wslconfig` on Windows:
+
+```ini
+[wsl2]
+networkingMode=mirrored
+
+[experimental]
+hostAddressLoopback=true
+```
+
+2. Restart WSL from PowerShell:
+
+```powershell
+wsl --shutdown
+```
+
+3. Allow inbound traffic to the WSL VM (PowerShell as Administrator):
+
+```powershell
+Set-NetFirewallHyperVVMSetting -Name '{40E0AC32-46A5-438A-A0B2-2B479E8F2E90}' -DefaultInboundAction Allow
+```
+
+4. Keep the repo on the Linux filesystem (for example `~/transporti_v0`, not `/mnt/c/...`).
+
+5. Run `npm start` and verify Expo QR output uses your Windows LAN IP (`192.168.x.x` style). Use that same IP in `EXPO_PUBLIC_API_URL`.
+
+## Choosing `EXPO_PUBLIC_API_URL`
+
+Use the backend base URL including `/api`.
+
+| Environment | Value |
+| --- | --- |
+| Android emulator | `http://10.0.2.2:3000/api` |
+| iOS simulator / local web | `http://localhost:3000/api` |
+| Physical phone on same Wi-Fi | `http://YOUR_LAN_IP:3000/api` |
+| Shared / deployed backend | `https://your-backend-host/api` |
+
+## Available scripts
+
+- `npm start` - Start Expo in LAN mode with a cleared cache
+- `npm run start:lan` - Start Expo in LAN mode
+- `npm run start:tunnel` - Start Expo with an Expo/ngrok tunnel
+- `npm run android` - Open the Android target
+- `npm run ios` - Open the iOS target
+- `npm run web` - Run the web target
+- `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript without emitting files
+
+## Notes about tunnel mode
+
+Expo tunnel only exposes the Metro bundler. It does **not** expose your local backend automatically.
+
+If you use `npm run start:tunnel`, point `EXPO_PUBLIC_API_URL` to a backend URL the phone can actually reach:
+
+- your machine LAN IP when the phone is on the same network
+- or a separately deployed/public backend URL
+
+### Recommended iPhone tunnel workflow
+
+When LAN is blocked (AP isolation, strict router, corporate Wi-Fi), run both tunnels:
+
+1. Backend tunnel (writes the public API URL into `transporti-mobile/.env`):
+   ```bash
+   cd ../transporti-backend
+   npm run start:with-ngrok
+   ```
+2. Mobile tunnel:
+   ```bash
+   cd ../transporti-mobile
+   npm run start:tunnel
+   ```
+
+From monorepo root you can also run:
+
 ```bash
-npm run android
+npm run start:backend:tunnel
 ```
 
-Or press `a` in the Expo Developer Tools.
+and in another terminal:
 
-### Run on Web (for testing):
 ```bash
-npm run web
+npm run start:mobile:tunnel
 ```
 
-## 📱 Testing on Physical Devices
-
-1. Install **Expo Go** app:
-   - [iOS App Store](https://apps.apple.com/app/expo-go/id982107779)
-   - [Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
-
-2. Scan the QR code from Expo Developer Tools with:
-   - **iOS**: Camera app
-   - **Android**: Expo Go app
-
-## 🏗️ Project Structure
-
-```
-transporti/
-├── .github/
-│   └── copilot-instructions.md
-├── components/
-│   └── screens/
-│       ├── M1_ConversationList.tsx
-│       ├── M2_ActiveChat.tsx
-│       ├── M3_ReadOnlyChat.tsx
-│       ├── M4_ConversationDetails.tsx
-│       ├── F1_RatingModal.tsx
-│       ├── F2_RatingSuccess.tsx
-│       ├── F3_NotificationPush.tsx
-│       ├── F4_ReceivedRatings.tsx
-│       ├── F5_RatingDetail.tsx
-│       └── F6_ErrorToast.tsx
-├── App.tsx
-├── app.json
-├── package.json
-├── tsconfig.json
-├── babel.config.js
-└── README.md
-```
-
-## 🎨 Tech Stack
-
-- **React Native** - Mobile app framework
-- **TypeScript** - Type safety
-- **Expo** - Development platform
-- **React Navigation** - Navigation library (ready to integrate)
-
-## 🔧 Development
-
-### Type Checking:
-```bash
-npm run type-check
-```
-
-### Linting:
-```bash
-npm run lint
-```
-
-## 📦 Building for Production
-
-### iOS:
-```bash
-expo build:ios
-```
-
-### Android:
-```bash
-expo build:android
-```
-
-## 🐛 Troubleshooting
-
-### Metro Bundler Issues:
-```bash
-# Clear cache
-expo start -c
-```
-
-### iOS Simulator Not Opening:
-```bash
-# Ensure Xcode Command Line Tools are installed
-xcode-select --install
-```
-
-### Android Emulator Issues:
-```bash
-# Check if emulator is running
-adb devices
-```
-
-## 📄 License
-
-This project is private and confidential.
-
-## 👥 Contributors
-
-- Development Team
-
-## 📞 Support
-
-For support, please contact the development team.
+The app no longer relies on a hardcoded ngrok backend URL, so each developer can use their own environment safely.

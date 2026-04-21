@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 
 /**
  * API Configuration
@@ -8,26 +8,61 @@ import { Platform } from 'react-native';
  * - Production: Use your deployed backend URL
  */
 
+const normalizeApiUrl = (url: string) => {
+  const trimmedUrl = url.trim().replace(/\/+$/, '');
+  return trimmedUrl.endsWith('/api') ? trimmedUrl : `${trimmedUrl}/api`;
+};
+
+const getMetroHost = () => {
+  const scriptURL = NativeModules?.SourceCode?.scriptURL as string | undefined;
+
+  if (!scriptURL) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(scriptURL);
+    return parsed.hostname || null;
+  } catch {
+    const match = scriptURL.match(/https?:\/\/([^/:]+)/i);
+    return match?.[1] || null;
+  }
+};
+
+const getDevelopmentBaseUrl = () => {
+  if (Platform.OS === 'web') {
+    return 'http://localhost:3000/api';
+  }
+
+  // On physical devices, Metro usually serves from your LAN IP.
+  // Reuse that host so API calls target your machine instead of localhost on the phone.
+  const metroHost = getMetroHost();
+  if (metroHost && !['localhost', '127.0.0.1'].includes(metroHost)) {
+    return `http://${metroHost}:3000/api`;
+  }
+
+  // Android emulator reaches the host machine through 10.0.2.2.
+  if (Platform.OS === 'android') {
+    return 'http://10.0.2.2:3000/api';
+  }
+
+  // iOS simulator can use localhost directly.
+  return 'http://localhost:3000/api';
+};
+
 // Determine the base URL based on platform
 const getBaseUrl = () => {
-  const isDevelopment = __DEV__;
-  const envUrl = process.env.EXPO_PUBLIC_API_URL;
+  const envUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
 
-  if (envUrl && envUrl.length > 0) {
-    return envUrl;
+  if (envUrl) {
+    return normalizeApiUrl(envUrl);
   }
 
-  if (isDevelopment) {
-    // Android emulator uses 10.0.2.2 to reach the host machine
-    if (Platform.OS === 'android') {
-      return 'https://unperceptional-unvaguely-ervin.ngrok-free.dev/api';
-    }
-
-    // iOS simulator or web
-    return 'https://unperceptional-unvaguely-ervin.ngrok-free.dev/api';
+  if (__DEV__) {
+    return getDevelopmentBaseUrl();
   }
 
-  // Production: Replace with your actual backend URL
+  // Production: replace with your deployed backend URL via EXPO_PUBLIC_API_URL when building.
   return 'https://api.transporti.tn/api';
 };
 
@@ -61,6 +96,7 @@ export const API_ENDPOINTS = {
     GET: (id: string) => `/shipments/${id}`,
     UPDATE: (id: string) => `/shipments/${id}`,
     DELETE: (id: string) => `/shipments/${id}`,
+    FEEDBACK: (id: string) => `/shipments/${id}/feedback`,
     STATS: '/shipments/stats',
     PHOTOS: (id: string) => `/shipments/${id}/photos`,
   },

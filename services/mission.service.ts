@@ -47,7 +47,7 @@ export const getAvailableMissions = async (
     const response = await apiClient.get('/missions/available', { params });
     return { success: true, missions: response.data.missions };
   } catch (error) {
-    return { success: false, error: handleApiError(error) };
+    return { success: false, error: handleApiError(error).message };
   }
 };
 
@@ -60,7 +60,7 @@ export const getMyMissions = async (
     const response = await apiClient.get('/missions/my-missions', { params });
     return { success: true, missions: response.data.missions };
   } catch (error) {
-    return { success: false, error: handleApiError(error) };
+    return { success: false, error: handleApiError(error).message };
   }
 };
 
@@ -72,7 +72,7 @@ export const getMissionById = async (
     const response = await apiClient.get(`/missions/${id}`);
     return { success: true, mission: response.data.mission };
   } catch (error) {
-    return { success: false, error: handleApiError(error) };
+    return { success: false, error: handleApiError(error).message };
   }
 };
 
@@ -85,7 +85,7 @@ export const acceptMission = async (
     const response = await apiClient.post(`/missions/${id}/accept`, data || {});
     return { success: true, mission: response.data.mission };
   } catch (error) {
-    return { success: false, error: handleApiError(error) };
+    return { success: false, error: handleApiError(error).message };
   }
 };
 
@@ -98,7 +98,7 @@ export const updateMissionStatus = async (
     const response = await apiClient.put(`/missions/${id}/status`, { status });
     return { success: true, mission: response.data.mission };
   } catch (error) {
-    return { success: false, error: handleApiError(error) };
+    return { success: false, error: handleApiError(error).message };
   }
 };
 
@@ -110,7 +110,7 @@ export const cancelMission = async (
     await apiClient.delete(`/missions/${id}`);
     return { success: true };
   } catch (error) {
-    return { success: false, error: handleApiError(error) };
+    return { success: false, error: handleApiError(error).message };
   }
 };
 
@@ -127,9 +127,10 @@ export const confirmDelivery = async (
       receiptNumber: response.data.receiptNumber,
     };
   } catch (error: any) {
+    const apiError = handleApiError(error);
     return { 
       success: false, 
-      error: handleApiError(error),
+      error: apiError.message,
       attemptsLeft: error.response?.data?.attemptsLeft,
     };
   }
@@ -145,6 +146,6 @@ export const getMissionStats = async (): Promise<{
     const response = await apiClient.get('/missions/stats');
     return { success: true, stats: response.data.stats };
   } catch (error) {
-    return { success: false, error: handleApiError(error) };
+    return { success: false, error: handleApiError(error).message };
   }
 };

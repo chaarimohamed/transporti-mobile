@@ -5,6 +5,7 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Button } from '../../ui/Button';
 
 interface InvitationSentScreenProps {
@@ -74,7 +75,7 @@ const InvitationSentScreen: React.FC<InvitationSentScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   content: {
     flex: 1,

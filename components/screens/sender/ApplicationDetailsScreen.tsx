@@ -10,6 +10,7 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -283,7 +284,7 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
       {/* Bottom Actions */}
       {loading ? (
         <View style={styles.bottomActions}>
-          <ActivityIndicator size="small" color="#1464F6" />
+          <ActivityIndicator size="small" color={Colors.primary} />
           <Text style={styles.loadingText}>Traitement...</Text>
         </View>
       ) : (
@@ -311,7 +312,7 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     backgroundColor: '#FFFFFF',
@@ -328,7 +329,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -468,7 +469,7 @@ const styles = StyleSheet.create({
   detailPrice: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1464F6',
+    color: Colors.primary,
   },
   descriptionSection: {
     gap: 8,
@@ -522,7 +523,7 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#1464F6',
+    color: Colors.primary,
     marginBottom: 4,
   },
   statLabel: {
@@ -537,7 +538,7 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#F0F7FF',
     borderWidth: 1,
-    borderColor: '#1464F6',
+    borderColor: Colors.primary,
     flexDirection: 'row',
     gap: 12,
     alignItems: 'flex-start',
@@ -576,19 +577,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#D92D20',
+    borderColor: Colors.error,
     alignItems: 'center',
   },
   rejectButtonText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#D92D20',
+    color: Colors.error,
   },
   acceptButton: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     alignItems: 'center',
   },
   acceptButtonText: {

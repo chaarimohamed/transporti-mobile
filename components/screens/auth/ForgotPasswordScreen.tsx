@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableOpacity } from 'react-native';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
+import { AppIcon } from '../../ui/Icon';
+import { Colors, Fonts, FontSizes, Radius, Shadows } from '../../../theme';
 import { forgotPassword, resetPassword } from '../../../services/authService';
 
 interface ForgotPasswordScreenProps {
@@ -113,7 +115,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
       {/* Back navigation bar — ← goes back to login (step email) or back to email step (step reset) */}
       <View style={styles.topBar}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack} activeOpacity={0.7}>
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-left" size={20} color={Colors.charcoal} />
         </TouchableOpacity>
         {step === 'reset' && (
           <Text style={styles.topBarTitle}>Réinitialiser le mot de passe</Text>
@@ -123,7 +125,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
           <View style={styles.logo}>
-            <Text style={styles.logoIcon}>🔒</Text>
+            <AppIcon name="lock" size={40} color={Colors.navy} />
           </View>
         </View>
 
@@ -141,7 +143,8 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
 
           {error ? (
             <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>⚠️ {error}</Text>
+              <AppIcon name="alert-triangle" size={16} color={Colors.error} />
+              <Text style={styles.errorText}>{error}</Text>
             </View>
           ) : null}
 
@@ -154,7 +157,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
-                  icon={<Text>✉️</Text>}
+                  icon={<AppIcon name="email" size={18} color={Colors.textMuted} />}
                 />
                 
                 <Button 
@@ -174,9 +177,9 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
                   placeholder="123456"
                   value={resetToken}
                   onChangeText={setResetToken}
-                  keyboardType="number-pad"
+                  keyboardType="numeric"
                   maxLength={6}
-                  icon={<Text>🔑</Text>}
+                  icon={<AppIcon name="lock" size={18} color={Colors.textMuted} />}
                 />
 
                 {devToken && (
@@ -229,7 +232,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.background,
   },
   content: {
     flexGrow: 1,
@@ -241,59 +244,58 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#1464F6',
+    width: 88,
+    height: 88,
+    borderRadius: Radius.xl,
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#1464F6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
+    ...Shadows.primaryGlow,
   },
-  logoIcon: {
-    fontSize: 40,
-  },
-  form: {
-    flex: 1,
-  },
+  form: { flex: 1 },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.xxl,
+    color: Colors.navy,
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     marginBottom: 24,
     textAlign: 'center',
     paddingHorizontal: 16,
+    lineHeight: 20,
   },
   errorContainer: {
-    backgroundColor: '#FEF2F2',
-    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: Colors.errorSurface,
+    borderRadius: Radius.sm,
     padding: 12,
     marginBottom: 16,
   },
   errorText: {
-    color: '#D92D20',
-    fontSize: 14,
+    fontFamily: Fonts.regular,
+    color: Colors.error,
+    fontSize: FontSizes.sm,
+    flex: 1,
   },
   inputs: {
     gap: 16,
     marginBottom: 24,
   },
   devHint: {
-    fontSize: 12,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
     color: '#6366F1',
     textAlign: 'center',
     backgroundColor: '#EEF2FF',
     padding: 8,
-    borderRadius: 4,
+    borderRadius: Radius.xs,
     marginTop: -8,
   },
   footer: {
@@ -301,14 +303,15 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   footerText: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     marginBottom: 8,
   },
   footerLink: {
-    fontSize: 14,
-    color: '#1464F6',
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.primary,
   },
   topBar: {
     flexDirection: 'row',
@@ -319,21 +322,19 @@ const styles = StyleSheet.create({
     minHeight: 52,
   },
   backButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.backgroundAlt,
+    borderWidth: 1,
+    borderColor: Colors.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backIcon: {
-    fontSize: 20,
-    color: '#1A1A1A',
-  },
   topBarTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
+    color: Colors.navy,
     marginLeft: 12,
   },
 });

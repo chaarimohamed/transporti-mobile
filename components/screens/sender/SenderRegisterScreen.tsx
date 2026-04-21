@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { Colors } from '../../../theme';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -277,7 +278,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   errorText: {
-    color: '#D92D20',
+    color: Colors.error,
     fontSize: 14,
     textAlign: 'center',
   },
@@ -292,7 +293,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   fieldError: {
-    color: '#D92D20',
+    color: Colors.error,
     fontSize: 12,
     marginTop: 4,
   },
@@ -318,8 +319,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#1464F6',
-    borderColor: '#1464F6',
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
   },
   checkmark: {
     color: '#fff',
@@ -332,7 +333,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   link: {
-    color: '#1464F6',
+    color: Colors.primary,
     fontWeight: '500',
   },
   footer: {
@@ -345,7 +346,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   footerLink: {
-    color: '#1464F6',
+    color: Colors.primary,
     fontSize: 14,
     fontWeight: '600',
   },

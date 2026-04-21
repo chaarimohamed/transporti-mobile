@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Switch,
 } from 'react-native';
+import { Colors } from '../../../theme';
 
 interface NotificationSettingsScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
@@ -57,7 +58,7 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
             <Switch
               value={pushEnabled}
               onValueChange={setPushEnabled}
-              trackColor={{ false: '#E5E5E5', true: '#1464F6' }}
+              trackColor={{ false: '#E5E5E5', true: Colors.primary }}
               thumbColor="#FFFFFF"
             />
           </View>
@@ -77,7 +78,7 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
             <Switch
               value={emailEnabled}
               onValueChange={setEmailEnabled}
-              trackColor={{ false: '#E5E5E5', true: '#1464F6' }}
+              trackColor={{ false: '#E5E5E5', true: Colors.primary }}
               thumbColor="#FFFFFF"
             />
           </View>
@@ -98,7 +99,7 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
             <Switch
               value={statusUpdates}
               onValueChange={setStatusUpdates}
-              trackColor={{ false: '#E5E5E5', true: '#1464F6' }}
+              trackColor={{ false: '#E5E5E5', true: Colors.primary }}
               thumbColor="#FFFFFF"
             />
           </View>
@@ -118,7 +119,7 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
             <Switch
               value={newOffers}
               onValueChange={setNewOffers}
-              trackColor={{ false: '#E5E5E5', true: '#1464F6' }}
+              trackColor={{ false: '#E5E5E5', true: Colors.primary }}
               thumbColor="#FFFFFF"
             />
           </View>
@@ -138,7 +139,7 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
             <Switch
               value={messages}
               onValueChange={setMessages}
-              trackColor={{ false: '#E5E5E5', true: '#1464F6' }}
+              trackColor={{ false: '#E5E5E5', true: Colors.primary }}
               thumbColor="#FFFFFF"
             />
           </View>
@@ -158,7 +159,7 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
             <Switch
               value={promotions}
               onValueChange={setPromotions}
-              trackColor={{ false: '#E5E5E5', true: '#1464F6' }}
+              trackColor={{ false: '#E5E5E5', true: Colors.primary }}
               thumbColor="#FFFFFF"
             />
           </View>
@@ -173,7 +174,7 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -189,7 +190,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },

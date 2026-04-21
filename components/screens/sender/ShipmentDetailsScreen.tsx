@@ -10,6 +10,7 @@ import {
   Alert,
   Platform,
 } from 'react-native';
+import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -100,10 +101,8 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
   };
 
   const handleCancelShipment = () => {
-    const alertFn = Platform.OS === 'web' ? window.confirm : Alert.alert;
-    
     if (Platform.OS === 'web') {
-      if (alertFn('Êtes-vous sûr de vouloir annuler cette expédition ?')) {
+      if (window.confirm('Êtes-vous sûr de vouloir annuler cette expédition ?')) {
         cancelShipment();
       }
     } else {
@@ -303,7 +302,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#1464F6" />
+          <ActivityIndicator size="large" color={Colors.primary} />
           <Text style={styles.loadingText}>Chargement...</Text>
         </View>
       </SafeAreaView>
@@ -594,6 +593,37 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
             </Card>
           </>
         )}
+        
+        {shipment.status === 'DELIVERED' && shipment.feedbackSummary?.canSubmit && (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Votre évaluation</Text>
+            </View>
+            <Card style={styles.feedbackCard}>
+              <Text style={styles.feedbackTitle}>
+                {shipment.feedbackSummary.hasSubmitted
+                  ? 'Votre avis a déjà été enregistré'
+                  : 'La livraison est terminée'}
+              </Text>
+              <Text style={styles.feedbackText}>
+                {shipment.feedbackSummary.hasSubmitted
+                  ? 'Vous pouvez ajuster votre note et votre commentaire sur ce transporteur.'
+                  : 'Évaluez le transporteur pour finaliser cette expédition côté expérience client.'}
+              </Text>
+              <Button
+                onPress={() => onNavigate?.('shipmentFeedback', {
+                  shipmentId: shipment.id,
+                  returnScreen: 'shipmentDetails',
+                  returnParams: { id: shipment.id },
+                })}
+                size="lg"
+                fullWidth
+              >
+                {shipment.feedbackSummary.hasSubmitted ? 'Modifier mon évaluation' : 'Évaluer le transporteur'}
+              </Button>
+            </Card>
+          </>
+        )}
       </ScrollView>
 
       {/* Bottom Actions */}
@@ -623,7 +653,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
   },
   header: {
     backgroundColor: '#FFFFFF',
@@ -640,7 +670,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F6F6F6',
+    backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -704,11 +734,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   timelineDotCompleted: {
-    borderColor: '#1464F6',
-    backgroundColor: '#1464F6',
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primary,
   },
   timelineDotActive: {
-    borderColor: '#1464F6',
+    borderColor: Colors.primary,
     backgroundColor: '#FFFFFF',
   },
   timelineCheck: {
@@ -722,7 +752,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E9E9E9',
   },
   timelineLineCompleted: {
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   timelineText: {
     fontSize: 14,
@@ -734,7 +764,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   timelineTextActive: {
-    color: '#1464F6',
+    color: Colors.primary,
     fontWeight: '600',
   },
   sectionHeader: {
@@ -773,7 +803,7 @@ const styles = StyleSheet.create({
   infoPriceValue: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#1464F6',
+    color: Colors.primary,
   },
   infoDivider: {
     height: 1,
@@ -797,7 +827,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -860,7 +890,7 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
   },
   itineraryTextContent: {
     flex: 1,
@@ -878,7 +908,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     backgroundColor: '#EFF6FF',
     borderWidth: 1,
-    borderColor: '#1464F6',
+    borderColor: Colors.primary,
   },
   handoverHeader: {
     flexDirection: 'row',
@@ -895,7 +925,7 @@ const styles = StyleSheet.create({
   handoverTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1464F6',
+    color: Colors.primary,
     marginBottom: 6,
   },
   handoverSubtitle: {
@@ -904,10 +934,29 @@ const styles = StyleSheet.create({
     lineHeight: 19,
   },
   handoverButton: {
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     borderRadius: 10,
     paddingVertical: 14,
     alignItems: 'center',
+  },
+  feedbackCard: {
+    padding: 18,
+    marginBottom: 8,
+    backgroundColor: '#FFF7E8',
+    borderWidth: 1,
+    borderColor: '#F3D9A6',
+  },
+  feedbackTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#7C4A03',
+    marginBottom: 8,
+  },
+  feedbackText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#6B5A3D',
+    marginBottom: 14,
   },
   handoverButtonText: {
     color: '#FFFFFF',
@@ -954,19 +1003,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#D92D20',
+    borderColor: Colors.error,
     alignItems: 'center',
   },
   rejectButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#D92D20',
+    color: Colors.error,
   },
   acceptButton: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: '#1464F6',
+    backgroundColor: Colors.primary,
     alignItems: 'center',
   },
   acceptButtonText: {
@@ -983,20 +1032,20 @@ const styles = StyleSheet.create({
   trackButton: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#1464F6',
+    borderColor: Colors.primary,
   },
   trackButtonText: {
-    color: '#1464F6',
+    color: Colors.primary,
     fontSize: 16,
     fontWeight: '600',
   },
   cancelButton: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: '#D92D20',
+    borderColor: Colors.error,
   },
   cancelButtonText: {
-    color: '#D92D20',
+    color: Colors.error,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -1028,7 +1077,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     fontSize: 16,
-    color: '#D92D20',
+    color: Colors.error,
     marginBottom: 24,
     textAlign: 'center',
   },

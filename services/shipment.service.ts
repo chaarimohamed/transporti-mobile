@@ -24,6 +24,8 @@ export interface Shipment {
     lastName: string;
     phone: string;
     email: string;
+    averageRating?: number;
+    totalReviews?: number;
   };
   carrier?: {
     id: string;
@@ -52,6 +54,35 @@ export interface Shipment {
   deliveryHelperCount?: number;
   pickupMeetingPoint?: string;
   deliveryMeetingPoint?: string;
+  feedback?: ShipmentFeedback;
+  feedbackSummary?: ShipmentFeedbackSummary;
+}
+
+export interface ShipmentFeedback {
+  id: string;
+  senderToCarrierRating?: number | null;
+  senderToCarrierComment?: string | null;
+  senderToCarrierSubmittedAt?: string | null;
+  carrierToSenderRating?: number | null;
+  carrierToSenderComment?: string | null;
+  carrierToSenderSubmittedAt?: string | null;
+}
+
+export interface ShipmentFeedbackSummary {
+  pendingForCurrentUser: boolean;
+  hasSubmitted: boolean;
+  canSubmit: boolean;
+  targetRole: 'sender' | 'carrier' | null;
+}
+
+export interface SubmitShipmentFeedbackData {
+  rating: number;
+  comment?: string;
+}
+
+export interface SubmitShipmentFeedbackResult {
+  feedback: ShipmentFeedback;
+  feedbackSummary: ShipmentFeedbackSummary;
 }
 
 export interface ShipmentStats {
@@ -571,7 +602,7 @@ export interface Carrier {
  */
 export const getAvailableCarriers = async (shipmentId: string): Promise<{ success: boolean; carriers?: Carrier[]; error?: string }> => {
   try {
-    const response = await apiClient.get<{ success: boolean; data: Carrier[] }>(
+    const response = await apiClient.get<{ success: boolean; data: Carrier[]; error?: string }>(
       `${API_ENDPOINTS.SHIPMENTS.LIST}/${shipmentId}/available-carriers`
     );
 
@@ -600,7 +631,7 @@ export const getAvailableCarriers = async (shipmentId: string): Promise<{ succes
  */
 export const getInvitedCarriers = async (shipmentId: string): Promise<{ success: boolean; carrierIds?: string[]; error?: string }> => {
   try {
-    const response = await apiClient.get<{ success: boolean; data: string[] }>(
+    const response = await apiClient.get<{ success: boolean; data: string[]; error?: string }>(
       `${API_ENDPOINTS.SHIPMENTS.LIST}/${shipmentId}/invited-carriers`
     );
 
@@ -646,5 +677,39 @@ export const confirmHandover = async (shipmentId: string): Promise<{ success: bo
   } catch (error) {
     const apiError = handleApiError(error);
     return { success: false, error: apiError.message };
+  }
+};
+
+/**
+ * Submit sender/carrier feedback after a delivery is completed.
+ */
+export const submitShipmentFeedback = async (
+  shipmentId: string,
+  data: SubmitShipmentFeedbackData
+): Promise<{ success: boolean; result?: SubmitShipmentFeedbackResult; message?: string; error?: string }> => {
+  try {
+    const response = await apiClient.post<ApiResponse<SubmitShipmentFeedbackResult>>(
+      API_ENDPOINTS.SHIPMENTS.FEEDBACK(shipmentId),
+      data
+    );
+
+    if (response.data.success && response.data.data) {
+      return {
+        success: true,
+        result: response.data.data,
+        message: response.data.message,
+      };
+    }
+
+    return {
+      success: false,
+      error: response.data.error || 'Impossible d\'enregistrer l\'évaluation',
+    };
+  } catch (error) {
+    const apiError = handleApiError(error);
+    return {
+      success: false,
+      error: apiError.message,
+    };
   }
 };
