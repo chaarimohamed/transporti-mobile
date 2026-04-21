@@ -602,7 +602,7 @@ export interface Carrier {
  */
 export const getAvailableCarriers = async (shipmentId: string): Promise<{ success: boolean; carriers?: Carrier[]; error?: string }> => {
   try {
-    const response = await apiClient.get<{ success: boolean; data: Carrier[] }>(
+    const response = await apiClient.get<{ success: boolean; data: Carrier[]; error?: string }>(
       `${API_ENDPOINTS.SHIPMENTS.LIST}/${shipmentId}/available-carriers`
     );
 
@@ -631,7 +631,7 @@ export const getAvailableCarriers = async (shipmentId: string): Promise<{ succes
  */
 export const getInvitedCarriers = async (shipmentId: string): Promise<{ success: boolean; carrierIds?: string[]; error?: string }> => {
   try {
-    const response = await apiClient.get<{ success: boolean; data: string[] }>(
+    const response = await apiClient.get<{ success: boolean; data: string[]; error?: string }>(
       `${API_ENDPOINTS.SHIPMENTS.LIST}/${shipmentId}/invited-carriers`
     );
 

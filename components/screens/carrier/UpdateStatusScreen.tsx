@@ -309,8 +309,6 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
                     </Text>
                     <Text style={styles.stepDescription}>{step.description}</Text>
 
-                    {console.log(`📋 Step ${step.key}:`, { current, isCompleted, stepKey: step.key, canStartMission })}
-
                     {/* Action buttons for current step */}
                     {current && !isCompleted && step.key === 'PICKUP' && canStartMission && (
                       <View style={styles.stepActions}>

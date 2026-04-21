@@ -101,10 +101,8 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
   };
 
   const handleCancelShipment = () => {
-    const alertFn = Platform.OS === 'web' ? window.confirm : Alert.alert;
-    
     if (Platform.OS === 'web') {
-      if (alertFn('Êtes-vous sûr de vouloir annuler cette expédition ?')) {
+      if (window.confirm('Êtes-vous sûr de vouloir annuler cette expédition ?')) {
         cancelShipment();
       }
     } else {

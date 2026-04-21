@@ -177,7 +177,9 @@ const PaymentErrorScreen: React.FC<PaymentErrorScreenProps> = ({
             {code.map((digit, index) => (
               <TextInput
                 key={index}
-                ref={ref => (inputRefs.current[index] = ref)}
+                ref={(ref) => {
+                  inputRefs.current[index] = ref;
+                }}
                 style={[styles.codeInput, styles.codeInputError]}
                 value={digit}
                 onChangeText={value => handleCodeChange(index, value)}
