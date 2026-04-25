@@ -52,7 +52,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
     >
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <BrandLogo width={228} height={114} style={styles.logo} />
+          <BrandLogo width={320} height={160} style={styles.logo} />
         </View>
 
         <View style={styles.form}>

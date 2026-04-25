@@ -24,7 +24,7 @@ export const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onNavi
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <BrandLogo width={240} height={120} style={styles.logo} />
+        <BrandLogo width={336} height={168} style={styles.logo} />
         <Text style={styles.title}>Bienvenue sur Transporti</Text>
         <Text style={styles.subtitle}>Choisissez votre profil pour continuer</Text>
       </View>

@@ -16,7 +16,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onNavigate }) => {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <BrandLogo width={260} height={130} style={styles.logo} />
+        <BrandLogo width={380} height={190} style={styles.logo} />
         <Text style={styles.tagline}>Connectez. Transportez. Gagnez.</Text>
       </View>
       <View style={styles.footer}>
