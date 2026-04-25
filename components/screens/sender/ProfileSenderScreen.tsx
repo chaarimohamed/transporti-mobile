@@ -12,6 +12,7 @@ import {
 import { Colors } from '../../../theme';
 import { useAuth } from '../../../contexts/AuthContext';
 import BottomNav from '../../ui/BottomNav';
+import { AppIcon, AppIconName } from '../../ui/Icon';
 import * as authService from '../../../services/authService';
 
 interface ProfileSenderScreenProps {
@@ -50,37 +51,41 @@ const ProfileSenderScreen: React.FC<ProfileSenderScreenProps> = ({
     );
   };
 
-  const menuItems = [
+  const menuItems: Array<{
+    icon: AppIconName;
+    label: string;
+    onPress: () => void;
+  }> = [
     {
-      icon: '👤',
+      icon: 'profile-user',
       label: 'Informations personnelles',
       onPress: () => {
         onNavigate?.('personalInformation');
       },
     },
     {
-      icon: '💳',
+      icon: 'wallet',
       label: 'Moyens de paiement',
       onPress: () => {
         Alert.alert('Information', 'Fonctionnalité à venir');
       },
     },
     {
-      icon: '🔔',
+      icon: 'notification-bell',
       label: 'Préférences de notification',
       onPress: () => {
         onNavigate?.('notificationSettings');
       },
     },
     {
-      icon: '🛡️',
+      icon: 'verified-shield',
       label: 'Sécurité et Confidentialité',
       onPress: () => {
         onNavigate?.('privacySecurity');
       },
     },
     {
-      icon: '📄',
+      icon: 'document',
       label: 'Conditions Générales',
       onPress: () => {
         onNavigate?.('termsAndConditions');
@@ -96,7 +101,7 @@ const ProfileSenderScreen: React.FC<ProfileSenderScreenProps> = ({
           {photoUri ? (
             <Image source={{ uri: photoUri }} style={styles.avatarImage} />
           ) : (
-            <Text style={styles.avatarIcon}>👤</Text>
+            <AppIcon name="profile-user" size={40} color={Colors.textMuted} />
           )}
         </View>
         <Text style={styles.userName}>
@@ -120,10 +125,12 @@ const ProfileSenderScreen: React.FC<ProfileSenderScreenProps> = ({
             activeOpacity={0.7}
           >
             <View style={styles.menuItemContent}>
-              <Text style={styles.menuItemIcon}>{item.icon}</Text>
+              <View style={styles.menuItemIcon}>
+                <AppIcon name={item.icon} size={20} color={Colors.charcoal} />
+              </View>
               <Text style={styles.menuItemLabel}>{item.label}</Text>
             </View>
-            <Text style={styles.chevronIcon}>›</Text>
+            <AppIcon name="chevron-right" size={18} color={Colors.textMuted} />
           </TouchableOpacity>
         ))}
 
@@ -133,7 +140,9 @@ const ProfileSenderScreen: React.FC<ProfileSenderScreenProps> = ({
             onPress={handleLogout}
             activeOpacity={0.7}
           >
-            <Text style={styles.logoutIcon}>🚪</Text>
+            <View style={styles.logoutIcon}>
+              <AppIcon name="logout" size={18} color={Colors.error} />
+            </View>
             <Text style={styles.logoutText}>Déconnexion</Text>
           </TouchableOpacity>
         </View>
@@ -218,10 +227,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuItemIcon: {
-    fontSize: 20,
-    marginRight: 12,
     width: 24,
-    textAlign: 'center',
+    height: 24,
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   menuItemLabel: {
     fontSize: 14,
@@ -245,8 +255,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   logoutIcon: {
-    fontSize: 18,
     marginRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logoutText: {
     fontSize: 14,

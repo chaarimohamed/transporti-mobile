@@ -14,6 +14,7 @@ import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
+import { AppIcon, AppIconName } from '../../ui/Icon';
 import * as missionService from '../../../services/mission.service';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
@@ -28,7 +29,7 @@ type MissionStep = 'PICKUP' | 'HANDOVER_PENDING' | 'LOADING' | 'IN_TRANSIT' | 'D
 interface StepConfig {
   key: MissionStep;
   label: string;
-  icon: string;
+  icon: AppIconName;
   description: string;
 }
 
@@ -184,13 +185,16 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
             onPress={() => onNavigate?.('activeMissions')}
             style={styles.backButton}
           >
-            <Text style={styles.backIcon}>←</Text>
+            <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Suivi Mission</Text>
           <View style={styles.headerSpacer} />
         </View>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>⚠️ {error}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <AppIcon name="alert-triangle" size={18} color={Colors.error} />
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
           <Button onPress={fetchMissionDetails}>
             <Text style={{ color: '#FFF' }}>Réessayer</Text>
           </Button>
@@ -215,19 +219,19 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
     {
       key: 'PICKUP',
       label: 'À récupérer',
-      icon: '📍',
+      icon: 'location-pin',
       description: `${mission.from}`,
     },
     {
       key: 'HANDOVER_PENDING',
       label: 'Remise en cours',
-      icon: '🤝',
+      icon: 'package-open',
       description: 'En attente de confirmation de l\'expéditeur',
     },
     {
       key: 'IN_TRANSIT',
       label: 'En route',
-      icon: '🚚',
+      icon: 'truck',
       description: 'Vers destination',
     },
   ];
@@ -240,7 +244,7 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
           onPress={() => onNavigate?.('activeMissions')}
           style={styles.backButton}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Suivi de mission</Text>
         <Badge status="neutral" text={mission.refNumber} />
@@ -250,9 +254,11 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
         {/* Mission Info Card */}
         <Card style={styles.infoCard}>
           <View style={styles.routeHeader}>
-            <Text style={styles.routeText}>
-              {mission.from} <Text style={styles.routeArrow}>→</Text> {mission.to}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <Text style={styles.routeText}>{mission.from}</Text>
+              <AppIcon name="arrow-right" size={16} color={Colors.textMuted} />
+              <Text style={styles.routeText}>{mission.to}</Text>
+            </View>
             <Text style={styles.priceText}>{mission.price} TND</Text>
           </View>
           <Text style={styles.cargoText}>{mission.cargo || mission.description || 'Marchandise'}</Text>
@@ -282,7 +288,7 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
                       {completed ? (
                         <Text style={styles.checkmark}>✓</Text>
                       ) : (
-                        <Text style={styles.stepIcon}>{step.icon}</Text>
+                        <AppIcon name={step.icon} size={20} color={current ? Colors.primary : Colors.textMuted} />
                       )}
                     </View>
 
@@ -331,7 +337,7 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
                     {current && !isCompleted && step.key === 'HANDOVER_PENDING' && (
                       <View style={styles.stepActions}>
                         <View style={styles.waitingBadge}>
-                          <Text style={styles.waitingText}>⏳ En attente de l'expéditeur</Text>
+                          <Text style={styles.waitingText}>En attente de l'expéditeur</Text>
                         </View>
                         <Text style={styles.waitingSubText}>
                           L'expéditeur doit confirmer qu'il vous a remis le colis

@@ -13,6 +13,7 @@ import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import BottomNav from '../../ui/BottomNav';
+import { AppIcon } from '../../ui/Icon';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 
@@ -136,7 +137,10 @@ const ActiveMissionsScreen: React.FC<ActiveMissionsScreenProps> = ({ onNavigate 
 
         {activeFilter && (
           <TouchableOpacity style={styles.clearFilter} onPress={() => setActiveFilter(null)}>
-            <Text style={styles.clearFilterText}>✕  Tout afficher</Text>
+            <View style={styles.clearFilterContent}>
+              <AppIcon name="close" size={14} color="#555" />
+              <Text style={styles.clearFilterText}>Tout afficher</Text>
+            </View>
           </TouchableOpacity>
         )}
       </View>
@@ -150,14 +154,17 @@ const ActiveMissionsScreen: React.FC<ActiveMissionsScreenProps> = ({ onNavigate 
           </View>
         ) : error ? (
           <Card style={styles.errorCard}>
-            <Text style={styles.errorText}>⚠️ {error}</Text>
+            <View style={styles.errorRow}>
+              <AppIcon name="alert-triangle" size={16} color={Colors.error} />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
             <TouchableOpacity onPress={fetchMissions} style={styles.retryButton}>
               <Text style={styles.retryText}>Réessayer</Text>
             </TouchableOpacity>
           </Card>
         ) : displayedShipments.length === 0 ? (
           <Card style={styles.emptyCard}>
-            <Text style={styles.emptyIcon}>🚚</Text>
+            <AppIcon name="truck" size={48} color={Colors.textMuted} />
             <Text style={styles.emptyText}>
               {activeFilter ? 'Aucune mission dans cette catégorie' : 'Aucune mission'}
             </Text>
@@ -204,14 +211,21 @@ const ActiveMissionsScreen: React.FC<ActiveMissionsScreenProps> = ({ onNavigate 
                   </View>
 
                   <View style={styles.routeContainer}>
-                    <Text style={styles.routeText} numberOfLines={1}>
-                      {shipment.from}{' '}
-                      <Text style={styles.routeArrow}>→</Text>{' '}
-                      {shipment.to}
-                    </Text>
+                    <View style={styles.routeRow}>
+                      <Text style={styles.routePoint} numberOfLines={1}>
+                        {shipment.from}
+                      </Text>
+                      <AppIcon name="arrow-right" size={14} color={Colors.textMuted} />
+                      <Text style={styles.routePoint} numberOfLines={1}>
+                        {shipment.to}
+                      </Text>
+                    </View>
                     <Text style={styles.cargoText}>{shipment.cargo || 'Marchandise'}</Text>
                     {shipment.createdAt && (
-                      <Text style={styles.dateText}>📅 {formatDate(shipment.createdAt)}</Text>
+                      <View style={styles.dateRow}>
+                        <AppIcon name="calendar" size={14} color={Colors.textMuted} />
+                        <Text style={styles.dateText}>{formatDate(shipment.createdAt)}</Text>
+                      </View>
                     )}
                   </View>
 
@@ -276,6 +290,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0F0F0',
     borderRadius: 20,
   },
+  clearFilterContent: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   clearFilterText: { fontSize: 13, color: '#555', fontWeight: '600' },
   scrollView: { flex: 1 },
   scrollContent: { padding: 16, paddingBottom: 100 },
@@ -292,9 +307,11 @@ const styles = StyleSheet.create({
   statusText: { fontSize: 12, fontWeight: '600' },
   priceText: { fontSize: 16, fontWeight: 'bold', color: '#1A1A1A' },
   routeContainer: { marginBottom: 12, gap: 4, minWidth: 0 },
+  routeRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   routeText: { fontSize: 15, fontWeight: '600', color: '#1A1A1A', flexShrink: 1 },
-  routeArrow: { color: '#999' },
+  routePoint: { flex: 1, fontSize: 15, fontWeight: '600', color: '#1A1A1A' },
   cargoText: { fontSize: 13, color: '#666666' },
+  dateRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   dateText: { fontSize: 13, color: '#666666', flexShrink: 1 },
   actionsContainer: { marginTop: 4 },
   updateButton: {},
@@ -307,7 +324,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.errorSurface,
     borderColor: '#FCA5A5',
   },
-  errorText: { fontSize: 14, color: Colors.error, marginBottom: 12, textAlign: 'center' },
+  errorRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
+  errorText: { fontSize: 14, color: Colors.error, textAlign: 'center' },
   retryButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,

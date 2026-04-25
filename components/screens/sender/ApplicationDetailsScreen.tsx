@@ -14,6 +14,7 @@ import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
+import { AppIcon } from '../../ui/Icon';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 
@@ -37,7 +38,7 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorIcon}>⚠️</Text>
+          <AppIcon name="alert-triangle" size={24} color={Colors.error} />
           <Text style={styles.errorText}>Expédition introuvable</Text>
           <Button onPress={() => onNavigate?.('applicationList')}>
             <Text style={styles.buttonText}>Retour</Text>
@@ -152,7 +153,7 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
           style={styles.backButton}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Candidature</Text>
         <View style={styles.headerRight} />
@@ -162,7 +163,7 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
         {/* Status Alert */}
         <Card style={styles.alertCard}>
           <View style={styles.alertContent}>
-            <Text style={styles.alertIcon}>⏳</Text>
+            <AppIcon name="refresh" size={22} color={Colors.warning} />
             <View style={styles.alertTextContainer}>
               <Text style={styles.alertTitle}>Décision en attente</Text>
               <Text style={styles.alertText}>
@@ -189,7 +190,7 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
           <View style={styles.routeSection}>
             <View style={styles.routePoint}>
               <View style={styles.pointDot}>
-                <Text style={styles.pointIcon}>📍</Text>
+                <AppIcon name="location-pin" size={16} color={Colors.primary} />
               </View>
               <View style={styles.pointInfo}>
                 <Text style={styles.pointLabel}>Départ</Text>
@@ -201,7 +202,7 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
 
             <View style={styles.routePoint}>
               <View style={styles.pointDot}>
-                <Text style={styles.pointIcon}>🎯</Text>
+                <AppIcon name="location-pin" size={16} color={Colors.primary} />
               </View>
               <View style={styles.pointInfo}>
                 <Text style={styles.pointLabel}>Arrivée</Text>
@@ -243,7 +244,7 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
         <Card style={styles.carrierCard}>
           <View style={styles.carrierHeader}>
             <View style={styles.carrierAvatar}>
-              <Text style={styles.carrierAvatarText}>👤</Text>
+              <AppIcon name="profile-user" size={28} color={Colors.primary} />
             </View>
             <View style={styles.carrierInfo}>
               <Text style={styles.carrierName}>Transporteur qualifié</Text>
@@ -273,7 +274,7 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
 
         {/* Actions Info */}
         <Card style={styles.infoBox}>
-          <Text style={styles.infoBoxIcon}>ℹ️</Text>
+          <AppIcon name="info-circle" size={18} color={Colors.primary} />
           <Text style={styles.infoBoxText}>
             En acceptant, l'expédition sera confiée au transporteur et passera en transit.
             En refusant, elle redeviendra disponible pour d'autres transporteurs.

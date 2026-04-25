@@ -5,7 +5,8 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import { Button } from '../../ui/Button';
 
 interface InvitationSentScreenProps {
@@ -41,7 +42,7 @@ const InvitationSentScreen: React.FC<InvitationSentScreenProps> = ({
         {/* Success Icon */}
         <View style={styles.iconContainer}>
           <View style={styles.successCircle}>
-            <Text style={styles.checkIcon}>✓</Text>
+            <AppIcon name="check-circle" size={40} color={Colors.surface} />
           </View>
         </View>
 
@@ -90,50 +91,46 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#2E8B57',
+    backgroundColor: Colors.success,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  checkIcon: {
-    fontSize: 40,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
   title: {
+    fontFamily: Fonts.semiBold,
     fontSize: 28,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
     marginBottom: 16,
     textAlign: 'center',
   },
   message: {
+    fontFamily: Fonts.regular,
     fontSize: 16,
-    color: '#666666',
+    color: Colors.textSecondary,
     textAlign: 'center',
     lineHeight: 24,
     marginBottom: 48,
   },
   bold: {
-    fontWeight: '700',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    color: Colors.textPrimary,
   },
   actions: {
     width: '100%',
     gap: 16,
   },
   primaryButtonText: {
+    fontFamily: Fonts.semiBold,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    color: Colors.textInverse,
   },
   secondaryButton: {
     backgroundColor: 'transparent',
     borderWidth: 0,
   },
   secondaryButtonText: {
+    fontFamily: Fonts.medium,
     fontSize: 16,
-    fontWeight: '500',
-    color: '#666666',
+    color: Colors.textSecondary,
   },
 });
 

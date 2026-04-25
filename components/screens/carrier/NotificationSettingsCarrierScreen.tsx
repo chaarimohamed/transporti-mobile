@@ -9,6 +9,7 @@ import {
   Switch,
 } from 'react-native';
 import { Colors } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 
 interface NotificationSettingsCarrierScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
@@ -31,7 +32,7 @@ const NotificationSettingsCarrierScreen: React.FC<NotificationSettingsCarrierScr
           style={styles.backButton}
           onPress={() => onNavigate?.('profileCarrier')}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={18} color="#1A1A1A" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Préférences de notification</Text>
         <View style={styles.placeholder} />
@@ -46,7 +47,9 @@ const NotificationSettingsCarrierScreen: React.FC<NotificationSettingsCarrierScr
         <View style={styles.settingsCard}>
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>📦</Text>
+              <View style={styles.settingIcon}>
+                <AppIcon name="package-box" size={20} color={Colors.primary} />
+              </View>
               <View style={styles.settingTexts}>
                 <Text style={styles.settingLabel}>Nouvelles missions</Text>
                 <Text style={styles.settingDescription}>
@@ -66,7 +69,9 @@ const NotificationSettingsCarrierScreen: React.FC<NotificationSettingsCarrierScr
 
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>🔄</Text>
+              <View style={styles.settingIcon}>
+                <AppIcon name="refresh" size={20} color={Colors.primary} />
+              </View>
               <View style={styles.settingTexts}>
                 <Text style={styles.settingLabel}>Mises à jour de missions</Text>
                 <Text style={styles.settingDescription}>
@@ -86,7 +91,9 @@ const NotificationSettingsCarrierScreen: React.FC<NotificationSettingsCarrierScr
 
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>💰</Text>
+              <View style={styles.settingIcon}>
+                <AppIcon name="wallet" size={20} color={Colors.primary} />
+              </View>
               <View style={styles.settingTexts}>
                 <Text style={styles.settingLabel}>Paiements</Text>
                 <Text style={styles.settingDescription}>
@@ -106,7 +113,9 @@ const NotificationSettingsCarrierScreen: React.FC<NotificationSettingsCarrierScr
 
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>💬</Text>
+              <View style={styles.settingIcon}>
+                <AppIcon name="chat" size={20} color={Colors.primary} />
+              </View>
               <View style={styles.settingTexts}>
                 <Text style={styles.settingLabel}>Messages</Text>
                 <Text style={styles.settingDescription}>
@@ -126,7 +135,9 @@ const NotificationSettingsCarrierScreen: React.FC<NotificationSettingsCarrierScr
 
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>🎁</Text>
+              <View style={styles.settingIcon}>
+                <AppIcon name="star-rating" size={20} color={Colors.primary} />
+              </View>
               <View style={styles.settingTexts}>
                 <Text style={styles.settingLabel}>Promotions</Text>
                 <Text style={styles.settingDescription}>
@@ -147,7 +158,9 @@ const NotificationSettingsCarrierScreen: React.FC<NotificationSettingsCarrierScr
         <View style={styles.settingsCard}>
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>📧</Text>
+              <View style={styles.settingIcon}>
+                <AppIcon name="email" size={20} color={Colors.primary} />
+              </View>
               <View style={styles.settingTexts}>
                 <Text style={styles.settingLabel}>Résumé hebdomadaire</Text>
                 <Text style={styles.settingDescription}>
@@ -239,8 +252,11 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   settingIcon: {
-    fontSize: 24,
+    width: 24,
+    height: 24,
     marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   settingTexts: {
     flex: 1,

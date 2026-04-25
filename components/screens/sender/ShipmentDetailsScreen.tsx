@@ -10,7 +10,8 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -313,7 +314,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorIcon}>⚠️</Text>
+          <AppIcon name="alert-triangle" size={48} color={Colors.error} />
           <Text style={styles.errorText}>{error || 'Expédition introuvable'}</Text>
           <Button onPress={() => onNavigate?.('dashboard')}>
             <Text style={styles.errorButtonText}>Retour</Text>
@@ -333,7 +334,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
           onPress={() => onNavigate?.('dashboard')}
           style={styles.backButton}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={20} color={Colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Détails {shipment.refNumber}</Text>
       </View>
@@ -436,13 +437,20 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
                         : 'Transporteur'}
                     </Text>
                     <View style={styles.carrierMeta}>
-                      <Text style={styles.carrierRating}>
-                        ⭐ {shipment.requestedCarrier?.averageRating && shipment.requestedCarrier.averageRating > 0
-                          ? shipment.requestedCarrier.averageRating.toFixed(1)
-                          : 'N/A'}
-                      </Text>
+                      <View style={styles.carrierMetaItem}>
+                        <AppIcon name="star" size={12} color={Colors.primary} />
+                        <Text style={styles.carrierRating}>
+                          {shipment.requestedCarrier?.averageRating && shipment.requestedCarrier.averageRating > 0
+                            ? shipment.requestedCarrier.averageRating.toFixed(1)
+                            : 'N/A'}
+                        </Text>
+                      </View>
                       {shipment.requestedCarrier?.gouvernerat && (
-                        <Text style={styles.carrierLocation}>  •  📍 {shipment.requestedCarrier.gouvernerat}</Text>
+                        <View style={styles.carrierMetaItem}>
+                          <Text style={styles.carrierLocation}> • </Text>
+                          <AppIcon name="map-pin" size={12} color={Colors.textSecondary} />
+                          <Text style={styles.carrierLocation}>{shipment.requestedCarrier.gouvernerat}</Text>
+                        </View>
                       )}
                     </View>
                   </View>
@@ -499,13 +507,20 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
                     {shipment.carrier.firstName} {shipment.carrier.lastName}
                   </Text>
                   <View style={styles.carrierMeta}>
-                    <Text style={styles.carrierRating}>
-                      ⭐ {shipment.carrier.averageRating && shipment.carrier.averageRating > 0
-                        ? shipment.carrier.averageRating.toFixed(1)
-                        : 'N/A'}
-                    </Text>
+                    <View style={styles.carrierMetaItem}>
+                      <AppIcon name="star" size={12} color={Colors.primary} />
+                      <Text style={styles.carrierRating}>
+                        {shipment.carrier.averageRating && shipment.carrier.averageRating > 0
+                          ? shipment.carrier.averageRating.toFixed(1)
+                          : 'N/A'}
+                      </Text>
+                    </View>
                     {shipment.carrier.gouvernerat && (
-                      <Text style={styles.carrierLocation}>  •  📍 {shipment.carrier.gouvernerat}</Text>
+                      <View style={styles.carrierMetaItem}>
+                        <Text style={styles.carrierLocation}> • </Text>
+                        <AppIcon name="map-pin" size={12} color={Colors.textSecondary} />
+                        <Text style={styles.carrierLocation}>{shipment.carrier.gouvernerat}</Text>
+                      </View>
                     )}
                   </View>
                 </View>
@@ -546,7 +561,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
           <View style={styles.infoDivider} />
 
           <View style={styles.infoRow}>
-            <Text style={styles.infoIcon}>📦</Text>
+            <AppIcon name="package" size={16} color={Colors.textSecondary} />
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Type de colis</Text>
               <Text style={styles.infoValue}>{shipment.cargo || 'Colis'}</Text>
@@ -556,7 +571,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
           <View style={styles.infoDivider} />
 
           <View style={styles.infoRow}>
-            <Text style={styles.infoIcon}>💰</Text>
+            <AppIcon name="wallet" size={16} color={Colors.textSecondary} />
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Prix</Text>
               <Text style={styles.infoPriceValue}>{shipment.price} TND</Text>
@@ -572,7 +587,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
             </View>
             <Card style={styles.handoverCard}>
               <View style={styles.handoverHeader}>
-                <Text style={styles.handoverIcon}>🤝</Text>
+                <AppIcon name="package" size={32} color={Colors.primary} />
                 <View style={styles.handoverInfo}>
                   <Text style={styles.handoverTitle}>Le transporteur est arrivé</Text>
                   <Text style={styles.handoverSubtitle}>
@@ -587,7 +602,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
                 activeOpacity={0.7}
               >
                 <Text style={styles.handoverButtonText}>
-                  {loading ? 'Confirmation...' : '✅ J\'ai remis le colis au transporteur'}
+                  {loading ? 'Confirmation...' : "J'ai remis le colis au transporteur"}
                 </Text>
               </TouchableOpacity>
             </Card>
@@ -656,15 +671,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
     paddingHorizontal: 24,
     paddingTop: 72,
     paddingBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: Spacing.md,
   },
   backButton: {
     width: 32,
@@ -674,14 +689,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backIcon: {
-    fontSize: 20,
-    color: '#1A1A1A',
-  },
   headerTitle: {
+    fontFamily: Fonts.bold,
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
   },
   scrollView: {
     flex: 1,
@@ -700,8 +711,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   statusLabel: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   timeline: {
     paddingLeft: 8,
@@ -716,8 +728,9 @@ const styles = StyleSheet.create({
     paddingTop: 2,
   },
   timelineTimestamp: {
-    fontSize: 11,
-    color: '#999',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textMuted,
     marginTop: 2,
   },
   timelineLeft: {
@@ -728,8 +741,8 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#E9E9E9',
-    backgroundColor: '#FFFFFF',
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -739,41 +752,42 @@ const styles = StyleSheet.create({
   },
   timelineDotActive: {
     borderColor: Colors.primary,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
   },
   timelineCheck: {
-    color: '#FFFFFF',
+    color: Colors.textInverse,
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: Fonts.bold,
   },
   timelineLine: {
     width: 2,
     height: 32,
-    backgroundColor: '#E9E9E9',
+    backgroundColor: Colors.border,
   },
   timelineLineCompleted: {
     backgroundColor: Colors.primary,
   },
   timelineText: {
-    fontSize: 14,
-    color: '#999',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textMuted,
     paddingTop: 2,
   },
   timelineTextCompleted: {
-    color: '#1A1A1A',
-    fontWeight: '600',
+    color: Colors.textPrimary,
+    fontFamily: Fonts.semiBold,
   },
   timelineTextActive: {
     color: Colors.primary,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   sectionHeader: {
     marginBottom: 12,
   },
   sectionTitle: {
+    fontFamily: Fonts.bold,
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#444444',
+    color: Colors.charcoal,
   },
   infoCard: {
     padding: 16,
@@ -781,34 +795,32 @@ const styles = StyleSheet.create({
   },
   infoRow: {
     flexDirection: 'row',
-    gap: 12,
-  },
-  infoIcon: {
-    fontSize: 16,
-    marginTop: 2,
+    gap: Spacing.sm + 4,
+    alignItems: 'center',
   },
   infoContent: {
     flex: 1,
   },
   infoLabel: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     marginBottom: 4,
   },
   infoValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
   },
   infoPriceValue: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.sm,
     color: Colors.primary,
   },
   infoDivider: {
     height: 1,
-    backgroundColor: '#E9E9E9',
-    marginVertical: 16,
+    backgroundColor: Colors.border,
+    marginVertical: Spacing.md,
   },
   carrierCard: {
     flexDirection: 'row',
@@ -832,34 +844,43 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   carrierAvatarText: {
+    fontFamily: Fonts.semiBold,
     fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    color: Colors.textInverse,
   },
   carrierInfo: {
     flex: 1,
   },
   carrierName: {
+    fontFamily: Fonts.bold,
     fontSize: 15,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
     marginBottom: 4,
   },
   carrierMeta: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    gap: 4,
+  },
+  carrierMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   carrierRating: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
   },
   carrierLocation: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
   },
   profileArrow: {
+    fontFamily: Fonts.regular,
     fontSize: 22,
-    color: '#AFAFAF',
+    color: Colors.textMuted,
   },
   itinerary: {
     marginBottom: 4,
@@ -877,14 +898,14 @@ const styles = StyleSheet.create({
   itineraryConnector: {
     width: 2,
     height: 28,
-    backgroundColor: '#E9E9E9',
+    backgroundColor: Colors.border,
     marginVertical: 4,
   },
   dotGreen: {
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#16A34A',
+    backgroundColor: Colors.success,
   },
   dotBlue: {
     width: 14,
@@ -899,14 +920,14 @@ const styles = StyleSheet.create({
   requestCard: {
     padding: 16,
     marginBottom: 24,
-    backgroundColor: '#FFF9E6',
+    backgroundColor: Colors.primarySurface,
     borderWidth: 1,
-    borderColor: '#FFC107',
+    borderColor: Colors.primaryLight,
   },
   handoverCard: {
     padding: 16,
     marginBottom: 24,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: Colors.primarySurface,
     borderWidth: 1,
     borderColor: Colors.primary,
   },
@@ -916,21 +937,19 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     alignItems: 'flex-start',
   },
-  handoverIcon: {
-    fontSize: 32,
-  },
   handoverInfo: {
     flex: 1,
   },
   handoverTitle: {
+    fontFamily: Fonts.bold,
     fontSize: 15,
-    fontWeight: '700',
     color: Colors.primary,
     marginBottom: 6,
   },
   handoverSubtitle: {
-    fontSize: 13,
-    color: '#374151',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
     lineHeight: 19,
   },
   handoverButton: {
@@ -942,26 +961,27 @@ const styles = StyleSheet.create({
   feedbackCard: {
     padding: 18,
     marginBottom: 8,
-    backgroundColor: '#FFF7E8',
+    backgroundColor: Colors.primarySurface,
     borderWidth: 1,
-    borderColor: '#F3D9A6',
+    borderColor: Colors.primaryLight,
   },
   feedbackTitle: {
+    fontFamily: Fonts.bold,
     fontSize: 16,
-    fontWeight: '700',
-    color: '#7C4A03',
+    color: Colors.primaryDark,
     marginBottom: 8,
   },
   feedbackText: {
-    fontSize: 14,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
     lineHeight: 20,
-    color: '#6B5A3D',
+    color: Colors.textSecondary,
     marginBottom: 14,
   },
   handoverButtonText: {
-    color: '#FFFFFF',
+    color: Colors.textInverse,
+    fontFamily: Fonts.bold,
     fontSize: 15,
-    fontWeight: '700',
   },
   requestHeader: {
     flexDirection: 'row',
@@ -973,7 +993,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -984,14 +1004,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   requestTitle: {
+    fontFamily: Fonts.semiBold,
     fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
     marginBottom: 4,
   },
   requestSubtitle: {
-    fontSize: 13,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   requestActions: {
     flexDirection: 'row',
@@ -1001,14 +1022,14 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.error,
     alignItems: 'center',
   },
   rejectButtonText: {
+    fontFamily: Fonts.semiBold,
     fontSize: 15,
-    fontWeight: '600',
     color: Colors.error,
   },
   acceptButton: {
@@ -1019,15 +1040,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   acceptButtonText: {
+    fontFamily: Fonts.semiBold,
     fontSize: 15,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    color: Colors.textInverse,
   },  bottomActions: {
     padding: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#E9E9E9',
-    gap: 12,
+    borderTopColor: Colors.border,
+    gap: Spacing.sm + 4,
   },
   trackButton: {
     backgroundColor: 'transparent',
@@ -1035,9 +1056,9 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
   },
   trackButtonText: {
+    fontFamily: Fonts.semiBold,
     color: Colors.primary,
     fontSize: 16,
-    fontWeight: '600',
   },
   cancelButton: {
     backgroundColor: 'transparent',
@@ -1045,14 +1066,14 @@ const styles = StyleSheet.create({
     borderColor: Colors.error,
   },
   cancelButtonText: {
+    fontFamily: Fonts.semiBold,
     color: Colors.error,
     fontSize: 16,
-    fontWeight: '600',
   },
   backButtonText: {
-    color: '#FFFFFF',
+    fontFamily: Fonts.semiBold,
+    color: Colors.textInverse,
     fontSize: 16,
-    fontWeight: '600',
   },
   loadingContainer: {
     flex: 1,
@@ -1062,8 +1083,9 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 12,
-    fontSize: 14,
-    color: '#666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   errorContainer: {
     flex: 1,
@@ -1071,20 +1093,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 40,
   },
-  errorIcon: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
   errorText: {
+    fontFamily: Fonts.regular,
     fontSize: 16,
     color: Colors.error,
     marginBottom: 24,
     textAlign: 'center',
   },
   errorButtonText: {
-    color: '#FFFFFF',
+    fontFamily: Fonts.semiBold,
+    color: Colors.textInverse,
     fontSize: 16,
-    fontWeight: '600',
   },
 });
 

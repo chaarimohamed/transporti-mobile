@@ -14,6 +14,7 @@ import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
+import { AppIcon } from '../../ui/Icon';
 import * as missionService from '../../../services/mission.service';
 
 interface PaymentSuccessScreenProps {
@@ -90,7 +91,7 @@ const PaymentSuccessScreen: React.FC<PaymentSuccessScreenProps> = ({
           style={styles.backButton}
           onPress={handleBackToMissions}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
         </TouchableOpacity>
         <View style={styles.headerSpacer} />
       </View>
@@ -105,7 +106,7 @@ const PaymentSuccessScreen: React.FC<PaymentSuccessScreenProps> = ({
           ]}
         >
           <View style={styles.successCircle}>
-            <Text style={styles.checkIcon}>✓</Text>
+            <AppIcon name="check-circle" size={44} color={Colors.textInverse} />
           </View>
         </Animated.View>
 
@@ -119,7 +120,7 @@ const PaymentSuccessScreen: React.FC<PaymentSuccessScreenProps> = ({
         <Card style={styles.receiptCard}>
           <View style={styles.receiptHeader}>
             <View style={styles.receiptIconCircle}>
-              <Text style={styles.receiptIcon}>📄</Text>
+              <AppIcon name="receipt" size={24} color={Colors.primary} />
             </View>
             <View style={styles.receiptInfo}>
               <Text style={styles.receiptNumber}>Reçu {receiptNumber}</Text>

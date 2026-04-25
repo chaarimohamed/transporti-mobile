@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Colors, Fonts, FontSizes, Radius } from '../../theme';
+import { AppIcon } from './Icon';
 
 interface InputProps {
   label?: string;
@@ -49,7 +50,11 @@ export const Input: React.FC<InputProps> = ({
         />
         {isPassword && (
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-            <Text style={styles.eyeText}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
+            <AppIcon
+              name={showPassword ? 'eye-open' : 'eye-closed'}
+              size={20}
+              color={Colors.textMuted}
+            />
           </TouchableOpacity>
         )}
       </View>
@@ -96,9 +101,6 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     padding: 8,
-  },
-  eyeText: {
-    fontSize: 18,
   },
   errorText: {
     fontFamily: Fonts.regular,

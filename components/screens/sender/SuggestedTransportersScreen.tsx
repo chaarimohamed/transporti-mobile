@@ -14,6 +14,7 @@ import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
+import { AppIcon } from '../../ui/Icon';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment, Carrier } from '../../../services/shipment.service';
 
@@ -214,7 +215,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
           style={styles.backButton}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Suggestions</Text>
         <View style={styles.headerRight} />
@@ -261,10 +262,10 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
                               ? `${appCarrier.firstName} ${appCarrier.lastName}`
                               : `Transporteur #${application.requestedCarrierId?.slice(0, 6)}`}
                           </Text>
-                          {appCarrier && <Text style={{ fontSize: 12, color: Colors.primary }}>›</Text>}
+                          {appCarrier && <AppIcon name="chevron-right" size={12} color={Colors.primary} />}
                         </View>
                         <View style={styles.applicationMeta}>
-                          <Text style={styles.starIcon}>⭐</Text>
+                          <AppIcon name="star-rating" size={14} color={Colors.warning} />
                           <Text style={styles.applicationRating}>
                             {appCarrier?.averageRating && appCarrier.averageRating > 0
                               ? appCarrier.averageRating.toFixed(1)
@@ -274,9 +275,10 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
                           <Text style={styles.applicationText}>En attente</Text>
                         </View>
                         {appCarrier?.gouvernerat && (
-                          <Text style={{ fontSize: 12, color: '#888', marginTop: 2 }}>
-                            📍 {appCarrier.gouvernerat}
-                          </Text>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                            <AppIcon name="location-pin" size={12} color={Colors.textMuted} />
+                            <Text style={{ fontSize: 12, color: '#888' }}>{appCarrier.gouvernerat}</Text>
+                          </View>
                         )}
                       </View>
                       <Text style={styles.applicationPrice}>{application.price} DT</Text>
@@ -365,10 +367,13 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
 
                   <View style={styles.contactInfo}>
                     {carrier.gouvernerat && (
-                      <Text style={styles.contactText}>📍 {carrier.gouvernerat}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <AppIcon name="location-pin" size={12} color={Colors.textMuted} />
+                        <Text style={styles.contactText}>{carrier.gouvernerat}</Text>
+                      </View>
                     )}
                     <View style={styles.ratingContainer}>
-                      <Text style={styles.starIcon}>⭐</Text>
+                      <AppIcon name="star-rating" size={14} color={Colors.warning} />
                       <Text style={styles.contactText}>
                         {carrier.averageRating && carrier.averageRating > 0
                           ? `${carrier.averageRating.toFixed(1)} (${carrier.totalReviews || 0} avis)`
@@ -382,7 +387,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
 
               {isInvited ? (
                 <View style={styles.invitedButton}>
-                  <Text style={styles.invitedButtonText}>✓ Invitation envoyée</Text>
+                  <Text style={styles.invitedButtonText}>Invitation envoyée</Text>
                 </View>
               ) : (
               <TouchableOpacity
@@ -403,7 +408,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
         {/* Empty State */}
         {carriers.length === 0 && applications.length === 0 && (
           <Card style={styles.emptyCard}>
-            <Text style={styles.emptyIcon}>🚚</Text>
+            <AppIcon name="truck" size={48} color={Colors.textMuted} />
             <Text style={styles.emptyTitle}>Aucun transporteur disponible</Text>
             <Text style={styles.emptyText}>Les transporteurs inscrits apparaîtront ici</Text>
           </Card>

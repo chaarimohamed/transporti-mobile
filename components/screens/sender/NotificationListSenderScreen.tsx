@@ -12,6 +12,7 @@ import {
 import { Colors } from '../../../theme';
 import * as notificationService from '../../../services/notification.service';
 import BottomNav from '../../ui/BottomNav';
+import { AppIcon, AppIconName } from '../../ui/Icon';
 
 interface NotificationListSenderScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
@@ -97,21 +98,21 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
     }
   };
 
-  const getNotificationIcon = (type: string) => {
+  const getNotificationIcon = (type: string): AppIconName => {
     switch (type) {
       case 'CARRIER_REQUEST':
       case 'REQUEST_ACCEPTED':
-        return '✅';
+        return 'check-circle';
       case 'SHIPMENT_INVITATION':
-        return '📬';
+        return 'notification-bell';
       case 'REQUEST_REJECTED':
-        return '❌';
+        return 'x-circle';
       case 'SHIPMENT_IN_TRANSIT':
-        return '🚚';
+        return 'truck';
       case 'SHIPMENT_DELIVERED':
-        return '📦';
+        return 'package-open';
       default:
-        return '🔔';
+        return 'notification-bell';
     }
   };
 
@@ -207,7 +208,7 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
                     { backgroundColor: colors.bg },
                   ]}
                 >
-                  <Text style={styles.iconText}>{icon}</Text>
+                  <AppIcon name={icon} size={18} color={colors.text} />
                 </View>
 
                 <View style={styles.notificationContent}>
@@ -233,7 +234,7 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
           })
         ) : (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>🔔</Text>
+            <AppIcon name="notification-bell" size={48} color={Colors.textMuted} />
             <Text style={styles.emptyText}>Aucune notification</Text>
           </View>
         )}

@@ -12,6 +12,7 @@ import {
 import { Colors } from '../../../theme';
 import { useAuth } from '../../../contexts/AuthContext';
 import BottomNav from '../../ui/BottomNav';
+import { AppIcon, AppIconName } from '../../ui/Icon';
 import * as authService from '../../../services/authService';
 
 interface ProfileCarrierScreenProps {
@@ -50,37 +51,41 @@ const ProfileCarrierScreen: React.FC<ProfileCarrierScreenProps> = ({
     );
   };
 
-  const menuItems = [
+  const menuItems: Array<{
+    icon: AppIconName;
+    label: string;
+    onPress: () => void;
+  }> = [
     {
-      icon: '👤',
+      icon: 'profile-user',
       label: 'Informations personnelles',
       onPress: () => {
         onNavigate?.('personalInformationCarrier');
       },
     },
     {
-      icon: '💳',
+      icon: 'wallet',
       label: 'Moyens de paiement',
       onPress: () => {
         Alert.alert('Information', 'Fonctionnalité à venir');
       },
     },
     {
-      icon: '🔔',
+      icon: 'notification-bell',
       label: 'Préférences de notification',
       onPress: () => {
         onNavigate?.('notificationSettingsCarrier');
       },
     },
     {
-      icon: '🛡️',
+      icon: 'verified-shield',
       label: 'Sécurité et Confidentialité',
       onPress: () => {
         onNavigate?.('privacySecurityCarrier');
       },
     },
     {
-      icon: '📄',
+      icon: 'document',
       label: 'Conditions Générales',
       onPress: () => {
         onNavigate?.('termsAndConditionsCarrier');
@@ -120,10 +125,12 @@ const ProfileCarrierScreen: React.FC<ProfileCarrierScreenProps> = ({
             activeOpacity={0.7}
           >
             <View style={styles.menuLeft}>
-              <Text style={styles.menuIconText}>{item.icon}</Text>
+              <View style={styles.menuIconText}>
+                <AppIcon name={item.icon} size={20} color={Colors.charcoal} />
+              </View>
               <Text style={styles.menuLabel}>{item.label}</Text>
             </View>
-            <Text style={styles.menuArrow}>›</Text>
+            <AppIcon name="chevron-right" size={18} color={Colors.textMuted} />
           </TouchableOpacity>
         ))}
 
@@ -133,7 +140,9 @@ const ProfileCarrierScreen: React.FC<ProfileCarrierScreenProps> = ({
             onPress={handleLogout}
             activeOpacity={0.7}
           >
-            <Text style={styles.logoutIcon}>🚪</Text>
+            <View style={styles.logoutIcon}>
+              <AppIcon name="logout" size={18} color={Colors.error} />
+            </View>
             <Text style={styles.logoutText}>Déconnexion</Text>
           </TouchableOpacity>
         </View>
@@ -224,10 +233,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuIconText: {
-    fontSize: 20,
-    marginRight: 12,
     width: 24,
-    textAlign: 'center',
+    height: 24,
+    marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   menuLabel: {
     fontSize: 14,
@@ -251,8 +261,9 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   logoutIcon: {
-    fontSize: 18,
     marginRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   logoutText: {
     fontSize: 14,

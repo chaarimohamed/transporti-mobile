@@ -14,6 +14,7 @@ import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import BottomNav from '../../ui/BottomNav';
+import { AppIcon } from '../../ui/Icon';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 import * as notificationService from '../../../services/notification.service';
@@ -108,7 +109,7 @@ const ApplicationListScreen: React.FC<ApplicationListScreenProps> = ({ onNavigat
           style={styles.backButton}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Candidatures</Text>
         <View style={styles.headerRight}>
@@ -129,15 +130,17 @@ const ApplicationListScreen: React.FC<ApplicationListScreenProps> = ({ onNavigat
       >
         {error ? (
           <Card style={styles.errorCard}>
-            <Text style={styles.errorIcon}>⚠️</Text>
-            <Text style={styles.errorText}>{error}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+              <AppIcon name="alert-triangle" size={18} color={Colors.error} />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
             <Button onPress={fetchApplications} style={styles.retryButton}>
               <Text style={styles.retryButtonText}>Réessayer</Text>
             </Button>
           </Card>
         ) : shipments.length === 0 ? (
           <Card style={styles.emptyCard}>
-            <Text style={styles.emptyIcon}>📋</Text>
+            <AppIcon name="document" size={48} color={Colors.textMuted} />
             <Text style={styles.emptyTitle}>Aucune candidature</Text>
             <Text style={styles.emptyText}>
               Les demandes de transporteurs apparaîtront ici
@@ -168,14 +171,14 @@ const ApplicationListScreen: React.FC<ApplicationListScreenProps> = ({ onNavigat
                 <View style={styles.cardBody}>
                   <View style={styles.routeInfo}>
                     <View style={styles.locationRow}>
-                      <Text style={styles.locationIcon}>📍</Text>
+                      <AppIcon name="location-pin" size={16} color={Colors.primary} />
                       <Text style={styles.locationText}>{shipment.from}</Text>
                     </View>
                     <View style={styles.routeArrow}>
-                      <Text style={styles.arrowIcon}>→</Text>
+                      <AppIcon name="arrow-right" size={16} color={Colors.textMuted} />
                     </View>
                     <View style={styles.locationRow}>
-                      <Text style={styles.locationIcon}>🎯</Text>
+                      <AppIcon name="location-pin" size={16} color={Colors.primary} />
                       <Text style={styles.locationText}>{shipment.to}</Text>
                     </View>
                   </View>
@@ -186,7 +189,7 @@ const ApplicationListScreen: React.FC<ApplicationListScreenProps> = ({ onNavigat
                   </View>
 
                   <View style={styles.notification}>
-                    <Text style={styles.notificationIcon}>👤</Text>
+                    <AppIcon name="profile-user" size={16} color={Colors.primary} />
                     <Text style={styles.notificationText}>
                       Un transporteur souhaite prendre cette expédition
                     </Text>
@@ -199,8 +202,10 @@ const ApplicationListScreen: React.FC<ApplicationListScreenProps> = ({ onNavigat
                     onPress={() => handleViewApplication(shipment)}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.viewButtonText}>Voir les détails</Text>
-                    <Text style={styles.viewButtonArrow}>→</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <Text style={styles.viewButtonText}>Voir les détails</Text>
+                      <AppIcon name="arrow-right" size={16} color="#FFFFFF" />
+                    </View>
                   </TouchableOpacity>
                 </View>
               </Card>

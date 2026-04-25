@@ -9,7 +9,8 @@ import {
   Linking,
   Alert,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -54,7 +55,7 @@ const PaymentBlockedScreen: React.FC<PaymentBlockedScreenProps> = ({
         {/* Blocked Icon */}
         <View style={styles.blockedIconContainer}>
           <View style={styles.blockedCircle}>
-            <Text style={styles.blockedIcon}>⛔</Text>
+            <AppIcon name="blocked-ban" size={80} color={Colors.error} />
           </View>
         </View>
 
@@ -84,7 +85,7 @@ const PaymentBlockedScreen: React.FC<PaymentBlockedScreenProps> = ({
             <Card style={styles.supportCard}>
               <View style={styles.supportCardContent}>
                 <View style={styles.supportIconCircle}>
-                  <Text style={styles.phoneIcon}>📞</Text>
+                  <AppIcon name="phone" size={20} color={Colors.primary} />
                 </View>
                 <View style={styles.supportInfo}>
                   <Text style={styles.supportName}>Support Transporti</Text>
@@ -106,7 +107,7 @@ const PaymentBlockedScreen: React.FC<PaymentBlockedScreenProps> = ({
             <Card style={styles.supportCard}>
               <View style={styles.supportCardContent}>
                 <View style={styles.supportIconCircle}>
-                  <Text style={styles.chatIcon}>💬</Text>
+                  <AppIcon name="chat" size={20} color={Colors.primary} />
                 </View>
                 <View style={styles.supportInfo}>
                   <Text style={styles.supportName}>Chat support</Text>
@@ -151,11 +152,11 @@ const PaymentBlockedScreen: React.FC<PaymentBlockedScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 24,
+    padding: Spacing.lg,
     alignItems: 'center',
     paddingBottom: 40,
   },
@@ -169,26 +170,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  blockedIcon: {
-    fontSize: 80,
-  },
   errorTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.xl,
     color: Colors.error,
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
     textAlign: 'center',
   },
   errorSubtitle: {
+    fontFamily: Fonts.regular,
     fontSize: 16,
-    color: '#666666',
+    color: Colors.textSecondary,
     marginBottom: 32,
     textAlign: 'center',
     lineHeight: 24,
   },
   orderCard: {
     width: '100%',
-    backgroundColor: '#FCE4E4',
+    backgroundColor: 'rgba(217, 45, 32, 0.08)',
     borderColor: 'rgba(217, 45, 32, 0.2)',
     borderWidth: 1,
     marginBottom: 32,
@@ -197,17 +196,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   orderLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#1A1A1A',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
   },
   orderAmount: {
+    fontFamily: Fonts.semiBold,
     fontSize: 16,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
   },
   badgeContainer: {
     flexDirection: 'row',
@@ -218,68 +217,64 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   supportTitle: {
+    fontFamily: Fonts.semiBold,
     fontSize: 18,
-    fontWeight: '600',
-    color: '#444444',
-    marginBottom: 16,
+    color: Colors.charcoal,
+    marginBottom: Spacing.md,
   },
   supportCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-    padding: 16,
+    marginBottom: Spacing.sm + 4,
+    padding: Spacing.md,
   },
   supportCardContent: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    marginRight: 12,
+    marginRight: Spacing.sm + 4,
   },
   supportIconCircle: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#EBF2FE',
+    backgroundColor: Colors.primarySurface,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
-  },
-  phoneIcon: {
-    fontSize: 20,
-  },
-  chatIcon: {
-    fontSize: 20,
+    marginRight: Spacing.sm + 4,
   },
   supportInfo: {
     flex: 1,
   },
   supportName: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
     marginBottom: 2,
   },
   supportDetail: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
   },
   ticketBanner: {
     width: '100%',
     backgroundColor: Colors.background,
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: Radius.md,
+    padding: Spacing.md,
     marginBottom: 24,
   },
   ticketTitle: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#444444',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.xs,
+    color: Colors.charcoal,
     marginBottom: 4,
   },
   ticketSubtitle: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     lineHeight: 18,
   },
 });

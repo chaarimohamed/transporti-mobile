@@ -13,6 +13,7 @@ import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import BottomNav from '../../ui/BottomNav';
+import { AppIcon } from '../../ui/Icon';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 
@@ -130,14 +131,17 @@ const ShipmentListScreen: React.FC<ShipmentListScreenProps> = ({ onNavigate, ini
           </View>
         ) : error ? (
           <Card style={styles.errorCard}>
-            <Text style={styles.errorText}>⚠️ {error}</Text>
+            <View style={styles.errorRow}>
+              <AppIcon name="alert-triangle" size={16} color={Colors.error} />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
             <TouchableOpacity onPress={fetchShipments} style={styles.retryButton}>
               <Text style={styles.retryText}>Réessayer</Text>
             </TouchableOpacity>
           </Card>
         ) : shipments.length === 0 ? (
           <Card style={styles.emptyCard}>
-            <Text style={styles.emptyIcon}>📦</Text>
+            <AppIcon name="package-box" size={48} color={Colors.textMuted} />
             <Text style={styles.emptyText}>Aucune expédition</Text>
             <Text style={styles.emptySubtext}>
               {activeTab === 'Toutes'
@@ -157,9 +161,15 @@ const ShipmentListScreen: React.FC<ShipmentListScreenProps> = ({ onNavigate, ini
 
                 <View style={styles.shipmentBody}>
                   <View style={styles.routeContainer}>
-                    <Text style={styles.routeText} numberOfLines={1}>
-                      {shipment.from} → {shipment.to}
-                    </Text>
+                    <View style={styles.routeRow}>
+                      <Text style={styles.routePoint} numberOfLines={1}>
+                        {shipment.from}
+                      </Text>
+                      <AppIcon name="arrow-right" size={14} color={Colors.textMuted} />
+                      <Text style={styles.routePoint} numberOfLines={1}>
+                        {shipment.to}
+                      </Text>
+                    </View>
                   </View>
                   <View style={styles.shipmentMeta}>
                     <Text style={styles.metaText}>
@@ -263,7 +273,18 @@ const styles = StyleSheet.create({
   routeContainer: {
     marginBottom: 4,
   },
+  routeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   routeText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#1A1A1A',
+  },
+  routePoint: {
+    flex: 1,
     fontSize: 15,
     fontWeight: 'bold',
     color: '#1A1A1A',
@@ -307,10 +328,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.errorSurface,
     borderColor: '#FCA5A5',
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
   errorText: {
     fontSize: 14,
     color: Colors.error,
-    marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {

@@ -10,7 +10,8 @@ import {
   Image,
   Platform,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import * as ImagePicker from 'expo-image-picker';
 import { Button } from '../../ui/Button';
 
@@ -132,7 +133,7 @@ const CarrierOnboarding3Screen: React.FC<CarrierOnboarding3ScreenProps> = ({
           </View>
           {hasPhoto && (
             <View style={styles.doneBadge}>
-              <Text style={styles.doneBadgeText}>✓</Text>
+              <AppIcon name="check-circle" size={14} color={Colors.surface} />
             </View>
           )}
         </View>
@@ -151,7 +152,7 @@ const CarrierOnboarding3Screen: React.FC<CarrierOnboarding3ScreenProps> = ({
             </>
           ) : (
             <View style={styles.uploadZoneInner}>
-              <Text style={styles.uploadIcon}>📷</Text>
+              <AppIcon name="camera" size={32} color={Colors.primary} />
               <Text style={styles.uploadHint}>Prendre une photo ou importer</Text>
               <Text style={styles.uploadFormats}>JPG · PNG · HEIC</Text>
             </View>
@@ -161,12 +162,12 @@ const CarrierOnboarding3Screen: React.FC<CarrierOnboarding3ScreenProps> = ({
         {!hasPhoto && (
           <View style={styles.quickActions}>
             <TouchableOpacity style={styles.quickBtn} onPress={() => launchCamera(setter)}>
-              <Text style={styles.quickBtnIcon}>📷</Text>
+              <AppIcon name="camera" size={16} color={Colors.primary} />
               <Text style={styles.quickBtnText}>Caméra</Text>
             </TouchableOpacity>
             <View style={styles.quickBtnDivider} />
             <TouchableOpacity style={styles.quickBtn} onPress={() => launchGallery(setter)}>
-              <Text style={styles.quickBtnIcon}>🖼️</Text>
+              <AppIcon name="gallery-image" size={16} color={Colors.primary} />
               <Text style={styles.quickBtnText}>Galerie</Text>
             </TouchableOpacity>
           </View>
@@ -181,7 +182,7 @@ const CarrierOnboarding3Screen: React.FC<CarrierOnboarding3ScreenProps> = ({
         {/* Progress */}
         <View style={styles.progressContainer}>
           <TouchableOpacity style={styles.backButton} onPress={() => onNavigate?.('carrierOnboarding2')} activeOpacity={0.7}>
-            <Text style={styles.backIcon}>←</Text>
+            <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
           </TouchableOpacity>
           <View style={styles.progressBar}>
             <View style={[styles.progressFill, { width: '66%' }]} />
@@ -205,7 +206,7 @@ const CarrierOnboarding3Screen: React.FC<CarrierOnboarding3ScreenProps> = ({
 
         {/* Security info */}
         <View style={styles.infoContainer}>
-          <Text style={styles.infoIcon}>🔒</Text>
+          <AppIcon name="lock" size={16} color={Colors.primary} />
           <Text style={styles.infoText}>
             Vos documents sont chiffrés (AES-256) avant d'être stockés. Seule l'équipe Transporti y a accès pour vérification.
           </Text>
@@ -225,48 +226,44 @@ const CarrierOnboarding3Screen: React.FC<CarrierOnboarding3ScreenProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFFFFF' },
-  scrollContent: { flexGrow: 1, padding: 24, paddingBottom: 120 },
+  container: { flex: 1, backgroundColor: Colors.surface },
+  scrollContent: { flexGrow: 1, padding: Spacing.lg, paddingBottom: 120 },
   progressContainer: { marginTop: 32, marginBottom: 24 },
-  backButton: { width: 32, height: 32, borderRadius: 16, backgroundColor: Colors.background, justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
-  backIcon: { fontSize: 20, color: '#1A1A1A' },
-  progressBar: { height: 4, backgroundColor: '#E9E9E9', borderRadius: 2, overflow: 'hidden', marginBottom: 8 },
+  backButton: { width: 32, height: 32, borderRadius: Radius.full, backgroundColor: Colors.background, justifyContent: 'center', alignItems: 'center', marginBottom: Spacing.md },
+  progressBar: { height: 4, backgroundColor: Colors.border, borderRadius: 2, overflow: 'hidden', marginBottom: Spacing.sm },
   progressFill: { height: '100%', backgroundColor: Colors.primary },
-  progressText: { fontSize: 12, color: '#666666', textAlign: 'center' },
+  progressText: { fontFamily: Fonts.regular, fontSize: FontSizes.xs, color: Colors.textSecondary, textAlign: 'center' },
   header: { marginBottom: 24 },
-  title: { fontSize: 24, fontWeight: '600', color: '#444444', marginBottom: 8 },
-  subtitle: { fontSize: 14, color: '#666666', lineHeight: 20 },
-  docsContainer: { gap: 16 },
+  title: { fontFamily: Fonts.semiBold, fontSize: FontSizes.xl, color: Colors.charcoal, marginBottom: Spacing.sm },
+  subtitle: { fontFamily: Fonts.regular, fontSize: FontSizes.sm, color: Colors.textSecondary, lineHeight: 20 },
+  docsContainer: { gap: Spacing.md },
   // doc card
-  docCard: { borderWidth: 1, borderColor: '#E9E9E9', borderRadius: 16, overflow: 'hidden', backgroundColor: '#FCFCFC' },
-  docCardHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', padding: 16, paddingBottom: 12 },
-  docLabel: { fontSize: 14, fontWeight: '600', color: '#1A1A1A', marginBottom: 2 },
+  docCard: { borderWidth: 1, borderColor: Colors.border, borderRadius: Radius.lg, overflow: 'hidden', backgroundColor: Colors.backgroundAlt },
+  docCardHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', padding: Spacing.md, paddingBottom: Spacing.sm + 4 },
+  docLabel: { fontFamily: Fonts.semiBold, fontSize: FontSizes.sm, color: Colors.textPrimary, marginBottom: 2 },
   required: { color: Colors.error },
-  docDescription: { fontSize: 12, color: '#888888' },
-  doneBadge: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#2E8B57', justifyContent: 'center', alignItems: 'center' },
-  doneBadgeText: { color: '#FFFFFF', fontSize: 13, fontWeight: '700' },
+  docDescription: { fontFamily: Fonts.regular, fontSize: FontSizes.xs, color: Colors.textSecondary },
+  doneBadge: { width: 24, height: 24, borderRadius: Radius.full, backgroundColor: Colors.success, justifyContent: 'center', alignItems: 'center' },
   // upload zone
-  uploadZone: { marginHorizontal: 16, height: 140, borderRadius: 12, borderWidth: 2, borderStyle: 'dashed', borderColor: Colors.primary, backgroundColor: '#F0F7FF', overflow: 'hidden', justifyContent: 'center', alignItems: 'center' },
-  uploadZoneWithPhoto: { borderStyle: 'solid', borderColor: '#2E8B57', backgroundColor: '#000' },
+  uploadZone: { marginHorizontal: Spacing.md, height: 140, borderRadius: Radius.md, borderWidth: 2, borderStyle: 'dashed', borderColor: Colors.primary, backgroundColor: Colors.primarySurface, overflow: 'hidden', justifyContent: 'center', alignItems: 'center' },
+  uploadZoneWithPhoto: { borderStyle: 'solid', borderColor: Colors.success, backgroundColor: '#000' },
   uploadZoneInner: { alignItems: 'center', gap: 4 },
-  uploadIcon: { fontSize: 32, marginBottom: 4 },
-  uploadHint: { fontSize: 14, fontWeight: '500', color: Colors.primary },
-  uploadFormats: { fontSize: 11, color: '#888888', marginTop: 2 },
+  uploadHint: { fontFamily: Fonts.medium, fontSize: FontSizes.sm, color: Colors.primary },
+  uploadFormats: { fontFamily: Fonts.regular, fontSize: FontSizes.xs, color: Colors.textMuted, marginTop: 2 },
   preview: { width: '100%', height: '100%' },
-  previewOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingVertical: 6, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center' },
-  previewOverlayText: { color: '#FFFFFF', fontSize: 12 },
+  previewOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingVertical: 6, backgroundColor: Colors.overlay, alignItems: 'center' },
+  previewOverlayText: { color: Colors.textInverse, fontFamily: Fonts.regular, fontSize: FontSizes.xs },
   // quick actions
-  quickActions: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: '#EEEEEE', marginTop: 12 },
-  quickBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, gap: 6 },
-  quickBtnDivider: { width: 1, backgroundColor: '#EEEEEE' },
+  quickActions: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: Colors.borderLight, marginTop: Spacing.sm + 4 },
+  quickBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: Spacing.sm + 4, gap: 6 },
+  quickBtnDivider: { width: 1, backgroundColor: Colors.borderLight },
   quickBtnIcon: { fontSize: 16 },
-  quickBtnText: { fontSize: 13, fontWeight: '500', color: Colors.primary },
+  quickBtnText: { fontFamily: Fonts.medium, fontSize: FontSizes.sm, color: Colors.primary },
   // info
-  infoContainer: { flexDirection: 'row', marginTop: 20, padding: 14, backgroundColor: '#F0F7FF', borderRadius: 12, alignItems: 'flex-start' },
-  infoIcon: { fontSize: 16, marginRight: 8, marginTop: 1 },
-  infoText: { flex: 1, fontSize: 12, color: Colors.primary, lineHeight: 18 },
+  infoContainer: { flexDirection: 'row', marginTop: 20, padding: 14, backgroundColor: Colors.primarySurface, borderRadius: Radius.md, alignItems: 'flex-start', gap: Spacing.sm },
+  infoText: { flex: 1, fontFamily: Fonts.regular, fontSize: FontSizes.xs, color: Colors.primary, lineHeight: 18 },
   // buttons
-  buttonContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, flexDirection: 'row', padding: 24, paddingBottom: 32, backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#E9E9E9', gap: 12 },
+  buttonContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, flexDirection: 'row', padding: Spacing.lg, paddingBottom: 32, backgroundColor: Colors.surface, borderTopWidth: 1, borderTopColor: Colors.border, gap: Spacing.sm + 4 },
   skipButton: { flex: 1 },
   nextButton: { flex: 1 },
 });

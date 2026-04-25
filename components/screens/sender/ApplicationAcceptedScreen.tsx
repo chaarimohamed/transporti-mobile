@@ -6,7 +6,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import { Button } from '../../ui/Button';
 import { Shipment } from '../../../services/shipment.service';
 
@@ -39,7 +40,7 @@ const ApplicationAcceptedScreen: React.FC<ApplicationAcceptedScreenProps> = ({
           style={styles.closeButton}
           activeOpacity={0.7}
         >
-          <Text style={styles.closeIcon}>✕</Text>
+          <AppIcon name="close" size={20} color={Colors.textSecondary} />
         </TouchableOpacity>
       </View>
 
@@ -47,7 +48,7 @@ const ApplicationAcceptedScreen: React.FC<ApplicationAcceptedScreenProps> = ({
         {/* Success Icon */}
         <View style={styles.iconContainer}>
           <View style={styles.successCircle}>
-            <Text style={styles.successIcon}>✓</Text>
+            <AppIcon name="check-circle" size={48} color={Colors.surface} />
           </View>
         </View>
 
@@ -63,7 +64,7 @@ const ApplicationAcceptedScreen: React.FC<ApplicationAcceptedScreenProps> = ({
         {/* Info Card */}
         <View style={styles.infoCard}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoIcon}>📍</Text>
+            <View style={{ marginRight: 12 }}><AppIcon name="map-pin" size={24} color={Colors.primary} /></View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Itinéraire</Text>
               <Text style={styles.infoValue}>
@@ -75,7 +76,7 @@ const ApplicationAcceptedScreen: React.FC<ApplicationAcceptedScreenProps> = ({
           <View style={styles.divider} />
 
           <View style={styles.infoRow}>
-            <Text style={styles.infoIcon}>👤</Text>
+            <View style={{ marginRight: 12 }}><AppIcon name="profile-user" size={24} color={Colors.primary} /></View>
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Transporteur</Text>
               <Text style={styles.infoValue}>{carrierName}</Text>
@@ -86,7 +87,7 @@ const ApplicationAcceptedScreen: React.FC<ApplicationAcceptedScreenProps> = ({
             <>
               <View style={styles.divider} />
               <View style={styles.infoRow}>
-                <Text style={styles.infoIcon}>📱</Text>
+                <View style={{ marginRight: 12 }}><AppIcon name="phone" size={24} color={Colors.primary} /></View>
                 <View style={styles.infoContent}>
                   <Text style={styles.infoLabel}>Téléphone</Text>
                   <Text style={styles.infoValue}>{shipment.carrier.phone}</Text>
@@ -121,12 +122,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
     paddingHorizontal: 20,
     paddingTop: 24,
-    paddingBottom: 16,
+    paddingBottom: Spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -135,9 +136,9 @@ const styles = StyleSheet.create({
     width: 40,
   },
   headerTitle: {
+    fontFamily: Fonts.semiBold,
     fontSize: 20,
-    fontWeight: '600',
-    color: '#444444',
+    color: Colors.charcoal,
     flex: 1,
     textAlign: 'center',
   },
@@ -148,10 +149,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  closeIcon: {
-    fontSize: 20,
-    color: '#666666',
   },
   content: {
     flex: 1,
@@ -167,38 +164,35 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#2E8B57',
+    backgroundColor: Colors.success,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#2E8B57',
+    shadowColor: Colors.success,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 8,
   },
-  successIcon: {
-    fontSize: 48,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
   title: {
+    fontFamily: Fonts.semiBold,
     fontSize: 28,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
   message: {
+    fontFamily: Fonts.regular,
     fontSize: 16,
-    color: '#444444',
+    color: Colors.charcoal,
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
     paddingHorizontal: 20,
   },
   submessage: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 32,
@@ -206,8 +200,8 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     width: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
     padding: 20,
     marginBottom: 32,
     shadowColor: '#000',
@@ -219,39 +213,36 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-  },
-  infoIcon: {
-    fontSize: 24,
   },
   infoContent: {
     flex: 1,
   },
   infoLabel: {
-    fontSize: 12,
-    color: '#999999',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textMuted,
     marginBottom: 4,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   infoValue: {
+    fontFamily: Fonts.semiBold,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
   },
   divider: {
     height: 1,
-    backgroundColor: '#E9E9E9',
-    marginVertical: 16,
+    backgroundColor: Colors.border,
+    marginVertical: Spacing.md,
   },
   actions: {
     width: '100%',
-    gap: 12,
+    gap: Spacing.sm + 4,
   },
   primaryButtonText: {
+    fontFamily: Fonts.semiBold,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    color: Colors.textInverse,
   },
   secondaryButton: {
     height: 56,
@@ -261,9 +252,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   secondaryButtonText: {
+    fontFamily: Fonts.medium,
     fontSize: 16,
-    fontWeight: '500',
-    color: '#666666',
+    color: Colors.textSecondary,
   },
 });
 

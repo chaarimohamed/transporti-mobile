@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import { Button } from '../../ui/Button';
 
 interface CarrierOnboarding2ScreenProps {
@@ -63,7 +64,7 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
             onPress={() => onNavigate?.('carrierRegister')}
             activeOpacity={0.7}
           >
-            <Text style={styles.backIcon}>←</Text>
+            <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
           </TouchableOpacity>
           <View style={styles.progressBar}>
             <View style={[styles.progressFill, { width: '33%' }]} />
@@ -95,7 +96,9 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
                 <View style={styles.checkboxChecked} />
               )}
             </View>
-            <Text style={styles.optionIcon}>📦</Text>
+            <View style={{ marginRight: 12 }}>
+              <AppIcon name="package" size={24} color={Colors.charcoal} />
+            </View>
             <View style={styles.optionTextContainer}>
               <Text style={styles.optionLabel}>Palette</Text>
               <Text style={styles.optionDescription}>Transport de palettes</Text>
@@ -116,7 +119,9 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
                 <View style={styles.checkboxChecked} />
               )}
             </View>
-            <Text style={styles.optionIcon}>❄️</Text>
+            <View style={{ marginRight: 12 }}>
+              <AppIcon name="temperature-cold" size={24} color={Colors.charcoal} />
+            </View>
             <View style={styles.optionTextContainer}>
               <Text style={styles.optionLabel}>Réfrigéré</Text>
               <Text style={styles.optionDescription}>Véhicule avec système de réfrigération</Text>
@@ -126,7 +131,9 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
           {/* Volume Option */}
           <View style={[styles.volumeCard, volumeError && styles.volumeCardError]}>
             <View style={styles.volumeHeader}>
-              <Text style={styles.volumeIcon}>🚚</Text>
+              <View style={{ marginRight: 12 }}>
+                <AppIcon name="truck" size={24} color={Colors.charcoal} />
+              </View>
               <View style={styles.volumeHeaderText}>
                 <Text style={styles.volumeTitle}>Taille du véhicule <Text style={styles.required}>*</Text></Text>
                 <Text style={styles.volumeSubtitle}>
@@ -199,11 +206,11 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
   },
   scrollContent: {
     flexGrow: 1,
-    padding: 24,
+    padding: Spacing.lg,
     paddingBottom: 120,
   },
   progressContainer: {
@@ -213,69 +220,67 @@ const styles = StyleSheet.create({
   backButton: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: Radius.full,
     backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
-  },
-  backIcon: {
-    fontSize: 20,
-    color: '#1A1A1A',
+    marginBottom: Spacing.md,
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#E9E9E9',
+    backgroundColor: Colors.border,
     borderRadius: 2,
     overflow: 'hidden',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   progressFill: {
     height: '100%',
     backgroundColor: Colors.primary,
   },
   progressText: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
   header: {
     marginBottom: 24,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#444444',
-    marginBottom: 8,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.xl,
+    color: Colors.charcoal,
+    marginBottom: Spacing.sm,
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     lineHeight: 20,
   },
   optionsContainer: {
-    gap: 12,
+    gap: Spacing.sm + 4,
   },
   optionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: Spacing.md,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
-    borderRadius: 16,
-    backgroundColor: '#FCFCFC',
+    borderColor: Colors.border,
+    borderRadius: Radius.lg,
+    backgroundColor: Colors.backgroundAlt,
   },
   optionCardSelected: {
     borderColor: Colors.primary,
-    backgroundColor: 'rgba(20, 100, 246, 0.05)',
+    backgroundColor: Colors.primarySurface,
   },
   checkbox: {
     width: 20,
     height: 20,
     borderWidth: 2,
-    borderColor: '#AFAFAF',
-    borderRadius: 4,
-    marginRight: 16,
+    borderColor: Colors.textMuted,
+    borderRadius: Radius.xs,
+    marginRight: Spacing.md,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -285,76 +290,70 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderRadius: 2,
   },
-  optionIcon: {
-    fontSize: 24,
-    marginRight: 12,
-  },
   optionTextContainer: {
     flex: 1,
   },
   optionLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#1A1A1A',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
   },
   optionDescription: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     marginTop: 2,
   },
   volumeCard: {
-    padding: 16,
+    padding: Spacing.md,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
-    borderRadius: 16,
-    backgroundColor: '#FCFCFC',
+    borderColor: Colors.border,
+    borderRadius: Radius.lg,
+    backgroundColor: Colors.backgroundAlt,
   },
   volumeHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 12,
-  },
-  volumeIcon: {
-    fontSize: 24,
-    marginRight: 12,
+    marginBottom: Spacing.sm + 4,
   },
   volumeHeaderText: {
     flex: 1,
   },
   volumeTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#1A1A1A',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
     marginBottom: 4,
   },
   volumeSubtitle: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     lineHeight: 16,
   },
   volumeOptionsContainer: {
-    gap: 8,
+    gap: Spacing.sm,
   },
   volumeOption: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
-    borderRadius: 12,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
   },
   volumeOptionSelected: {
     borderColor: Colors.primary,
-    backgroundColor: 'rgba(20, 100, 246, 0.05)',
+    backgroundColor: Colors.primarySurface,
   },
   volumeRadio: {
     width: 20,
     height: 20,
     borderWidth: 2,
-    borderColor: '#AFAFAF',
+    borderColor: Colors.textMuted,
     borderRadius: 10,
-    marginRight: 12,
+    marginRight: Spacing.sm + 4,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -368,16 +367,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   volumeOptionText: {
-    fontSize: 14,
-    color: '#1A1A1A',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
   },
   volumeOptionTextSelected: {
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
     color: Colors.primary,
   },
   volumeOptionDescription: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     marginTop: 2,
   },
   volumeCardError: {
@@ -389,8 +390,9 @@ const styles = StyleSheet.create({
   },
   volumeErrorText: {
     color: Colors.error,
-    fontSize: 13,
-    marginTop: 8,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    marginTop: Spacing.sm,
     marginLeft: 4,
   },
   buttonContainer: {
@@ -398,11 +400,11 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 24,
+    padding: Spacing.lg,
     paddingBottom: 32,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#E9E9E9',
+    borderTopColor: Colors.border,
   },
   nextButton: {
     width: '100%',

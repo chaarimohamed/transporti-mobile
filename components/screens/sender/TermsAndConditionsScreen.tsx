@@ -7,7 +7,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 
 interface TermsAndConditionsScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
@@ -26,7 +27,7 @@ const TermsAndConditionsScreen: React.FC<TermsAndConditionsScreenProps> = ({
           style={styles.backButton}
           onPress={() => onNavigate?.(returnScreen)}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Conditions Générales</Text>
         <View style={styles.placeholder} />
@@ -110,7 +111,10 @@ const TermsAndConditionsScreen: React.FC<TermsAndConditionsScreenProps> = ({
 
         {/* Transporteurs */}
         <View style={styles.divider} />
-        <Text style={styles.mainTitle}>🚚 CONDITIONS SPÉCIFIQUES TRANSPORTEURS</Text>
+        <View style={styles.mainTitleRow}>
+          <AppIcon name="truck" size={22} color={Colors.charcoal} />
+          <Text style={styles.mainTitle}>CONDITIONS SPÉCIFIQUES TRANSPORTEURS</Text>
+        </View>
 
         {/* Transporteur Section 1 */}
         <View style={styles.section}>
@@ -164,7 +168,10 @@ const TermsAndConditionsScreen: React.FC<TermsAndConditionsScreenProps> = ({
 
         {/* Expéditeurs */}
         <View style={styles.divider} />
-        <Text style={styles.mainTitle}>📦 CONDITIONS SPÉCIFIQUES EXPÉDITEURS</Text>
+        <View style={styles.mainTitleRow}>
+          <AppIcon name="package" size={22} color={Colors.charcoal} />
+          <Text style={styles.mainTitle}>CONDITIONS SPÉCIFIQUES EXPÉDITEURS</Text>
+        </View>
 
         {/* Expéditeur Section 1 */}
         <View style={styles.section}>
@@ -215,26 +222,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 72,
     paddingBottom: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
   },
   backButton: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: Radius.full,
     backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backIcon: {
-    fontSize: 20,
-    color: '#1A1A1A',
-  },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.md,
+    color: Colors.textPrimary,
     flex: 1,
     textAlign: 'center',
   },
@@ -245,54 +248,63 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 24,
+    padding: Spacing.lg,
     paddingBottom: 40,
   },
-  mainTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1A1A1A',
+  mainTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
     marginBottom: 20,
+  },
+  mainTitle: {
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.lg,
+    color: Colors.textPrimary,
+    flex: 1,
   },
   section: {
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 12,
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm + 4,
   },
   paragraph: {
-    fontSize: 14,
-    color: '#444444',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.charcoal,
     lineHeight: 22,
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   bullet: {
-    fontSize: 14,
-    color: '#444444',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.charcoal,
     lineHeight: 22,
-    marginLeft: 8,
+    marginLeft: Spacing.sm,
     marginBottom: 4,
   },
   bold: {
-    fontWeight: '700',
+    fontFamily: Fonts.bold,
   },
   highlight: {
-    fontSize: 14,
-    color: '#444444',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.charcoal,
     lineHeight: 22,
-    marginTop: 8,
-    padding: 12,
-    backgroundColor: '#FFF9E6',
-    borderRadius: 8,
+    marginTop: Spacing.sm,
+    padding: Spacing.sm + 4,
+    backgroundColor: Colors.primarySurface,
+    borderRadius: Radius.sm,
     borderLeftWidth: 3,
-    borderLeftColor: '#FFB800',
+    borderLeftColor: Colors.primary,
   },
   divider: {
     height: 2,
-    backgroundColor: '#E9E9E9',
+    backgroundColor: Colors.border,
     marginVertical: 32,
   },
   footer: {

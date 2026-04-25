@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingV
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
 import { AppIcon } from '../../ui/Icon';
+import { BrandLogo } from '../../ui/BrandLogo';
 import { useAuth } from '../../../contexts/AuthContext';
 import { Colors, Fonts, FontSizes, Radius, Shadows } from '../../../theme';
 
@@ -51,10 +52,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
     >
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <View style={styles.logo}>
-            <AppIcon name="truck" size={32} color={Colors.navy} />
-          </View>
-          <Text style={styles.appName}>Transporti</Text>
+          <BrandLogo width={228} height={114} style={styles.logo} />
         </View>
 
         <View style={styles.form}>
@@ -142,20 +140,8 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   logo: {
-    width: 72,
-    height: 72,
-    backgroundColor: Colors.primary,
-    borderRadius: Radius.lg,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: 12,
     ...Shadows.primaryGlow,
-  },
-  appName: {
-    fontFamily: Fonts.bold,
-    fontSize: FontSizes.xl,
-    color: Colors.navy,
-    letterSpacing: -0.3,
   },
   form: {
     gap: 24,

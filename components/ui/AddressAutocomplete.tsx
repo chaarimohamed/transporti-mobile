@@ -10,6 +10,8 @@ import {
   Platform,
 } from 'react-native';
 import { googlePlacesService, GoogleSuggestion, AddressDetails } from '../../services/googlePlaces.service';
+import { Colors, Fonts, FontSizes, Radius, Shadows, Spacing } from '../../theme';
+import { AppIcon } from './Icon';
 
 interface AddressAutocompleteProps {
   value: string;
@@ -94,7 +96,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
       onPress={() => handleSelectSuggestion(item)}
       activeOpacity={0.7}
     >
-      <Text style={styles.suggestionIcon}>📍</Text>
+      <AppIcon name="map-pin" size={16} color={Colors.textMuted} />
       <View style={styles.suggestionTextContainer}>
         <Text style={styles.suggestionName}>{item.structured_formatting.main_text}</Text>
         {item.structured_formatting.secondary_text && (
@@ -107,7 +109,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <Text style={styles.inputIcon}>{iconText}</Text>
+        <AppIcon name="location-pin" size={18} color={Colors.textMuted} />
         <TextInput
           style={styles.textInput}
           value={value}
@@ -128,7 +130,7 @@ export const AddressAutocomplete: React.FC<AddressAutocompleteProps> = ({
         {loading && (
           <ActivityIndicator
             size="small"
-            color="#1464F6"
+            color={Colors.primary}
             style={styles.loader}
           />
         )}
@@ -157,25 +159,23 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E9E9E9',
-    paddingHorizontal: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.xl,
+    borderWidth: 1.5,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.md,
     paddingVertical: Platform.OS === 'ios' ? 14 : 12,
-    gap: 12,
-  },
-  inputIcon: {
-    fontSize: 18,
+    gap: Spacing.sm + 4,
   },
   textInput: {
     flex: 1,
-    fontSize: 15,
-    color: '#1A1A1A',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
     paddingVertical: 0,
   },
   loader: {
-    marginLeft: 8,
+    marginLeft: Spacing.sm,
   },
   suggestionsContainer: {
     position: 'absolute',
@@ -183,16 +183,12 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     marginTop: 4,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
+    borderColor: Colors.border,
     maxHeight: 250,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    ...Shadows.md,
     zIndex: 1001,
   },
   suggestionsList: {
@@ -201,25 +197,23 @@ const styles = StyleSheet.create({
   suggestionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    padding: Spacing.sm + 4,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-    gap: 12,
-  },
-  suggestionIcon: {
-    fontSize: 16,
+    borderBottomColor: Colors.borderLight,
+    gap: Spacing.sm + 4,
   },
   suggestionTextContainer: {
     flex: 1,
   },
   suggestionName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
     marginBottom: 2,
   },
   suggestionPlace: {
-    fontSize: 13,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
 });

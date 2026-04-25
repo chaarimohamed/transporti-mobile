@@ -14,6 +14,7 @@ import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
+import { AppIcon } from '../../ui/Icon';
 import { GOOGLE_MAPS_API_KEY } from '../../../config/google.config';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
@@ -246,13 +247,16 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
             onPress={() => onNavigate?.(returnScreen || 'missionList')}
             style={styles.backButton}
           >
-            <Text style={styles.backIcon}>←</Text>
+            <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Détails Mission</Text>
           <View style={styles.headerSpacer} />
         </View>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>⚠️ {error}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <AppIcon name="alert-triangle" size={18} color={Colors.error} />
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
           <Button onPress={fetchShipmentDetails}>
             <Text style={{ color: '#FFF' }}>Réessayer</Text>
           </Button>
@@ -269,7 +273,7 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
           onPress={() => onNavigate?.(returnScreen || 'missionList')}
           style={styles.backButton}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Détails Mission</Text>
         <Badge status="neutral" text={shipment.refNumber} />

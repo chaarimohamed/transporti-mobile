@@ -12,6 +12,7 @@ import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
+import { AppIcon } from '../../ui/Icon';
 
 interface PaymentReceiptScreenProps {
   route?: { 
@@ -112,14 +113,14 @@ const PaymentReceiptScreen: React.FC<PaymentReceiptScreenProps> = ({
           style={styles.backButton}
           onPress={() => onNavigate?.('activeMissions')}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Reçu de paiement</Text>
         <TouchableOpacity
           style={styles.shareButton}
           onPress={handleShare}
         >
-          <Text style={styles.shareIcon}>↗</Text>
+          <AppIcon name="upload" size={18} color={Colors.primary} />
         </TouchableOpacity>
       </View>
 
@@ -200,7 +201,7 @@ const PaymentReceiptScreen: React.FC<PaymentReceiptScreenProps> = ({
             {/* Delivery Address */}
             <View style={styles.addressSection}>
               <View style={styles.addressHeader}>
-                <Text style={styles.packageIcon}>📦</Text>
+                <AppIcon name="package-box" size={18} color={Colors.primary} />
                 <Text style={styles.addressLabel}>Livraison à :</Text>
               </View>
               <Text style={styles.addressValue}>{address}</Text>
@@ -229,7 +230,7 @@ const PaymentReceiptScreen: React.FC<PaymentReceiptScreenProps> = ({
           size="lg"
           fullWidth
         >
-          📥 Télécharger le reçu (PDF)
+          Télécharger le reçu (PDF)
         </Button>
         <Button
           onPress={handleShareByEmail}
@@ -237,7 +238,7 @@ const PaymentReceiptScreen: React.FC<PaymentReceiptScreenProps> = ({
           size="lg"
           fullWidth
         >
-          ✉️ Partager par email
+          Partager par email
         </Button>
       </View>
     </SafeAreaView>

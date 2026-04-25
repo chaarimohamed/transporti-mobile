@@ -10,7 +10,8 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import * as Location from 'expo-location';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
@@ -126,7 +127,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
           })}
           style={styles.backButton}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Définir le trajet</Text>
       </View>
@@ -157,7 +158,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
           onPress={handleGetCurrentLocation}
         >
           <View style={styles.locationIcon}>
-            <Text style={styles.locationIconText}>📍</Text>
+            <AppIcon name="map-current-location" size={20} color={Colors.primary} />
           </View>
           <View style={styles.locationInfo}>
             <Text style={styles.locationTitle}>Ma position actuelle</Text>
@@ -175,7 +176,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
           })}
         >
           <View style={styles.locationIcon}>
-            <Text style={styles.locationIconText}>🗺️</Text>
+            <AppIcon name="map-picker" size={20} color={Colors.primary} />
           </View>
           <View style={styles.locationInfo}>
             <Text style={styles.locationTitle}>Utiliser la carte</Text>
@@ -220,11 +221,11 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Nom et prénom</Text>
                 <View style={styles.inputWithIcon}>
-                  <Text style={styles.inputIconText}>👤</Text>
+                  <AppIcon name="profile-user" size={18} color={Colors.textMuted} />
                   <TextInput
                     style={styles.textInput}
                     placeholder="Ex: Ahmed Ben Salah"
-                    placeholderTextColor="#999"
+                    placeholderTextColor={Colors.placeholder}
                     value={senderName}
                     onChangeText={setSenderName}
                   />
@@ -234,11 +235,11 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
               <View style={styles.inputGroup}>
                 <Text style={styles.inputLabel}>Numéro de téléphone</Text>
                 <View style={styles.inputWithIcon}>
-                  <Text style={styles.inputIconText}>📞</Text>
+                  <AppIcon name="phone" size={18} color={Colors.textMuted} />
                   <TextInput
                     style={styles.textInput}
                     placeholder="Ex: +216 20 123 456"
-                    placeholderTextColor="#999"
+                    placeholderTextColor={Colors.placeholder}
                     value={senderPhone}
                     onChangeText={setSenderPhone}
                     keyboardType="phone-pad"
@@ -281,53 +282,49 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.md,
     paddingTop: 36,
-    paddingBottom: 16,
+    paddingBottom: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
-    gap: 16,
+    borderBottomColor: Colors.border,
+    gap: Spacing.md,
   },
   backButton: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: Radius.full,
     backgroundColor: Colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backIcon: {
-    fontSize: 20,
-    color: '#1A1A1A',
-  },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.md,
+    color: Colors.textPrimary,
   },
   addressSection: {
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.md,
     paddingTop: 10,
-    paddingBottom: 12,
+    paddingBottom: Spacing.sm + 4,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
   },
   addressLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#666666',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     letterSpacing: 0.5,
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   addressInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.sm + 4,
   },
   dotIndicator: {
     width: 10,
@@ -343,12 +340,13 @@ const styles = StyleSheet.create({
   addressInput: {
     height: 44,
     backgroundColor: Colors.background,
-    borderRadius: 12,
+    borderRadius: Radius.md,
     borderWidth: 1,
     borderColor: Colors.primary,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    color: '#1A1A1A',
+    paddingHorizontal: Spacing.md,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
   },
   clearButton: {
     position: 'absolute',
@@ -356,8 +354,9 @@ const styles = StyleSheet.create({
     top: 12,
   },
   clearIcon: {
-    fontSize: 16,
-    color: '#666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textSecondary,
   },
   scrollView: {
     flex: 1,
@@ -368,68 +367,66 @@ const styles = StyleSheet.create({
   locationButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    gap: 16,
+    padding: Spacing.md,
+    gap: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
   },
   locationIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.primary + '1A',
+    backgroundColor: Colors.primarySurface,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  locationIconText: {
-    fontSize: 20,
   },
   locationInfo: {
     flex: 1,
   },
   locationTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
     marginBottom: 2,
   },
   locationSubtitle: {
-    fontSize: 12,
-    color: '#666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
   },
   section: {
-    padding: 16,
+    padding: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
   },
   sectionTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
-    marginBottom: 12,
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm + 4,
   },
   optionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    borderRadius: 12,
+    padding: Spacing.sm + 4,
+    borderRadius: Radius.md,
     borderWidth: 2,
-    borderColor: '#E9E9E9',
-    backgroundColor: '#FFFFFF',
-    marginBottom: 8,
-    gap: 12,
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
+    marginBottom: Spacing.sm,
+    gap: Spacing.sm + 4,
   },
   optionButtonActive: {
     borderColor: Colors.primary,
-    backgroundColor: Colors.primary + '0D',
+    backgroundColor: Colors.primarySurface,
   },
   radioOuter: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#E9E9E9',
-    backgroundColor: '#FFFFFF',
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -443,33 +440,34 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
   },
   optionText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
   },
   optionTextContainer: {
     flex: 1,
   },
   optionSubtext: {
-    fontSize: 12,
-    color: '#666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
   },
   toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
   toggleLabel: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
   },
   toggle: {
     width: 48,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#E9E9E9',
+    backgroundColor: Colors.border,
     padding: 2,
     justifyContent: 'center',
   },
@@ -480,10 +478,10 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
+    backgroundColor: Colors.surface,
+    shadowColor: Colors.navy,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.15,
     shadowRadius: 2,
     elevation: 2,
   },
@@ -491,46 +489,45 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   senderInfo: {
-    marginTop: 16,
-    gap: 16,
+    marginTop: Spacing.md,
+    gap: Spacing.md,
   },
   inputGroup: {
-    gap: 8,
+    gap: Spacing.sm,
   },
   inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
     marginLeft: 4,
   },
   inputWithIcon: {
     flexDirection: 'row',
     alignItems: 'center',
     height: 48,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
-    paddingHorizontal: 16,
-    gap: 12,
-  },
-  inputIconText: {
-    fontSize: 18,
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.md,
+    gap: Spacing.sm + 4,
   },
   textInput: {
     flex: 1,
-    fontSize: 15,
-    color: '#1A1A1A',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
   },
   textArea: {
     height: 100,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
-    padding: 16,
-    fontSize: 15,
-    color: '#1A1A1A',
+    borderColor: Colors.border,
+    padding: Spacing.md,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
   },
   bottomActions: {
     position: 'absolute',
@@ -538,14 +535,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: Spacing.md,
     paddingBottom: Platform.OS === 'ios' ? 34 : 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#E9E9E9',
-    shadowColor: '#000',
+    borderTopColor: Colors.border,
+    shadowColor: Colors.navy,
     shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 10,
   },
@@ -557,9 +554,9 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   nextButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
+    color: Colors.textInverse,
+    fontSize: FontSizes.base,
   },
 });
 

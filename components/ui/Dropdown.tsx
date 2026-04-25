@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import { Colors, Fonts, FontSizes, Radius, Shadows, Spacing } from '../../theme';
+import { AppIcon } from './Icon';
 
 interface DropdownProps {
   label?: string;
@@ -26,7 +28,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      
+
       <TouchableOpacity
         style={styles.input}
         onPress={() => setIsOpen(true)}
@@ -36,7 +38,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
         <Text style={[styles.text, !value && styles.placeholder]}>
           {displayText}
         </Text>
-        <Text style={styles.arrow}>▼</Text>
+        <AppIcon name="caret-down" size={16} color={Colors.textMuted} />
       </TouchableOpacity>
 
       <Modal
@@ -45,19 +47,19 @@ export const Dropdown: React.FC<DropdownProps> = ({
         animationType="fade"
         onRequestClose={() => setIsOpen(false)}
       >
-        <TouchableOpacity 
-          style={styles.overlay} 
+        <TouchableOpacity
+          style={styles.overlay}
           activeOpacity={1}
           onPress={() => setIsOpen(false)}
         >
           <View style={styles.modal}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{label || 'Sélectionner'}</Text>
-              <TouchableOpacity onPress={() => setIsOpen(false)}>
-                <Text style={styles.closeButton}>✕</Text>
+              <TouchableOpacity onPress={() => setIsOpen(false)} style={styles.closeBtn}>
+                <AppIcon name="close" size={20} color={Colors.textSecondary} />
               </TouchableOpacity>
             </View>
-            
+
             <ScrollView style={styles.optionsList}>
               {options.map((option) => (
                 <TouchableOpacity
@@ -80,7 +82,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                     {option.label}
                   </Text>
                   {value === option.value && (
-                    <Text style={styles.checkmark}>✓</Text>
+                    <AppIcon name="selection-check" size={18} color={Colors.primary} />
                   )}
                 </TouchableOpacity>
               ))}
@@ -97,78 +99,63 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#444',
-    marginBottom: 8,
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+    color: Colors.charcoal,
+    marginBottom: Spacing.sm,
   },
   input: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F6F6F6',
-    borderRadius: 8,
-    paddingHorizontal: 16,
+    backgroundColor: Colors.backgroundAlt,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
     paddingVertical: 14,
-    borderWidth: 1,
-    borderColor: '#E9E9E9',
+    borderWidth: 1.5,
+    borderColor: Colors.borderLight,
   },
   icon: {
-    marginRight: 12,
+    marginRight: Spacing.sm + 4,
   },
   text: {
     flex: 1,
-    fontSize: 16,
-    color: '#1A1A1A',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
   },
   placeholder: {
-    color: '#999',
-  },
-  arrow: {
-    fontSize: 12,
-    color: '#666',
+    color: Colors.placeholder,
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: Colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: Spacing.lg,
   },
   modal: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
     width: '100%',
     maxWidth: 400,
     maxHeight: '80%',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 5,
-      },
-    }),
+    ...Shadows.md,
   },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    padding: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.md,
+    color: Colors.textPrimary,
   },
-  closeButton: {
-    fontSize: 24,
-    color: '#666',
-    padding: 4,
+  closeBtn: {
+    padding: Spacing.xs,
   },
   optionsList: {
     maxHeight: 400,
@@ -177,25 +164,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.md,
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F6F6F6',
+    borderBottomColor: Colors.borderLight,
   },
   selectedOption: {
-    backgroundColor: '#F0F7FF',
+    backgroundColor: Colors.primarySurface,
   },
   optionText: {
-    fontSize: 16,
-    color: '#1A1A1A',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
   },
   selectedOptionText: {
-    color: '#1464F6',
-    fontWeight: '600',
-  },
-  checkmark: {
-    fontSize: 18,
-    color: '#1464F6',
-    fontWeight: 'bold',
+    fontFamily: Fonts.semiBold,
+    color: Colors.primaryDark,
   },
 });

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { AppIcon } from '../../ui/Icon';
+import { BrandLogo } from '../../ui/BrandLogo';
 import { Colors, Fonts, FontSizes, Radius, Shadows } from '../../../theme';
 
 interface RoleSelectionScreenProps {
@@ -23,9 +24,7 @@ export const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onNavi
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
-        <View style={styles.logo}>
-          <AppIcon name="truck" size={40} color={Colors.navy} />
-        </View>
+        <BrandLogo width={240} height={120} style={styles.logo} />
         <Text style={styles.title}>Bienvenue sur Transporti</Text>
         <Text style={styles.subtitle}>Choisissez votre profil pour continuer</Text>
       </View>
@@ -80,12 +79,6 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   logo: {
-    width: 88,
-    height: 88,
-    backgroundColor: Colors.primary,
-    borderRadius: Radius.xl,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: 20,
     ...Shadows.primaryGlow,
   },

@@ -9,7 +9,8 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import { WebView } from 'react-native-webview';
 import * as Location from 'expo-location';
 import { Button } from '../../ui/Button';
@@ -239,7 +240,7 @@ const MapPickerScreen: React.FC<MapPickerScreenProps> = ({
           }
           style={styles.backButton}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={24} color={Colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {type === 'pickup' ? 'Position de collecte' : 'Position de livraison'}
@@ -283,7 +284,7 @@ const MapPickerScreen: React.FC<MapPickerScreenProps> = ({
 
       <View style={styles.instructionsCard}>
         <Text style={styles.instructionsText}>
-          💡 Appuyez sur la carte ou déplacez le marqueur pour définir votre position exacte
+          Appuyez sur la carte ou déplacez le marqueur pour définir votre position exacte
         </Text>
       </View>
 
@@ -312,97 +313,96 @@ const MapPickerScreen: React.FC<MapPickerScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 36,
-    paddingBottom: 16,
+    paddingBottom: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: Colors.borderLight,
   },
   backButton: {
     width: 40,
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
-  },
-  backIcon: {
-    fontSize: 24,
-    color: '#1A1A1A',
+    marginRight: Spacing.sm + 4,
   },
   headerTitle: {
+    fontFamily: Fonts.semiBold,
     fontSize: 18,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
   },
   addressCard: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: Colors.backgroundAlt,
     marginHorizontal: 20,
-    marginTop: 16,
-    marginBottom: 12,
-    padding: 16,
-    borderRadius: 12,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm + 4,
+    padding: Spacing.md,
+    borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
+    borderColor: Colors.border,
   },
   addressLoading: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.sm + 4,
   },
   addressLoadingText: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   addressLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#666666',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     marginBottom: 6,
     textTransform: 'uppercase',
   },
   addressText: {
+    fontFamily: Fonts.medium,
     fontSize: 15,
-    fontWeight: '500',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
     lineHeight: 22,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.sm + 4,
   },
   loadingText: {
+    fontFamily: Fonts.regular,
     fontSize: 15,
-    color: '#666666',
+    color: Colors.textSecondary,
   },
   mapContainer: {
     flex: 1,
     marginHorizontal: 20,
-    marginBottom: 12,
-    borderRadius: 16,
+    marginBottom: Spacing.sm + 4,
+    borderRadius: Radius.lg,
     overflow: 'hidden',
-    backgroundColor: '#F0F0F0',
+    backgroundColor: Colors.backgroundAlt,
   },
   webview: {
     flex: 1,
     backgroundColor: 'transparent',
   },
   instructionsCard: {
-    backgroundColor: '#E8F3FF',
+    backgroundColor: Colors.primarySurface,
     marginHorizontal: 20,
-    marginTop: 12,
-    marginBottom: 16,
-    padding: 12,
-    borderRadius: 8,
+    marginTop: Spacing.sm + 4,
+    marginBottom: Spacing.md,
+    padding: Spacing.sm + 4,
+    borderRadius: Spacing.sm,
   },
   instructionsText: {
-    fontSize: 13,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
     color: Colors.primary,
     lineHeight: 18,
   },
@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 20,
     paddingBottom: Platform.OS === 'ios' ? 20 : 24,
-    gap: 12,
+    gap: Spacing.sm + 4,
   },
   cancelButton: {
     flex: 1,

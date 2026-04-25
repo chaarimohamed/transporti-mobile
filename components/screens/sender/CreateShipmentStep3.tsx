@@ -10,7 +10,8 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import * as shipmentService from '../../../services/shipment.service';
@@ -145,7 +146,7 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
           onPress={() => onNavigate?.('createShipmentStep2', { ...initialData, acceptTerms })}
           style={styles.backButton}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={22} color={Colors.charcoal} />
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Résumé</Text>
@@ -169,7 +170,7 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
         <Card style={styles.routeCard}>
           <View style={styles.routeItem}>
             <View style={styles.routeIconContainer}>
-              <Text style={styles.routeIcon}>📍</Text>
+              <AppIcon name="map-pin" size={18} color={Colors.primary} />
             </View>
             <View style={styles.routeInfo}>
               <Text style={styles.routeLabel}>COLLECTE</Text>
@@ -193,7 +194,7 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
 
           <View style={styles.routeItem}>
             <View style={styles.routeIconContainer}>
-              <Text style={styles.routeIcon}>📍</Text>
+              <AppIcon name="location-pin" size={18} color={Colors.accent} />
             </View>
             <View style={styles.routeInfo}>
               <Text style={styles.routeLabel}>LIVRAISON</Text>
@@ -263,21 +264,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
-    paddingHorizontal: 24,
+    borderBottomColor: Colors.border,
+    paddingHorizontal: Spacing.lg,
     paddingTop: 72,
     paddingBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
   },
   backButton: {
-    marginRight: 16,
-  },
-  backIcon: {
-    fontSize: 24,
-    color: '#1A1A1A',
+    marginRight: Spacing.md,
   },
   headerContent: {
     flex: 1,
@@ -286,25 +283,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.lg,
+    color: Colors.textPrimary,
   },
   stepIndicator: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   progressContainer: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 24,
-    paddingBottom: 16,
+    backgroundColor: Colors.surface,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#F0F0F0',
-    borderRadius: 2,
+    backgroundColor: Colors.borderLight,
+    borderRadius: Radius.xs,
     overflow: 'hidden',
   },
   progressFill: {
@@ -315,112 +313,112 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 24,
+    padding: Spacing.lg,
     paddingBottom: 120,
   },
   routeCard: {
-    padding: 16,
-    marginBottom: 16,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
   },
   routeItem: {
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.sm + 4,
   },
   routeIconContainer: {
     marginTop: 4,
-  },
-  routeIcon: {
-    fontSize: 18,
   },
   routeInfo: {
     flex: 1,
   },
   routeLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#666666',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     letterSpacing: 0.5,
     marginBottom: 4,
   },
   routeAddress: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
     marginBottom: 4,
   },
   routeDate: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
   },
   divider: {
     height: 1,
-    backgroundColor: '#E9E9E9',
-    marginVertical: 16,
+    backgroundColor: Colors.border,
+    marginVertical: Spacing.md,
   },
   detailsCard: {
-    padding: 16,
-    marginBottom: 16,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
   },
   detailsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
+    gap: Spacing.md,
   },
   detailItem: {
     width: '47%',
   },
   detailLabel: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     marginBottom: 4,
   },
   detailValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
   },
   detailValueSuccess: {
-    color: '#2E8B57',
+    color: Colors.success,
   },
   priceCard: {
     padding: 20,
-    marginBottom: 16,
+    marginBottom: Spacing.md,
     backgroundColor: Colors.background,
   },
   priceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   priceLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
   },
   priceValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.xl,
     color: Colors.primary,
   },
   priceNote: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     fontStyle: 'italic',
   },
   termsRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.sm + 4,
     alignItems: 'flex-start',
     paddingHorizontal: 4,
   },
   checkbox: {
     width: 20,
     height: 20,
-    borderRadius: 6,
+    borderRadius: Radius.xs,
     borderWidth: 2,
-    borderColor: '#E9E9E9',
-    backgroundColor: '#FFFFFF',
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 2,
@@ -429,20 +427,16 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     backgroundColor: Colors.primary,
   },
-  checkmark: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
   termsText: {
     flex: 1,
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     lineHeight: 20,
   },
   termsLink: {
     color: Colors.primary,
-    fontWeight: '600',
+    fontFamily: Fonts.semiBold,
   },
   bottomActions: {
     position: 'absolute',
@@ -450,16 +444,16 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.sm + 4,
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: Spacing.md,
     paddingBottom: Platform.OS === 'ios' ? 34 : 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#E9E9E9',
-    shadowColor: '#000',
+    borderTopColor: Colors.border,
+    shadowColor: Colors.navy,
     shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 10,
   },

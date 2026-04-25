@@ -9,7 +9,8 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -54,7 +55,7 @@ const TransporterProfileScreen: React.FC<TransporterProfileScreenProps> = ({
             style={styles.backButton}
             activeOpacity={0.7}
           >
-            <Text style={styles.backIcon}>←</Text>
+            <AppIcon name="arrow-back" size={24} color={Colors.textPrimary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Profil Transporteur</Text>
           <View style={styles.headerRight} />
@@ -112,7 +113,7 @@ const TransporterProfileScreen: React.FC<TransporterProfileScreenProps> = ({
           style={styles.backButton}
           activeOpacity={0.7}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={24} color={Colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {carrier.firstName} {carrier.lastName}
@@ -131,7 +132,7 @@ const TransporterProfileScreen: React.FC<TransporterProfileScreenProps> = ({
             </View>
             {carrier.verified && (
               <View style={styles.verifiedBadge}>
-                <Text style={styles.verifiedIcon}>✓</Text>
+                <AppIcon name="check-circle" size={14} color={Colors.textInverse} />
               </View>
             )}
           </View>
@@ -146,7 +147,7 @@ const TransporterProfileScreen: React.FC<TransporterProfileScreenProps> = ({
 
           {/* Rating */}
           <View style={styles.ratingRow}>
-            <Text style={styles.starIcon}>⭐</Text>
+            <AppIcon name="star" size={14} color={Colors.primary} />
             <Text style={styles.ratingText}>
               {carrier.averageRating && carrier.averageRating > 0
                 ? `${carrier.averageRating.toFixed(1)} / 5  •  ${carrier.totalReviews ?? 0} avis`
@@ -180,7 +181,7 @@ const TransporterProfileScreen: React.FC<TransporterProfileScreenProps> = ({
         <Button onPress={handleInvite} disabled={isInviting}>
           {isInviting ? (
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <ActivityIndicator color="#FFFFFF" />
+              <ActivityIndicator color={Colors.textInverse} />
               <Text style={styles.primaryButtonText}>Envoi en cours...</Text>
             </View>
           ) : (
@@ -205,12 +206,12 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
     paddingHorizontal: 20,
     paddingTop: 24,
-    paddingBottom: 16,
+    paddingBottom: Spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -223,14 +224,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backIcon: {
-    fontSize: 24,
-    color: '#1A1A1A',
-  },
   headerTitle: {
+    fontFamily: Fonts.semiBold,
     fontSize: 20,
-    fontWeight: '600',
-    color: '#444444',
+    color: Colors.charcoal,
     flex: 1,
     textAlign: 'center',
   },
@@ -250,7 +247,7 @@ const styles = StyleSheet.create({
   },
   avatarContainer: {
     position: 'relative',
-    marginBottom: 16,
+    marginBottom: Spacing.md,
   },
   avatar: {
     width: 80,
@@ -260,12 +257,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 3,
-    borderColor: '#FFFFFF',
+    borderColor: Colors.surface,
   },
   avatarText: {
+    fontFamily: Fonts.semiBold,
     fontSize: 28,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    color: Colors.textInverse,
   },
   verifiedBadge: {
     position: 'absolute',
@@ -274,22 +271,17 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#2E8B57',
+    backgroundColor: Colors.success,
     borderWidth: 3,
-    borderColor: '#FFFFFF',
+    borderColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  verifiedIcon: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
   profileName: {
+    fontFamily: Fonts.semiBold,
     fontSize: 24,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 12,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm + 4,
   },
   ratingRow: {
     flexDirection: 'row',
@@ -298,46 +290,45 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   ratingText: {
-    fontSize: 14,
-    color: '#555555',
-    fontWeight: '500',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   profileInfo: {
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: Spacing.sm + 4,
   },
   infoText: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     marginVertical: 4,
   },
-  starIcon: {
-    fontSize: 14,
-    marginRight: 4,
-  },
   ratingValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
     marginRight: 4,
   },
   ratingDivider: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     marginHorizontal: 4,
   },
   locationText: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   section: {
     marginBottom: 24,
   },
   sectionTitle: {
+    fontFamily: Fonts.semiBold,
     fontSize: 18,
-    fontWeight: '600',
-    color: '#444444',
-    marginBottom: 16,
+    color: Colors.charcoal,
+    marginBottom: Spacing.md,
   },
   infoCard: {
     padding: 20,
@@ -345,16 +336,17 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    paddingVertical: Spacing.sm,
   },
   infoLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666666',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   infoValue: {
-    fontSize: 14,
-    color: '#1A1A1A',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
   },
   bottomSpacer: {
     height: 20,
@@ -364,17 +356,17 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#E9E9E9',
+    borderTopColor: Colors.border,
     padding: 20,
     paddingBottom: 34,
-    gap: 12,
+    gap: Spacing.sm + 4,
   },
   primaryButtonText: {
+    fontFamily: Fonts.semiBold,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    color: Colors.textInverse,
   },
   secondaryButton: {
     height: 56,
@@ -383,9 +375,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   secondaryButtonText: {
+    fontFamily: Fonts.medium,
     fontSize: 16,
-    fontWeight: '500',
-    color: '#666666',
+    color: Colors.textSecondary,
   },
   errorContainer: {
     flex: 1,
@@ -393,8 +385,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   errorText: {
+    fontFamily: Fonts.regular,
     fontSize: 16,
-    color: '#666666',
+    color: Colors.textSecondary,
   },
 });
 

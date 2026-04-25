@@ -11,11 +11,12 @@ import {
   Alert,
   Modal,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Picker } from '@react-native-picker/picker';
 import { Button } from '../../ui/Button';
+import { AppIcon } from '../../ui/Icon';
 import { openAndroidDatePicker } from '../../../utils/androidDatePicker';
 
 interface ShipmentStep1Data {
@@ -135,7 +136,7 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
           onPress={() => onNavigate?.('dashboard')}
           style={styles.backButton}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={22} color={Colors.charcoal} />
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Nouvelle expédition</Text>
@@ -164,7 +165,7 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
               onPress={handleAddPhoto}
               activeOpacity={0.7}
             >
-              <Text style={styles.addPhotoIcon}>+</Text>
+              <AppIcon name="add-photo" size={28} color={Colors.primary} />
             </TouchableOpacity>
 
             {photos.map((photo, index) => (
@@ -175,7 +176,7 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
                   onPress={() => handleRemovePhoto(index)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.removePhotoIcon}>✕</Text>
+                  <AppIcon name="close" size={10} color={Colors.textInverse} />
                 </TouchableOpacity>
               </View>
             ))}
@@ -189,11 +190,11 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
             style={styles.pickerInputContainer}
             onPress={handleOpenDatePicker}
           >
-            <Text style={styles.inputIcon}>📅</Text>
+            <AppIcon name="date-field" size={18} color={Colors.textMuted} />
             <Text style={styles.pickerText}>
               {formatDate(pickupDate)}
             </Text>
-            <Text style={styles.dropdownIcon}>▼</Text>
+            <AppIcon name="caret-down" size={16} color={Colors.textMuted} />
           </TouchableOpacity>
         </View>
 
@@ -239,11 +240,11 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
             style={styles.pickerInputContainer}
             onPress={() => setShowWeightPicker(true)}
           >
-            <Text style={styles.inputIcon}>⚖️</Text>
+            <AppIcon name="weight" size={18} color={Colors.textMuted} />
             <Text style={[styles.pickerText, !weightRange && styles.pickerPlaceholder]}>
               {weightRange || 'Sélectionner le poids'}
             </Text>
-            <Text style={styles.dropdownIcon}>▼</Text>
+            <AppIcon name="caret-down" size={16} color={Colors.textMuted} />
           </TouchableOpacity>
         </View>
 
@@ -317,21 +318,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
-    paddingHorizontal: 24,
+    borderBottomColor: Colors.border,
+    paddingHorizontal: Spacing.lg,
     paddingTop: 72,
     paddingBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
   },
   backButton: {
-    marginRight: 16,
-  },
-  backIcon: {
-    fontSize: 24,
-    color: '#1A1A1A',
+    marginRight: Spacing.md,
   },
   headerContent: {
     flex: 1,
@@ -340,25 +337,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.lg,
+    color: Colors.textPrimary,
   },
   stepIndicator: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   progressContainer: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 24,
-    paddingBottom: 16,
+    backgroundColor: Colors.surface,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#F0F0F0',
-    borderRadius: 2,
+    backgroundColor: Colors.borderLight,
+    borderRadius: Radius.xs,
     overflow: 'hidden',
   },
   progressFill: {
@@ -369,17 +367,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 24,
+    padding: Spacing.lg,
     paddingBottom: 120,
   },
   section: {
     marginBottom: 20,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 8,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm,
     marginLeft: 4,
   },
   photosContainer: {
@@ -390,17 +388,13 @@ const styles = StyleSheet.create({
   addPhotoButton: {
     width: 80,
     height: 80,
-    borderRadius: 16,
+    borderRadius: Radius.md,
     borderWidth: 1,
     borderStyle: 'dashed',
     borderColor: Colors.primary,
-    backgroundColor: Colors.primary + '0D', // 5% opacity
+    backgroundColor: Colors.primarySurface,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  addPhotoIcon: {
-    fontSize: 32,
-    color: Colors.primary,
   },
   photoPreview: {
     width: 80,
@@ -430,12 +424,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: '#FFFFFF',
-  },
-  removePhotoIcon: {
-    fontSize: 10,
-    color: '#FFFFFF',
-    fontWeight: 'bold',
+    borderColor: Colors.surface,
   },
   inputContainer: {
     position: 'relative',
@@ -461,32 +450,33 @@ const styles = StyleSheet.create({
   pickerInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E9E9E9',
-    paddingHorizontal: 16,
+    backgroundColor: Colors.backgroundAlt,
+    borderRadius: Radius.md,
+    borderWidth: 1.5,
+    borderColor: Colors.borderLight,
+    paddingHorizontal: Spacing.md,
     paddingVertical: 14,
-    gap: 12,
+    gap: Spacing.sm + 4,
   },
   pickerText: {
     flex: 1,
     minWidth: 0,
-    fontSize: 16,
-    color: '#1A1A1A',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
   },
   pickerPlaceholder: {
-    color: '#999',
+    color: Colors.placeholder,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: Colors.overlay,
     justifyContent: 'flex-end',
   },
   pickerModal: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: Colors.surface,
+    borderTopLeftRadius: Radius.xl,
+    borderTopRightRadius: Radius.xl,
     paddingBottom: Platform.OS === 'ios' ? 34 : 16,
   },
   pickerHeader: {
@@ -494,23 +484,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingVertical: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
   },
   pickerTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
   },
   pickerCancelButton: {
-    fontSize: 16,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textSecondary,
   },
   pickerDoneButton: {
-    fontSize: 16,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
     color: Colors.primary,
-    fontWeight: '600',
   },
   picker: {
     width: '100%',
@@ -528,16 +519,16 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.sm + 4,
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: Spacing.md,
     paddingBottom: Platform.OS === 'ios' ? 34 : 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#E9E9E9',
-    shadowColor: '#000',
+    borderTopColor: Colors.border,
+    shadowColor: Colors.navy,
     shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 10,
   },

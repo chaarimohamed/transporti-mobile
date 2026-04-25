@@ -10,7 +10,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -161,7 +162,7 @@ const ShipmentFeedbackScreen: React.FC<ShipmentFeedbackScreenProps> = ({ route, 
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.stateContainer}>
-          <Text style={styles.stateIcon}>⚠️</Text>
+          <View style={{ marginBottom: 12 }}><AppIcon name="alert-triangle" size={28} color={Colors.primary} /></View>
           <Text style={styles.stateTitle}>Impossible d'afficher cette évaluation</Text>
           <Text style={styles.stateText}>{error || 'Expédition introuvable'}</Text>
           <Button onPress={handleGoBack} size="lg">
@@ -176,7 +177,7 @@ const ShipmentFeedbackScreen: React.FC<ShipmentFeedbackScreenProps> = ({ route, 
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={handleGoBack}>
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={20} color={Colors.textPrimary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{title}</Text>
         <View style={styles.headerSpacer} />
@@ -306,29 +307,25 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingTop: 72,
-    paddingBottom: 16,
-    backgroundColor: '#FFFFFF',
+    paddingBottom: Spacing.md,
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
   },
   backButton: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: Radius.full,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.background,
   },
-  backIcon: {
-    fontSize: 20,
-    color: '#1A1A1A',
-  },
   headerTitle: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: Spacing.sm + 4,
+    fontFamily: Fonts.semiBold,
     fontSize: 18,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
   },
   headerSpacer: {
     width: 32,
@@ -337,30 +334,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    padding: Spacing.md,
     paddingBottom: 160,
   },
   heroCard: {
-    marginBottom: 16,
+    marginBottom: Spacing.md,
     padding: 20,
-    backgroundColor: '#0F172A',
+    backgroundColor: Colors.navy,
     borderWidth: 0,
   },
   heroEyebrow: {
-    color: '#93C5FD',
-    fontSize: 13,
-    fontWeight: '700',
-    marginBottom: 8,
+    color: Colors.primaryLight,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    marginBottom: Spacing.sm,
   },
   heroTitle: {
-    color: '#FFFFFF',
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 8,
+    color: Colors.textInverse,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.xl,
+    marginBottom: Spacing.sm,
   },
   heroSubtitle: {
-    color: '#D7E3F4',
-    fontSize: 14,
+    color: Colors.placeholder,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
     lineHeight: 20,
     marginBottom: 20,
   },
@@ -371,66 +369,68 @@ const styles = StyleSheet.create({
   routePill: {
     flex: 1,
     borderRadius: 14,
-    padding: 12,
+    padding: Spacing.sm + 4,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   routePillLabel: {
-    color: '#A5B4C7',
-    fontSize: 11,
+    color: Colors.textMuted,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
     textTransform: 'uppercase',
     marginBottom: 4,
   },
   routePillValue: {
-    color: '#FFFFFF',
-    fontSize: 13,
-    fontWeight: '600',
+    color: Colors.textInverse,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
   },
   formCard: {
-    marginBottom: 16,
+    marginBottom: Spacing.md,
     padding: 18,
   },
   sectionTitle: {
+    fontFamily: Fonts.semiBold,
     fontSize: 16,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
     marginBottom: 6,
   },
   sectionSubtitle: {
-    fontSize: 13,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
     lineHeight: 18,
-    color: '#666666',
+    color: Colors.textSecondary,
     marginBottom: 14,
   },
   starsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: Spacing.sm + 4,
   },
   starButton: {
     width: 52,
     height: 52,
-    borderRadius: 16,
+    borderRadius: Spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: Colors.backgroundAlt,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: Colors.border,
   },
   starButtonActive: {
-    backgroundColor: '#FFF4CC',
-    borderColor: '#F59E0B',
+    backgroundColor: Colors.primarySurface,
+    borderColor: Colors.primary,
   },
   starText: {
     fontSize: 24,
-    color: '#CBD5E1',
+    color: Colors.border,
   },
   starTextActive: {
-    color: '#F59E0B',
+    color: Colors.primary,
   },
   ratingCaption: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
     marginBottom: 22,
     textAlign: 'center',
   },
@@ -438,48 +438,51 @@ const styles = StyleSheet.create({
     minHeight: 132,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#D7DCE2',
-    backgroundColor: '#FAFBFC',
-    paddingHorizontal: 16,
+    borderColor: Colors.border,
+    backgroundColor: Colors.backgroundAlt,
+    paddingHorizontal: Spacing.md,
     paddingVertical: 14,
+    fontFamily: Fonts.regular,
     fontSize: 15,
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
   },
   commentCount: {
-    marginTop: 8,
+    marginTop: Spacing.sm,
     textAlign: 'right',
-    fontSize: 12,
-    color: '#8B8B8B',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textMuted,
   },
   infoCard: {
-    marginBottom: 16,
+    marginBottom: Spacing.md,
     padding: 18,
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E7EDF5',
+    backgroundColor: Colors.surface,
+    borderColor: Colors.borderLight,
     borderWidth: 1,
   },
   infoTitle: {
+    fontFamily: Fonts.semiBold,
     fontSize: 15,
-    fontWeight: '700',
-    color: '#102A43',
-    marginBottom: 8,
+    color: Colors.navy,
+    marginBottom: Spacing.sm,
   },
   infoText: {
-    fontSize: 14,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
     lineHeight: 20,
-    color: '#52606D',
+    color: Colors.textSecondary,
   },
   footer: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    paddingHorizontal: 16,
-    paddingTop: 12,
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.sm + 4,
     paddingBottom: 24,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#E9E9E9',
+    borderTopColor: Colors.border,
     gap: 10,
   },
   stateContainer: {
@@ -488,22 +491,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 24,
   },
-  stateIcon: {
-    fontSize: 28,
-    marginBottom: 12,
-  },
   stateTitle: {
+    fontFamily: Fonts.semiBold,
     fontSize: 18,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 8,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm,
     textAlign: 'center',
   },
   stateText: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     textAlign: 'center',
-    marginVertical: 12,
+    marginVertical: Spacing.sm + 4,
   },
 });
 

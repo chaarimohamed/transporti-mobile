@@ -13,6 +13,7 @@ import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
+import { AppIcon } from '../../ui/Icon';
 
 interface PaymentErrorScreenProps {
   route?: { 
@@ -148,7 +149,7 @@ const PaymentErrorScreen: React.FC<PaymentErrorScreenProps> = ({
             style={styles.backButton}
             onPress={() => onNavigate?.('activeMissions')}
           >
-            <Text style={styles.backIcon}>←</Text>
+            <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Confirmer la livraison</Text>
           <View style={{ width: 40 }} />
@@ -156,7 +157,7 @@ const PaymentErrorScreen: React.FC<PaymentErrorScreenProps> = ({
 
         {/* Error Banner */}
         <View style={styles.errorBanner}>
-          <Text style={styles.errorIcon}>⚠️</Text>
+          <AppIcon name="alert-triangle" size={24} color={Colors.error} />
           <View style={styles.errorText}>
             <Text style={styles.errorTitle}>Code incorrect</Text>
             <Text style={styles.errorSubtitle}>
@@ -191,7 +192,7 @@ const PaymentErrorScreen: React.FC<PaymentErrorScreenProps> = ({
             ))}
           </View>
           <View style={styles.errorMessageRow}>
-            <Text style={styles.errorMessageIcon}>⚠️</Text>
+            <AppIcon name="alert-triangle" size={14} color={Colors.error} />
             <Text style={styles.errorMessage}>Code invalide</Text>
           </View>
         </View>

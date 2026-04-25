@@ -15,6 +15,7 @@ import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import BottomNav from '../../ui/BottomNav';
+import { AppIcon, AppIconName } from '../../ui/Icon';
 import * as notificationService from '../../../services/notification.service';
 import * as shipmentService from '../../../services/shipment.service';
 
@@ -134,20 +135,20 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
     }
   };
 
-  const getNotificationIcon = (type: string) => {
+  const getNotificationIcon = (type: string): AppIconName => {
     switch (type) {
       case 'SHIPMENT_INVITATION':
-        return '📬';
+        return 'package-box';
       case 'REQUEST_ACCEPTED':
-        return '✅';
+        return 'check-circle';
       case 'REQUEST_REJECTED':
-        return '❌';
+        return 'x-circle';
       case 'SHIPMENT_IN_TRANSIT':
-        return '🚛';
+        return 'truck';
       case 'SHIPMENT_DELIVERED':
-        return '📦';
+        return 'package-open';
       default:
-        return '🔔';
+        return 'notification-bell';
     }
   };
 
@@ -195,14 +196,17 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
       >
         {error ? (
           <Card style={styles.errorCard}>
-            <Text style={styles.errorText}>⚠️ {error}</Text>
+            <View style={styles.errorRow}>
+              <AppIcon name="alert-triangle" size={16} color={Colors.error} />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
             <TouchableOpacity onPress={fetchNotifications} style={styles.retryButton}>
               <Text style={styles.retryText}>Réessayer</Text>
             </TouchableOpacity>
           </Card>
         ) : notifications.length === 0 ? (
           <Card style={styles.emptyCard}>
-            <Text style={styles.emptyIcon}>🔔</Text>
+            <AppIcon name="notification-bell" size={48} color={Colors.textMuted} />
             <Text style={styles.emptyTitle}>Aucune notification</Text>
             <Text style={styles.emptyText}>
               Vous recevrez ici les invitations et mises à jour sur vos expéditions
@@ -212,9 +216,9 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
           notifications.map((notification) => (
             <Card key={notification.id} style={styles.notificationCard}>
               <View style={styles.notificationHeader}>
-                <Text style={styles.notificationIcon}>
-                  {getNotificationIcon(notification.type)}
-                </Text>
+                <View style={styles.notificationIcon}>
+                  <AppIcon name={getNotificationIcon(notification.type)} size={20} color={Colors.primary} />
+                </View>
                 <View style={styles.notificationContent}>
                   <Text style={styles.notificationTitle}>{notification.title}</Text>
                   <Text style={styles.notificationMessage}>{notification.message}</Text>
@@ -248,7 +252,10 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
                   onPress={() => handleViewShipment(notification)}
                   activeOpacity={0.7}
                 >
-                  <Text style={styles.viewButtonText}>Voir les détails →</Text>
+                  <View style={styles.viewButtonContent}>
+                    <Text style={styles.viewButtonText}>Voir les détails</Text>
+                    <AppIcon name="arrow-right" size={14} color={Colors.primary} />
+                  </View>
                 </TouchableOpacity>
               )}
             </Card>
@@ -308,10 +315,15 @@ const styles = StyleSheet.create({
     borderColor: '#FCA5A5',
     marginBottom: 16,
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
   errorText: {
     fontSize: 14,
     color: Colors.error,
-    marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {
@@ -355,14 +367,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   notificationIcon: {
-    fontSize: 20,
     width: 40,
     height: 40,
-    lineHeight: 40,
-    textAlign: 'center',
     backgroundColor: Colors.background,
     borderRadius: 20,
-    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   notificationContent: {
     flex: 1,
@@ -424,6 +434,11 @@ const styles = StyleSheet.create({
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  viewButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   viewButtonText: {
     fontSize: 14,

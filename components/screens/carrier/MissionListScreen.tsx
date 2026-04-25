@@ -12,6 +12,7 @@ import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import Badge from '../../ui/Badge';
 import BottomNav from '../../ui/BottomNav';
+import { AppIcon } from '../../ui/Icon';
 import { useAuth } from '../../../contexts/AuthContext';
 import * as shipmentService from '../../../services/shipment.service';
 import * as notificationService from '../../../services/notification.service';
@@ -141,14 +142,17 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
           </View>
         ) : error ? (
           <Card style={styles.errorCard}>
-            <Text style={styles.errorText}>⚠️ {error}</Text>
+            <View style={styles.errorRow}>
+              <AppIcon name="alert-triangle" size={16} color={Colors.error} />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
             <TouchableOpacity onPress={fetchShipments} style={styles.retryButton}>
               <Text style={styles.retryText}>Réessayer</Text>
             </TouchableOpacity>
           </Card>
         ) : displayedShipments.length === 0 ? (
           <Card style={styles.emptyCard}>
-            <Text style={styles.emptyIcon}>📦</Text>
+            <AppIcon name="package-box" size={48} color={Colors.textMuted} />
             <Text style={styles.emptyText}>
               {activeFilter === 'Proches'
                 ? 'Aucune mission dans votre région'
@@ -175,25 +179,34 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
                 <Card style={styles.missionCard}>
                   <View style={styles.missionHeader}>
                     <View style={styles.routeContainer}>
-                      <Text style={styles.routeText} numberOfLines={1}>
-                        {shipment.from} <Text style={styles.routeArrow}>→</Text> {shipment.to}
-                      </Text>
+                      <View style={styles.routeRow}>
+                        <Text style={styles.routePoint} numberOfLines={1}>
+                          {shipment.from}
+                        </Text>
+                        <AppIcon name="arrow-right" size={14} color={Colors.textMuted} />
+                        <Text style={styles.routePoint} numberOfLines={1}>
+                          {shipment.to}
+                        </Text>
+                      </View>
                     </View>
                     <Text style={styles.priceText}>{shipment.price} TND</Text>
                   </View>
 
                   <View style={styles.badgesContainer}>
                     <Badge status="neutral" text={shipment.cargo || 'Marchandise'} />
-                    {isInvited && <Badge status="warning" text="Invité 📬" />}
+                    {isInvited && <Badge status="warning" text="Invité" />}
                     {isNew && <Badge status="warning" text="Nouveau" />}
                   </View>
 
-                  <Text style={styles.dateText}>
-                    📅 {new Date(shipment.createdAt).toLocaleDateString('fr-FR', {
-                      day: 'numeric',
-                      month: 'short',
-                    })}
-                  </Text>
+                  <View style={styles.dateRow}>
+                    <AppIcon name="calendar" size={14} color={Colors.textMuted} />
+                    <Text style={styles.dateText}>
+                      {new Date(shipment.createdAt).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                      })}
+                    </Text>
+                  </View>
                 </Card>
               </TouchableOpacity>
             );
@@ -273,14 +286,23 @@ const styles = StyleSheet.create({
     minWidth: 0,
     marginRight: 12,
   },
+  routeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
   routeText: {
     fontSize: 15,
     fontWeight: 'bold',
     color: '#1A1A1A',
     marginBottom: 4,
   },
-  routeArrow: {
-    color: '#999',
+  routePoint: {
+    flex: 1,
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#1A1A1A',
   },
   priceText: {
     fontSize: 16,
@@ -293,10 +315,15 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 8,
   },
+  dateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 2,
+  },
   dateText: {
     fontSize: 12,
     color: '#666666',
-    marginTop: 2,
     flexShrink: 1,
   },
   loadingContainer: {
@@ -315,10 +342,15 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.errorSurface,
     borderColor: '#FCA5A5',
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
   errorText: {
     fontSize: 14,
     color: Colors.error,
-    marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {

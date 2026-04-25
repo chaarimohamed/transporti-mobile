@@ -9,6 +9,7 @@ import {
   Switch,
 } from 'react-native';
 import { Colors } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 
 interface NotificationSettingsScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
@@ -32,7 +33,7 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
           style={styles.backButton}
           onPress={() => onNavigate?.('profile')}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={18} color="#1A1A1A" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
         <View style={styles.placeholder} />
@@ -47,7 +48,9 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
         <View style={styles.settingsCard}>
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>🔔</Text>
+              <View style={styles.settingIcon}>
+                <AppIcon name="notification-bell" size={20} color={Colors.primary} />
+              </View>
               <View style={styles.settingTexts}>
                 <Text style={styles.settingLabel}>Push Mobile</Text>
                 <Text style={styles.settingDescription}>
@@ -67,7 +70,9 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
 
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>✉️</Text>
+              <View style={styles.settingIcon}>
+                <AppIcon name="email" size={20} color={Colors.primary} />
+              </View>
               <View style={styles.settingTexts}>
                 <Text style={styles.settingLabel}>Email</Text>
                 <Text style={styles.settingDescription}>
@@ -88,7 +93,9 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
         <View style={styles.settingsCard}>
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>🔄</Text>
+              <View style={styles.settingIcon}>
+                <AppIcon name="refresh" size={20} color={Colors.primary} />
+              </View>
               <View style={styles.settingTexts}>
                 <Text style={styles.settingLabel}>Mises à jour de statut</Text>
                 <Text style={styles.settingDescription}>
@@ -108,7 +115,9 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
 
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>📦</Text>
+              <View style={styles.settingIcon}>
+                <AppIcon name="package-box" size={20} color={Colors.primary} />
+              </View>
               <View style={styles.settingTexts}>
                 <Text style={styles.settingLabel}>Nouvelles offres de mission</Text>
                 <Text style={styles.settingDescription}>
@@ -128,7 +137,9 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
 
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>💬</Text>
+              <View style={styles.settingIcon}>
+                <AppIcon name="chat" size={20} color={Colors.primary} />
+              </View>
               <View style={styles.settingTexts}>
                 <Text style={styles.settingLabel}>Messages reçus</Text>
                 <Text style={styles.settingDescription}>
@@ -148,7 +159,9 @@ const NotificationSettingsScreen: React.FC<NotificationSettingsScreenProps> = ({
 
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Text style={styles.settingIcon}>🎁</Text>
+              <View style={styles.settingIcon}>
+                <AppIcon name="star-rating" size={20} color={Colors.primary} />
+              </View>
               <View style={styles.settingTexts}>
                 <Text style={styles.settingLabel}>Promotions et actus</Text>
                 <Text style={styles.settingDescription}>
@@ -240,8 +253,11 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   settingIcon: {
-    fontSize: 24,
+    width: 24,
+    height: 24,
     marginRight: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   settingTexts: {
     flex: 1,

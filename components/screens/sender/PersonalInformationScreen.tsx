@@ -10,7 +10,8 @@ import {
   Platform,
   Image,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { Input } from '../../ui/Input';
@@ -201,7 +202,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
           style={styles.backButton}
           onPress={() => onNavigate?.('profile')}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Informations personnelles</Text>
         <View style={styles.placeholder} />
@@ -219,7 +220,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
               {photoUri ? (
                 <Image source={{ uri: photoUri }} style={styles.avatarImage} />
               ) : (
-                <Text style={styles.avatarIcon}>👤</Text>
+                <AppIcon name="profile-user" size={40} color={Colors.textMuted} />
               )}
             </View>
           </View>
@@ -266,7 +267,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
               <Text style={dateOfBirth ? styles.dateButtonText : styles.dateButtonPlaceholder}>
                 {dateOfBirth || 'JJ/MM/AAAA'}
               </Text>
-              <Text style={styles.dateIcon}>📅</Text>
+              <AppIcon name="date-field" size={20} color={Colors.textSecondary} />
             </TouchableOpacity>
             {showDatePicker && (
               <DateTimePicker
@@ -337,29 +338,25 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: Spacing.md,
     paddingTop: 72,
-    paddingBottom: 20,
-    backgroundColor: '#FFFFFF',
+    paddingBottom: Spacing.md,
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
   },
   backButton: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: Radius.full,
     backgroundColor: Colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backIcon: {
-    fontSize: 20,
-    color: '#1A1A1A',
-  },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.md,
+    color: Colors.textPrimary,
     flex: 1,
     textAlign: 'center',
   },
@@ -370,7 +367,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 24,
+    padding: Spacing.lg,
     paddingBottom: 40,
   },
   photoSection: {
@@ -379,7 +376,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   photoContainer: {
-    marginRight: 16,
+    marginRight: Spacing.md,
   },
   avatar: {
     width: 80,
@@ -389,7 +386,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#E9E9E9',
+    borderColor: Colors.border,
     overflow: 'hidden',
   },
   avatarImage: {
@@ -397,118 +394,115 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
   },
-  avatarIcon: {
-    fontSize: 40,
-    opacity: 0.5,
-  },
   photoTextContainer: {
     flex: 1,
     justifyContent: 'center',
     minWidth: 0,
   },
   photoDescription: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     lineHeight: 18,
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   changePhotoLink: {
-    fontSize: 14,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
     color: Colors.primary,
-    fontWeight: '600',
   },
   form: {
-    gap: 16,
+    gap: Spacing.md,
   },
   row: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: Spacing.sm + 4,
   },
   halfInput: {
     flex: 1,
     flexBasis: 150,
   },
   phoneContainer: {
-    marginTop: 8,
+    marginTop: Spacing.sm,
   },
   phoneLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#444444',
-    marginBottom: 8,
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+    color: Colors.charcoal,
+    marginBottom: Spacing.sm,
   },
   phoneRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: Spacing.sm,
   },
   countryCode: {
     width: 80,
     height: 56,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
-    borderRadius: 12,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
     justifyContent: 'center',
     alignItems: 'center',
   },
   countryCodeText: {
-    fontSize: 14,
-    color: '#1A1A1A',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
   },
   phoneInput: {
     flex: 1,
     minWidth: 0,
   },
   changeNumberLink: {
-    fontSize: 14,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
     color: Colors.primary,
-    fontWeight: '600',
-    marginTop: 8,
+    marginTop: Spacing.sm,
     textAlign: 'right',
   },
   dateLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#444444',
-    marginBottom: 8,
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+    color: Colors.charcoal,
+    marginBottom: Spacing.sm,
   },
   dateButton: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
-    borderRadius: 12,
-    paddingHorizontal: 16,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
     paddingVertical: 18,
   },
   dateButtonText: {
     flex: 1,
-    fontSize: 15,
-    color: '#1A1A1A',
-    marginRight: 12,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
+    marginRight: Spacing.sm + 4,
   },
   dateButtonPlaceholder: {
     flex: 1,
-    fontSize: 15,
-    color: '#AAAAAA',
-    marginRight: 12,
-  },
-  dateIcon: {
-    fontSize: 18,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.placeholder,
+    marginRight: Spacing.sm + 4,
   },
   dateConfirmButton: {
-    marginTop: 8,
+    marginTop: Spacing.sm,
     alignItems: 'flex-end',
     paddingRight: 4,
   },
   dateConfirmText: {
-    fontSize: 14,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
     color: Colors.primary,
-    fontWeight: '600',
   },
   buttonContainer: {
     marginTop: 32,

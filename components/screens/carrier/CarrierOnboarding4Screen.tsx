@@ -6,7 +6,8 @@ import {
   SafeAreaView,
   Animated,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Spacing } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 import { Button } from '../../ui/Button';
 import { updateProfile, uploadDocuments } from '../../../services/authService';
 
@@ -80,7 +81,7 @@ const CarrierOnboarding4Screen: React.FC<CarrierOnboarding4ScreenProps> = ({
           ]}
         >
           <View style={styles.successCircle}>
-            <Text style={styles.checkIcon}>✓</Text>
+            <AppIcon name="check-circle" size={48} color={Colors.surface} />
           </View>
         </Animated.View>
 
@@ -95,15 +96,15 @@ const CarrierOnboarding4Screen: React.FC<CarrierOnboarding4ScreenProps> = ({
         {/* Features List */}
         <View style={styles.featuresList}>
           <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>🚚</Text>
+            <View style={{ marginRight: 16 }}><AppIcon name="truck" size={24} color={Colors.primary} /></View>
             <Text style={styles.featureText}>Trouvez des missions près de vous</Text>
           </View>
           <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>💰</Text>
+            <View style={{ marginRight: 16 }}><AppIcon name="wallet" size={24} color={Colors.primary} /></View>
             <Text style={styles.featureText}>Gagnez de l'argent en livrant</Text>
           </View>
           <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>⭐</Text>
+            <View style={{ marginRight: 16 }}><AppIcon name="star" size={24} color={Colors.primary} /></View>
             <Text style={styles.featureText}>Construisez votre réputation</Text>
           </View>
         </View>
@@ -127,11 +128,11 @@ const CarrierOnboarding4Screen: React.FC<CarrierOnboarding4ScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
   },
   content: {
     flex: 1,
-    padding: 24,
+    padding: Spacing.lg,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -143,18 +144,19 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#E9E9E9',
+    backgroundColor: Colors.border,
     borderRadius: 2,
     overflow: 'hidden',
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   progressFill: {
     height: '100%',
     backgroundColor: Colors.primary,
   },
   progressText: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
   iconContainer: {
@@ -164,19 +166,14 @@ const styles = StyleSheet.create({
     width: 96,
     height: 96,
     borderRadius: 48,
-    backgroundColor: '#2E8B57',
+    backgroundColor: Colors.success,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#2E8B57',
+    shadowColor: Colors.success,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
-  },
-  checkIcon: {
-    fontSize: 48,
-    fontWeight: '700',
-    color: '#FFFFFF',
   },
   messageContainer: {
     alignItems: 'center',
@@ -184,15 +181,16 @@ const styles = StyleSheet.create({
     maxWidth: 320,
   },
   title: {
+    fontFamily: Fonts.semiBold,
     fontSize: 32,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 12,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm + 4,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -204,15 +202,12 @@ const styles = StyleSheet.create({
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-  },
-  featureIcon: {
-    fontSize: 24,
-    marginRight: 16,
+    paddingVertical: Spacing.sm + 4,
   },
   featureText: {
-    fontSize: 14,
-    color: '#444444',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.charcoal,
     flex: 1,
   },
   buttonContainer: {

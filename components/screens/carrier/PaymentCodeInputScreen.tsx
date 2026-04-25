@@ -14,6 +14,7 @@ import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
+import { AppIcon } from '../../ui/Icon';
 import * as missionService from '../../../services/mission.service';
 
 interface PaymentCodeInputScreenProps {
@@ -138,7 +139,7 @@ const PaymentCodeInputScreen: React.FC<PaymentCodeInputScreenProps> = ({
             style={styles.backButton}
             onPress={() => onNavigate?.('activeMissions')}
           >
-            <Text style={styles.backIcon}>←</Text>
+            <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Confirmer la livraison</Text>
           <View style={styles.missionBadge}>
@@ -150,7 +151,7 @@ const PaymentCodeInputScreen: React.FC<PaymentCodeInputScreenProps> = ({
         <Card style={styles.orderCard}>
           <View style={styles.orderHeader}>
             <View style={styles.iconCircle}>
-              <Text style={styles.packageIcon}>📦</Text>
+              <AppIcon name="package-box" size={28} color={Colors.primary} />
             </View>
             <View style={styles.orderInfo}>
               <Text style={styles.orderLabel}>Livraison à</Text>
@@ -172,7 +173,7 @@ const PaymentCodeInputScreen: React.FC<PaymentCodeInputScreenProps> = ({
 
         {/* Instructions Banner */}
         <View style={styles.instructionBanner}>
-          <Text style={styles.lightbulbIcon}>💡</Text>
+          <AppIcon name="info-circle" size={20} color={Colors.primary} />
           <View style={styles.instructionText}>
             <Text style={styles.instructionTitle}>Demandez le code de paiement</Text>
             <Text style={styles.instructionSubtitle}>

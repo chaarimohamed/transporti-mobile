@@ -4,6 +4,7 @@ import { Colors } from '../../../theme';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
 import { Dropdown } from '../../ui/Dropdown';
+import { AppIcon } from '../../ui/Icon';
 import { useAuth } from '../../../contexts/AuthContext';
 
 interface CarrierRegisterScreenProps {
@@ -182,7 +183,7 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
     >
       <ScrollView contentContainerStyle={styles.content}>
         <TouchableOpacity onPress={() => onNavigate('roleSelection')} style={styles.backButton}>
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
         </TouchableOpacity>
 
         <View style={styles.header}>
@@ -192,7 +193,10 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
 
         {error ? (
           <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>⚠️ {error}</Text>
+            <View style={styles.errorRow}>
+              <AppIcon name="alert-triangle" size={16} color={Colors.error} />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
           </View>
         ) : null}
 
@@ -204,7 +208,7 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
                 placeholder="Flen"
                 value={firstName}
                 onChangeText={(v) => { setFirstName(v); setFieldErrors(e => ({ ...e, firstName: '' })); }}
-                icon={<Text>👤</Text>}
+                icon={<AppIcon name="profile-user" size={18} color={Colors.textMuted} />}
               />
               {fieldErrors.firstName ? <Text style={styles.fieldError}>{fieldErrors.firstName}</Text> : null}
             </View>
@@ -225,7 +229,7 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
             value={phone}
             onChangeText={(v) => { setPhone(v); setFieldErrors(e => ({ ...e, phone: '' })); }}
             keyboardType="phone-pad"
-            icon={<Text>📱</Text>}
+            icon={<AppIcon name="phone" size={18} color={Colors.textMuted} />}
           />
           {fieldErrors.phone ? <Text style={styles.fieldError}>{fieldErrors.phone}</Text> : null}
 
@@ -235,7 +239,7 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
             value={email}
             onChangeText={(v) => { setEmail(v); setFieldErrors(e => ({ ...e, email: '' })); }}
             keyboardType="email-address"
-            icon={<Text>✉️</Text>}
+            icon={<AppIcon name="email" size={18} color={Colors.textMuted} />}
           />
           {fieldErrors.email ? <Text style={styles.fieldError}>{fieldErrors.email}</Text> : null}
 
@@ -245,7 +249,7 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
             value={gouvernerat}
             onValueChange={(v) => { setGouvernerat(v); setFieldErrors(e => ({ ...e, gouvernerat: '' })); }}
             options={gouverneratOptions}
-            icon={<Text>📍</Text>}
+            icon={<AppIcon name="location-pin" size={18} color={Colors.textMuted} />}
           />
           {fieldErrors.gouvernerat ? <Text style={styles.fieldError}>{fieldErrors.gouvernerat}</Text> : null}
 
@@ -256,7 +260,7 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
             onChangeText={(v) => { setLicense(v); setFieldErrors(e => ({ ...e, license: '' })); }}
             keyboardType="default"
             maxLength={12}
-            icon={<Text>🚗</Text>}
+            icon={<AppIcon name="truck" size={18} color={Colors.textMuted} />}
           />
           {fieldErrors.license ? <Text style={styles.fieldError}>{fieldErrors.license}</Text> : null}
 
@@ -365,6 +369,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 8,
+  },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   errorText: {
     color: Colors.error,

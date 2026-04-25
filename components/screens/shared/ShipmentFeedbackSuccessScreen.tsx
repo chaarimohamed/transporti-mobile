@@ -2,6 +2,8 @@ import React from 'react';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Button } from '../../ui/Button';
 import { useAuth } from '../../../contexts/AuthContext';
+import { Colors, Fonts, FontSizes, Radius } from '../../../theme';
+import { AppIcon } from '../../ui/Icon';
 
 interface ShipmentFeedbackSuccessScreenProps {
   route?: {
@@ -49,7 +51,7 @@ const ShipmentFeedbackSuccessScreen: React.FC<ShipmentFeedbackSuccessScreenProps
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.iconWrap}>
-          <Text style={styles.iconText}>✓</Text>
+          <AppIcon name="check-circle" size={42} color={Colors.success} />
         </View>
 
         <Text style={styles.title}>Évaluation enregistrée</Text>
@@ -89,7 +91,7 @@ const ShipmentFeedbackSuccessScreen: React.FC<ShipmentFeedbackSuccessScreenProps
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFDF8',
+    backgroundColor: Colors.background,
   },
   content: {
     flex: 1,
@@ -103,25 +105,21 @@ const styles = StyleSheet.create({
     borderRadius: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#DFF6E9',
+    backgroundColor: 'rgba(45, 158, 107, 0.12)',
     marginBottom: 24,
   },
-  iconText: {
-    fontSize: 42,
-    color: '#1F8A5B',
-    fontWeight: '700',
-  },
   title: {
+    fontFamily: Fonts.semiBold,
     fontSize: 26,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
     textAlign: 'center',
     marginBottom: 10,
   },
   subtitle: {
+    fontFamily: Fonts.regular,
     fontSize: 15,
     lineHeight: 22,
-    color: '#5C6773',
+    color: Colors.textSecondary,
     textAlign: 'center',
     marginBottom: 18,
   },
@@ -132,35 +130,36 @@ const styles = StyleSheet.create({
   },
   star: {
     fontSize: 28,
-    color: '#D0D7DE',
+    color: Colors.border,
   },
   starActive: {
-    color: '#F59E0B',
+    color: Colors.primary,
   },
   summaryCard: {
     width: '100%',
     borderRadius: 24,
     padding: 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderWidth: 1,
-    borderColor: '#F0E6D5',
+    borderColor: Colors.borderLight,
   },
   summaryTitle: {
+    fontFamily: Fonts.semiBold,
     fontSize: 16,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    color: Colors.textPrimary,
     marginBottom: 10,
   },
   summaryText: {
-    fontSize: 14,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
     lineHeight: 21,
-    color: '#5C6773',
+    color: Colors.textSecondary,
     marginBottom: 10,
   },
   summaryMeta: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#A16207',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.primaryDark,
     textTransform: 'capitalize',
   },
   footer: {
@@ -168,8 +167,8 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 24,
     borderTopWidth: 1,
-    borderTopColor: '#EEE5D9',
-    backgroundColor: '#FFFFFF',
+    borderTopColor: Colors.borderLight,
+    backgroundColor: Colors.surface,
     gap: 10,
   },
 });

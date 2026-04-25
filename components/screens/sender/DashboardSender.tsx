@@ -240,7 +240,10 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
               activeOpacity={0.7}
               onPress={() => onNavigate && onNavigate('shipmentList')}
             >
-              <Text style={styles.seeAllLink}>Voir tout →</Text>
+              <View style={styles.linkWithIcon}>
+                <Text style={styles.seeAllLink}>Voir tout</Text>
+                <AppIcon name="arrow-right" size={14} color={Colors.accent} />
+              </View>
             </TouchableOpacity>
           </View>
 
@@ -251,7 +254,10 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
             </View>
           ) : error ? (
             <Card style={styles.errorCard}>
-              <Text style={styles.errorText}>⚠️ {error}</Text>
+              <View style={styles.errorRow}>
+                <AppIcon name="alert-triangle" size={16} color={Colors.error} />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
               <TouchableOpacity onPress={fetchData} style={styles.retryButton}>
                 <Text style={styles.retryText}>Réessayer</Text>
               </TouchableOpacity>
@@ -294,7 +300,10 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
                           activeOpacity={0.7}
                           onPress={(e) => { e.stopPropagation?.(); onNavigate?.('suggestedTransporters', { shipmentId: shipment.id, shipment }); }}
                         >
-                          <Text style={styles.searchTransporterLink}>Chercher un transporteur →</Text>
+                          <View style={styles.linkWithIcon}>
+                            <Text style={styles.searchTransporterLink}>Chercher un transporteur</Text>
+                            <AppIcon name="arrow-right" size={14} color={Colors.accent} />
+                          </View>
                         </TouchableOpacity>
                       )}
                     </View>
@@ -430,6 +439,11 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.sm,
     color: Colors.accent,
   },
+  linkWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   shipmentCard: {
     marginBottom: 12,
   },
@@ -494,11 +508,16 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.errorSurface,
     borderColor: 'rgba(217,45,32,0.2)',
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
   errorText: {
     fontFamily: Fonts.regular,
     fontSize: FontSizes.sm,
     color: Colors.error,
-    marginBottom: 12,
     textAlign: 'center',
   },
   retryButton: {

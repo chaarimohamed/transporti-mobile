@@ -11,6 +11,7 @@ import {
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import Badge from '../../ui/Badge';
+import { AppIcon } from '../../ui/Icon';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 
@@ -157,12 +158,12 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
           {/* Card Footer */}
           <View style={styles.cardFooter}>
             <View style={styles.paymentMethodContainer}>
-              <Text style={styles.cardIcon}>💳</Text>
+              <AppIcon name="wallet" size={16} color={Colors.textMuted} />
               <Text style={styles.paymentMethodText}>{item.paymentMethod}</Text>
             </View>
             <View style={styles.viewReceiptContainer}>
               <Text style={styles.viewReceiptText}>Voir reçu</Text>
-              <Text style={styles.chevronIcon}>›</Text>
+              <AppIcon name="chevron-right" size={16} color={Colors.textMuted} />
             </View>
           </View>
         </Card>
@@ -189,7 +190,7 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
           style={styles.backButton}
           onPress={() => onNavigate?.('activeMissions')}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Facturation</Text>
         <View style={styles.filterButton} />
@@ -251,14 +252,14 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
           historyItems.map(renderHistoryCard)
         ) : (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>📦</Text>
+            <AppIcon name="package-box" size={48} color={Colors.textMuted} />
             <Text style={styles.emptyText}>Aucun paiement trouvé</Text>
           </View>
         )}
 
         {/* End of History */}
         <View style={styles.endOfHistoryContainer}>
-          <Text style={styles.calendarIcon}>📅</Text>
+          <AppIcon name="calendar" size={16} color={Colors.textMuted} />
           <Text style={styles.endOfHistoryText}>Fin de l'historique</Text>
         </View>
       </ScrollView>

@@ -10,10 +10,11 @@ import {
   Modal,
   Platform,
 } from 'react-native';
-import { Colors } from '../../../theme';
+import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import { Picker } from '@react-native-picker/picker';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
+import { AppIcon } from '../../ui/Icon';
 
 interface CreateShipmentStep2Props {
   onNavigate?: (screen: string, data?: any) => void;
@@ -62,7 +63,7 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
           })}
           style={styles.backButton}
         >
-          <Text style={styles.backIcon}>←</Text>
+          <AppIcon name="arrow-back" size={22} color={Colors.charcoal} />
         </TouchableOpacity>
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Détails supplémentaires</Text>
@@ -95,7 +96,7 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
               {format === 'L' && 'Taille L - Boîte moyenne'}
               {format === 'XL' && 'Taille XL - Grande boîte ou meuble'}
             </Text>
-            <Text style={styles.dropdownIcon}>▼</Text>
+            <AppIcon name="caret-down" size={16} color={Colors.textMuted} />
           </TouchableOpacity>
         </View>
 
@@ -143,7 +144,7 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
             activeOpacity={0.7}
           >
             <View style={[styles.checkbox, showDimensions && styles.checkboxActive]}>
-              {showDimensions && <Text style={styles.checkmark}>✓</Text>}
+              {showDimensions && <AppIcon name="selection-check" size={12} color={Colors.textInverse} weight="bold" />}
             </View>
             <Text style={styles.checkboxLabel}>
               Connaissez-vous les dimensions exactes ?
@@ -208,7 +209,7 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
         <Card style={styles.insuranceCard}>
           <View style={styles.insuranceContent}>
             <View style={styles.insuranceIcon}>
-              <Text style={styles.insuranceIconText}>🛡️</Text>
+              <AppIcon name="insurance-shield" size={22} color={Colors.primary} />
             </View>
             <View style={styles.insuranceInfo}>
               <Text style={styles.insuranceTitle}>Assurance</Text>
@@ -253,21 +254,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
-    paddingHorizontal: 24,
+    borderBottomColor: Colors.border,
+    paddingHorizontal: Spacing.lg,
     paddingTop: 72,
     paddingBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
   },
   backButton: {
-    marginRight: 16,
-  },
-  backIcon: {
-    fontSize: 24,
-    color: '#1A1A1A',
+    marginRight: Spacing.md,
   },
   headerContent: {
     flex: 1,
@@ -276,25 +273,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.lg,
+    color: Colors.textPrimary,
   },
   stepIndicator: {
-    fontSize: 14,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textSecondary,
   },
   progressContainer: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 24,
-    paddingBottom: 16,
+    backgroundColor: Colors.surface,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#F0F0F0',
-    borderRadius: 2,
+    backgroundColor: Colors.borderLight,
+    borderRadius: Radius.xs,
     overflow: 'hidden',
   },
   progressFill: {
@@ -305,54 +303,51 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 24,
+    padding: Spacing.lg,
     paddingBottom: 120,
   },
   section: {
     marginBottom: 20,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
-    marginBottom: 8,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
+    marginBottom: Spacing.sm,
     marginLeft: 4,
   },
   selectWrapper: {
     position: 'relative',
   },
-  dropdownIcon: {
-    fontSize: 12,
-    color: '#666666',
-  },
   pickerInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.md,
     borderWidth: 2,
     borderColor: Colors.primary,
-    paddingHorizontal: 16,
+    paddingHorizontal: Spacing.md,
     paddingVertical: 14,
-    gap: 12,
+    gap: Spacing.sm + 4,
   },
   pickerText: {
     flex: 1,
-    fontSize: 15,
-    color: '#1A1A1A',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
   },
   pickerPlaceholder: {
-    color: '#999',
+    color: Colors.placeholder,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: Colors.overlay,
     justifyContent: 'flex-end',
   },
   pickerModal: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: Colors.surface,
+    borderTopLeftRadius: Radius.xl,
+    borderTopRightRadius: Radius.xl,
     paddingBottom: Platform.OS === 'ios' ? 34 : 16,
   },
   pickerHeader: {
@@ -360,23 +355,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingVertical: Spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
+    borderBottomColor: Colors.border,
   },
   pickerTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
   },
   pickerCancelButton: {
-    fontSize: 16,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textSecondary,
   },
   pickerDoneButton: {
-    fontSize: 16,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
     color: Colors.primary,
-    fontWeight: '600',
   },
   picker: {
     width: '100%',
@@ -384,17 +380,17 @@ const styles = StyleSheet.create({
   checkboxRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.sm + 4,
     paddingVertical: 4,
-    marginBottom: 12,
+    marginBottom: Spacing.sm + 4,
   },
   checkbox: {
     width: 20,
     height: 20,
-    borderRadius: 6,
+    borderRadius: Radius.xs,
     borderWidth: 2,
-    borderColor: '#E9E9E9',
-    backgroundColor: '#FFFFFF',
+    borderColor: Colors.border,
+    backgroundColor: Colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -402,136 +398,87 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     backgroundColor: Colors.primary,
   },
-  checkmark: {
-    color: '#FFFFFF',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
   checkboxLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
   },
   dimensionsGrid: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 12,
+    gap: Spacing.sm + 4,
+    marginTop: Spacing.sm + 4,
   },
   dimensionInput: {
     flex: 1,
     gap: 6,
   },
   dimensionLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#666666',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
   },
   dimensionField: {
     height: 48,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.md,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
-    paddingHorizontal: 12,
-    fontSize: 14,
-    color: '#1A1A1A',
+    borderColor: Colors.border,
+    paddingHorizontal: Spacing.sm + 4,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.sm,
+    color: Colors.textPrimary,
     textAlign: 'center',
   },
   textArea: {
     height: 120,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    backgroundColor: Colors.surface,
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    borderColor: '#E9E9E9',
-    padding: 16,
-    fontSize: 15,
-    color: '#1A1A1A',
-  },
-  inputWithIcon: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 48,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E9E9E9',
-    paddingHorizontal: 16,
-    gap: 12,
-  },
-  inputIconText: {
-    fontSize: 18,
-  },
-  textInput: {
-    flex: 1,
-    fontSize: 15,
-    color: '#1A1A1A',
+    borderColor: Colors.border,
+    padding: Spacing.md,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
   },
   insuranceCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
-    marginTop: 8,
+    padding: Spacing.md,
+    marginTop: Spacing.sm,
   },
   insuranceContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.sm + 4,
     flex: 1,
   },
   insuranceIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: Colors.primary + '1A',
+    backgroundColor: Colors.primarySurface,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  insuranceIconText: {
-    fontSize: 20,
   },
   insuranceInfo: {
     flex: 1,
   },
   insuranceTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1A1A',
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
     marginBottom: 2,
   },
   insuranceSubtitle: {
-    fontSize: 12,
-    color: '#666666',
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
   },
   insuranceOffLabel: {
-    fontSize: 14,
-    color: '#999999',
-    fontWeight: '500',
-  },
-  toggle: {
-    width: 48,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#E9E9E9',
-    padding: 2,
-    justifyContent: 'center',
-  },
-  toggleActive: {
-    backgroundColor: Colors.primary,
-  },
-  toggleThumb: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  toggleThumbActive: {
-    alignSelf: 'flex-end',
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+    color: Colors.placeholder,
   },
   bottomActions: {
     position: 'absolute',
@@ -539,16 +486,16 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    gap: 12,
+    gap: Spacing.sm + 4,
     paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingTop: Spacing.md,
     paddingBottom: Platform.OS === 'ios' ? 34 : 20,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: Colors.surface,
     borderTopWidth: 1,
-    borderTopColor: '#E9E9E9',
-    shadowColor: '#000',
+    borderTopColor: Colors.border,
+    shadowColor: Colors.navy,
     shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 10,
   },
