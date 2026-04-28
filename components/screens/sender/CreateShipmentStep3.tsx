@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
+  Image,
 } from 'react-native';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import { AppIcon } from '../../ui/Icon';
@@ -35,10 +36,32 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
     }
   }, [initialData]);
 
-  const estimatedPrice = calculatePrice(initialData);
+  const distanceKm = (() => {
+    const p = initialData?.pickupCoordinates;
+    const d = initialData?.deliveryCoordinates;
+    if (p?.lat && p?.lng && d?.lat && d?.lng) {
+      const R = 6371;
+      const dLat = ((d.lat - p.lat) * Math.PI) / 180;
+      const dLng = ((d.lng - p.lng) * Math.PI) / 180;
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos((p.lat * Math.PI) / 180) *
+          Math.cos((d.lat * Math.PI) / 180) *
+          Math.sin(dLng / 2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+    return null;
+  })();
 
-  function calculatePrice(data: any): number {
+  const estimatedPrice = calculatePrice(initialData, distanceKm);
+
+  function calculatePrice(data: any, distKm: number | null): number {
     let basePrice = 50;
+    
+    // Distance pricing
+    if (distKm !== null) {
+      basePrice += Math.round(distKm * 0.5);
+    }
     
     // Weight pricing
     if (data?.weightRange) {
@@ -203,11 +226,24 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
               </Text>
             </View>
           </View>
+
+          {distanceKm !== null && (
+            <View style={styles.distanceRow}>
+              <AppIcon name="route" size={14} color={Colors.textSecondary} />
+              <Text style={styles.distanceText}>Distance estimée : {Math.round(distanceKm)} km</Text>
+            </View>
+          )}
         </Card>
 
         {/* Package Details */}
         <Card style={styles.detailsCard}>
           <View style={styles.detailsGrid}>
+            {initialData?.itemName && (
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>Article</Text>
+                <Text style={styles.detailValue}>{initialData.itemName}</Text>
+              </View>
+            )}
             <View style={styles.detailItem}>
               <Text style={styles.detailLabel}>Type</Text>
               <Text style={styles.detailValue}>
@@ -222,6 +258,22 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
             </View>
           </View>
         </Card>
+
+        {/* Photos */}
+        {initialData?.photos?.length > 0 && (
+          <Card style={styles.photosCard}>
+            <Text style={styles.photosTitle}>Photos du colis</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.photosScroll}>
+              {initialData.photos.map((photo: any, index: number) => (
+                <Image
+                  key={index}
+                  source={{ uri: typeof photo === 'string' ? photo : photo.uri }}
+                  style={styles.photoThumb}
+                />
+              ))}
+            </ScrollView>
+          </Card>
+        )}
 
         {/* Price */}
         <Card style={styles.priceCard}>
@@ -405,6 +457,38 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.xs,
     color: Colors.textSecondary,
     fontStyle: 'italic',
+  },
+  distanceRow: {
+    alignItems: 'center',
+    borderTopColor: Colors.borderLight,
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    gap: Spacing.xs,
+    marginTop: Spacing.sm + 4,
+    paddingTop: Spacing.sm + 4,
+  },
+  distanceText: {
+    color: Colors.textSecondary,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+  },
+  photosCard: {
+    marginBottom: Spacing.md,
+    padding: Spacing.md,
+  },
+  photosScroll: {
+    marginTop: Spacing.sm,
+  },
+  photosTitle: {
+    color: Colors.textPrimary,
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+  },
+  photoThumb: {
+    borderRadius: Radius.sm,
+    height: 80,
+    marginRight: Spacing.sm,
+    width: 80,
   },
   termsRow: {
     flexDirection: 'row',

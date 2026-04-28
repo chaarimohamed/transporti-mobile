@@ -128,7 +128,7 @@ const AddressDeliveryScreen: React.FC<AddressDeliveryScreenProps> = ({
         >
           <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Définir le trajet</Text>
+        <Text style={styles.headerTitle}>Adresse de livraison</Text>
       </View>
 
       {/* Address Input */}
@@ -191,8 +191,8 @@ const AddressDeliveryScreen: React.FC<AddressDeliveryScreenProps> = ({
             onValueChange={(val) => setDeliveryHelperCount(parseInt(val))}
             options={[
               { label: 'Non', value: '0' },
-              { label: '1 personne (+15 DT)', value: '1' },
-              { label: '2 personnes (+30 DT)', value: '2' },
+              { label: '1 personne', value: '1' },
+              { label: '2 personnes', value: '2' },
             ]}
           />
         </View>
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.accent,
     marginTop: 4,
   },
   inputWrapper: {

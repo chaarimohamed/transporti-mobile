@@ -2,7 +2,7 @@ import apiClient, { ApiResponse, handleApiError } from './api.service';
 
 export interface Notification {
   id: string;
-  type: 'CARRIER_REQUEST' | 'SHIPMENT_INVITATION' | 'REQUEST_ACCEPTED' | 'REQUEST_REJECTED' | 'SHIPMENT_IN_TRANSIT' | 'SHIPMENT_DELIVERED';
+  type: 'CARRIER_REQUEST' | 'SHIPMENT_INVITATION' | 'REQUEST_ACCEPTED' | 'REQUEST_REJECTED' | 'HANDOVER_REQUESTED' | 'HANDOVER_CONFIRMED' | 'SHIPMENT_IN_TRANSIT' | 'SHIPMENT_DELIVERED';
   title: string;
   message: string;
   read: boolean;

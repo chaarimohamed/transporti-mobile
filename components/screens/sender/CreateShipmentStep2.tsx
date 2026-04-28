@@ -7,11 +7,10 @@ import {
   TouchableOpacity,
   SafeAreaView,
   TextInput,
-  Modal,
   Platform,
 } from 'react-native';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
-import { Picker } from '@react-native-picker/picker';
+import { Armchair, Briefcase } from 'phosphor-react-native';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import { AppIcon } from '../../ui/Icon';
@@ -27,7 +26,6 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
 }) => {
   // Initialise directly from initialData so values are always restored on back-navigation
   const [format, setFormat] = useState(initialData?.format || 'M');
-  const [showFormatPicker, setShowFormatPicker] = useState(false);
   const [showDimensions, setShowDimensions] = useState(!!initialData?.dimensions);
   const [height, setHeight] = useState(String(initialData?.dimensions?.height || ''));
   const [width, setWidth] = useState(String(initialData?.dimensions?.width || ''));
@@ -86,55 +84,68 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
         {/* Package Format */}
         <View style={styles.section}>
           <Text style={styles.label}>Format du colis</Text>
-          <TouchableOpacity
-            style={styles.pickerInputContainer}
-            onPress={() => setShowFormatPicker(true)}
-          >
-            <Text style={[styles.pickerText, !format && styles.pickerPlaceholder]}>
-              {format === 'S' && 'Taille S - Tient dans une boîte à chaussures'}
-              {format === 'M' && 'Taille M - Petit sac ou boîte'}
-              {format === 'L' && 'Taille L - Boîte moyenne'}
-              {format === 'XL' && 'Taille XL - Grande boîte ou meuble'}
-            </Text>
-            <AppIcon name="caret-down" size={16} color={Colors.textMuted} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Format Picker Modal */}
-        <Modal
-          visible={showFormatPicker}
-          transparent
-          animationType="slide"
-          onRequestClose={() => setShowFormatPicker(false)}
-        >
-          <TouchableOpacity 
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPress={() => setShowFormatPicker(false)}
-          >
-            <View style={styles.pickerModal}>
-              <View style={styles.pickerHeader}>
-                <TouchableOpacity onPress={() => setShowFormatPicker(false)}>
-                  <Text style={styles.pickerCancelButton}>Annuler</Text>
-                </TouchableOpacity>
-                <Text style={styles.pickerTitle}>Format du colis</Text>
-                <TouchableOpacity onPress={() => setShowFormatPicker(false)}>
-                  <Text style={styles.pickerDoneButton}>Terminé</Text>
-                </TouchableOpacity>
-              </View>
-              <Picker
-                selectedValue={format}
-                onValueChange={(itemValue) => setFormat(itemValue)}
-                style={styles.picker}
+          <View style={styles.formatGrid}>
+            {[
+              {
+                value: 'S',
+                label: 'Petit colis',
+                subtitle: 'Document',
+                examples: 'Vêtements, chaussures, livres',
+                icon: <AppIcon name="package" size={26} color={format === 'S' ? Colors.primary : Colors.textMuted} />,
+              },
+              {
+                value: 'M',
+                label: 'Sac / Valise',
+                subtitle: 'Moyen',
+                examples: 'Bagages, électronique, caisses',
+                icon: <Briefcase size={26} color={format === 'M' ? Colors.primary : Colors.textMuted} weight="duotone" />,
+              },
+              {
+                value: 'L',
+                label: 'Meuble / Électroménager',
+                subtitle: 'Grand',
+                examples: 'Frigo, canapé, télévision',
+                icon: <Armchair size={26} color={format === 'L' ? Colors.primary : Colors.textMuted} weight="duotone" />,
+              },
+              {
+                value: 'XL',
+                label: 'Déménagement',
+                subtitle: 'Très grand',
+                examples: 'Piano, armoire, contenu entier',
+                icon: <AppIcon name="truck" size={26} color={format === 'XL' ? Colors.primary : Colors.textMuted} />,
+              },
+            ].map((option) => (
+              <TouchableOpacity
+                key={option.value}
+                style={[
+                  styles.formatCard,
+                  format === option.value && styles.formatCardSelected,
+                ]}
+                onPress={() => setFormat(option.value)}
+                activeOpacity={0.7}
               >
-                <Picker.Item label="Taille S - Boîte à chaussures" value="S" />
-                <Picker.Item label="Taille M - Petit sac ou boîte" value="M" />
-                <Picker.Item label="Taille L - Boîte moyenne" value="L" />
-                <Picker.Item label="Taille XL - Grande boîte" value="XL" />
-              </Picker>
-            </View>
-          </TouchableOpacity>
-        </Modal>
+                <View style={styles.formatCardIcon}>{option.icon}</View>
+                <View style={styles.formatCardInfo}>
+                  <Text style={[
+                    styles.formatCardLabel,
+                    format === option.value && styles.formatCardLabelSelected,
+                  ]}>
+                    {option.label}
+                  </Text>
+                  <Text style={styles.formatCardExamples}>{option.examples}</Text>
+                </View>
+                <View style={[
+                  styles.formatCardRadio,
+                  format === option.value && styles.formatCardRadioSelected,
+                ]}>
+                  {format === option.value && (
+                    <View style={styles.formatCardRadioDot} />
+                  )}
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
 
         {/* Dimensions Checkbox */}
         <View style={styles.section}>
@@ -319,63 +330,66 @@ const styles = StyleSheet.create({
   selectWrapper: {
     position: 'relative',
   },
-  pickerInputContainer: {
+  formatGrid: {
+    gap: Spacing.sm + 4,
+  },
+  formatCard: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: Colors.surface,
     borderRadius: Radius.md,
-    borderWidth: 2,
-    borderColor: Colors.primary,
+    borderWidth: 1.5,
+    borderColor: Colors.borderLight,
     paddingHorizontal: Spacing.md,
-    paddingVertical: 14,
-    gap: Spacing.sm + 4,
-  },
-  pickerText: {
-    flex: 1,
-    fontFamily: Fonts.regular,
-    fontSize: FontSizes.base,
-    color: Colors.textPrimary,
-  },
-  pickerPlaceholder: {
-    color: Colors.placeholder,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: Colors.overlay,
-    justifyContent: 'flex-end',
-  },
-  pickerModal: {
-    backgroundColor: Colors.surface,
-    borderTopLeftRadius: Radius.xl,
-    borderTopRightRadius: Radius.xl,
-    paddingBottom: Platform.OS === 'ios' ? 34 : 16,
-  },
-  pickerHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
     paddingVertical: Spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    gap: Spacing.md,
   },
-  pickerTitle: {
+  formatCardSelected: {
+    borderColor: Colors.primary,
+    backgroundColor: Colors.primarySurface,
+  },
+  formatCardIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  formatCardInfo: {
+    flex: 1,
+  },
+  formatCardLabel: {
     fontFamily: Fonts.semiBold,
-    fontSize: FontSizes.base,
+    fontSize: FontSizes.sm,
     color: Colors.textPrimary,
+    marginBottom: 2,
   },
-  pickerCancelButton: {
-    fontFamily: Fonts.regular,
-    fontSize: FontSizes.base,
-    color: Colors.textSecondary,
-  },
-  pickerDoneButton: {
-    fontFamily: Fonts.semiBold,
-    fontSize: FontSizes.base,
+  formatCardLabelSelected: {
     color: Colors.primary,
   },
-  picker: {
-    width: '100%',
+  formatCardExamples: {
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
+  },
+  formatCardRadio: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: Colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  formatCardRadioSelected: {
+    borderColor: Colors.primary,
+  },
+  formatCardRadioDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: Colors.primary,
   },
   checkboxRow: {
     flexDirection: 'row',

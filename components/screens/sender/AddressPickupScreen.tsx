@@ -129,7 +129,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
         >
           <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Définir le trajet</Text>
+        <Text style={styles.headerTitle}>Adresse de collecte</Text>
       </View>
 
       {/* Address Input */}
@@ -192,8 +192,8 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
             onValueChange={(val) => setHelperCount(parseInt(val))}
             options={[
               { label: 'Non', value: '0' },
-              { label: '1 personne (+15 DT)', value: '1' },
-              { label: '2 personnes (+30 DT)', value: '2' },
+              { label: '1 personne', value: '1' },
+              { label: '2 personnes', value: '2' },
             ]}
           />
         </View>

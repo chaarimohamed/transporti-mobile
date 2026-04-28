@@ -109,6 +109,8 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
         return 'x-circle';
       case 'SHIPMENT_IN_TRANSIT':
         return 'truck';
+      case 'HANDOVER_REQUESTED':
+        return 'truck';
       case 'SHIPMENT_DELIVERED':
         return 'package-open';
       default:
@@ -127,6 +129,7 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
         };
       case 'SHIPMENT_INVITATION':
       case 'SHIPMENT_IN_TRANSIT':
+      case 'HANDOVER_REQUESTED':
         return {
           bg: 'rgba(20, 100, 246, 0.1)',
           text: Colors.primary,

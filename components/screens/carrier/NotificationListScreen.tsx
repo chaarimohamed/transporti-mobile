@@ -145,6 +145,8 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
         return 'x-circle';
       case 'SHIPMENT_IN_TRANSIT':
         return 'truck';
+      case 'HANDOVER_CONFIRMED':
+        return 'check-circle';
       case 'SHIPMENT_DELIVERED':
         return 'package-open';
       default:

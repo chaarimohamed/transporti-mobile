@@ -5,6 +5,7 @@ import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, P
 import * as SplashScreenNative from 'expo-splash-screen';
 import { Colors } from './theme';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { registerForPushNotificationsAsync, registerTokenWithBackend } from './services/pushNotification.service';
 import { SplashScreen } from './components/screens/auth/SplashScreen';
 import { RoleSelectionScreen } from './components/screens/auth/RoleSelectionScreen';
 import { LoginScreen } from './components/screens/auth/LoginScreen';
@@ -84,6 +85,17 @@ function AppContent() {
       setCurrentScreen('roleSelection');
     }
   }, [isAuthenticated, isLoading]);
+
+  // Register push token once the user is authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      registerForPushNotificationsAsync().then((token) => {
+        if (token) {
+          registerTokenWithBackend(token);
+        }
+      });
+    }
+  }, [isAuthenticated, user]);
 
   if (!fontsLoaded) {
     return null;

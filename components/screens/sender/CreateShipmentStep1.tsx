@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
+  TextInput,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -14,12 +15,12 @@ import {
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Picker } from '@react-native-picker/picker';
 import { Button } from '../../ui/Button';
 import { AppIcon } from '../../ui/Icon';
 import { openAndroidDatePicker } from '../../../utils/androidDatePicker';
 
 interface ShipmentStep1Data {
+  itemName?: string;
   photos?: { uri: string; base64: string }[];
   pickupDate?: string;
   weightRange?: string;
@@ -34,6 +35,7 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
   onNavigate,
   initialData,
 }) => {
+  const [itemName, setItemName] = useState('');
   const [photos, setPhotos] = useState<{ uri: string; base64: string }[]>([]);
   const [pickupDate, setPickupDate] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -42,6 +44,9 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
 
   // Restore state from initialData when navigating back
   useEffect(() => {
+    if (initialData?.itemName) {
+      setItemName(initialData.itemName);
+    }
     if (initialData?.photos) {
       setPhotos(initialData.photos);
     }
@@ -119,6 +124,7 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
 
   const handleNext = () => {
     const data = {
+      itemName,
       photos,
       pickupDate: formatDate(pickupDate),
       weightRange,
@@ -156,6 +162,19 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
       >
+        {/* Item Name */}
+        <View style={styles.section}>
+          <Text style={styles.label}>Nom de l'article</Text>
+          <TextInput
+            style={styles.nameInput}
+            placeholder="Ex: Canapé, réfrigérateur, guitare..."
+            placeholderTextColor={Colors.placeholder}
+            value={itemName}
+            onChangeText={setItemName}
+            returnKeyType="done"
+          />
+        </View>
+
         {/* Photo Upload */}
         <View style={styles.section}>
           <Text style={styles.label}>Ajouter des photos</Text>
@@ -274,18 +293,37 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
                   <Text style={styles.pickerDoneButton}>Terminé</Text>
                 </TouchableOpacity>
               </View>
-              <Picker
-                selectedValue={weightRange}
-                onValueChange={(itemValue) => setWeightRange(itemValue)}
-                style={styles.picker}
-              >
-                <Picker.Item label="Sélectionner le poids" value="" />
-                <Picker.Item label="Moins de 5 kg" value="<5" />
-                <Picker.Item label="Entre 5 kg et 30 kg" value="5-30" />
-                <Picker.Item label="Entre 30 kg et 50 kg" value="30-50" />
-                <Picker.Item label="Entre 50 kg et 100 kg" value="50-100" />
-                <Picker.Item label="Plus de 100 kg" value=">100" />
-              </Picker>
+              <ScrollView style={styles.pickerOptionsList}>
+                {[
+                  { label: 'Moins de 5 kg', value: '<5' },
+                  { label: 'Entre 5 kg et 30 kg', value: '5-30' },
+                  { label: 'Entre 30 kg et 50 kg', value: '30-50' },
+                  { label: 'Entre 50 kg et 100 kg', value: '50-100' },
+                  { label: 'Plus de 100 kg', value: '>100' },
+                ].map((option) => (
+                  <TouchableOpacity
+                    key={option.value}
+                    style={[
+                      styles.pickerOption,
+                      weightRange === option.value && styles.pickerOptionSelected,
+                    ]}
+                    onPress={() => {
+                      setWeightRange(option.value);
+                      setShowWeightPicker(false);
+                    }}
+                  >
+                    <Text style={[
+                      styles.pickerOptionText,
+                      weightRange === option.value && styles.pickerOptionTextSelected,
+                    ]}>
+                      {option.label}
+                    </Text>
+                    {weightRange === option.value && (
+                      <AppIcon name="selection-check" size={18} color={Colors.primary} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </TouchableOpacity>
           </TouchableOpacity>
         </Modal>
@@ -503,15 +541,43 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.base,
     color: Colors.primary,
   },
+  nameInput: {
+    backgroundColor: Colors.backgroundAlt,
+    borderRadius: Radius.md,
+    borderWidth: 1.5,
+    borderColor: Colors.borderLight,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 14,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
+  },
+  pickerOptionsList: {
+    maxHeight: 300,
+  },
   picker: {
     width: '100%',
   },
-  selectWrapper: {
-    position: 'relative',
+  pickerOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderLight,
   },
-  dropdownIcon: {
-    fontSize: 12,
-    color: '#666666',
+  pickerOptionSelected: {
+    backgroundColor: Colors.primarySurface,
+  },
+  pickerOptionText: {
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.base,
+    color: Colors.textPrimary,
+  },
+  pickerOptionTextSelected: {
+    fontFamily: Fonts.semiBold,
+    color: Colors.primary,
   },
   bottomActions: {
     position: 'absolute',
