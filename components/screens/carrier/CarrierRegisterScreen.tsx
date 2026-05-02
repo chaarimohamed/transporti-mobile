@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
 import { Colors } from '../../../theme';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
@@ -24,6 +24,33 @@ const isValidMatricule = (val: string) => /^\d{7}[A-Za-z]$/.test(val.trim());
 // Immatriculation tunisienne: 1-3 digits, optional space, TN, optional space, 1-4 digits
 const isValidLicense = (val: string) => /^\d{1,3}\s?TN\s?\d{1,4}$/.test(val.trim());
 
+const parseLicenseValue = (val: string) => {
+  const match = val.trim().match(/^(\d{1,3})\s*(?:TN|تونس)\s*(\d{1,4})$/i);
+  return {
+    front: match?.[1] ?? '',
+    back: match?.[2] ?? '',
+  };
+};
+
+const buildLicenseValue = (front: string, back: string) => {
+  const normalizedFront = front.trim();
+  const normalizedBack = back.trim();
+
+  if (!normalizedFront && !normalizedBack) {
+    return '';
+  }
+
+  if (!normalizedFront) {
+    return `TN ${normalizedBack}`;
+  }
+
+  if (!normalizedBack) {
+    return `${normalizedFront} TN`;
+  }
+
+  return `${normalizedFront} TN ${normalizedBack}`;
+};
+
 export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ onNavigate, initialData }) => {
   const { register } = useAuth();
   const [firstName, setFirstName] = useState('');
@@ -31,7 +58,8 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [gouvernerat, setGouvernerat] = useState('');
-  const [license, setLicense] = useState('');
+  const [licenseFront, setLicenseFront] = useState('');
+  const [licenseBack, setLicenseBack] = useState('');
   const [matricule, setMatricule] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -49,7 +77,11 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
       if (fd.phone !== undefined) setPhone(fd.phone);
       if (fd.email !== undefined) setEmail(fd.email);
       if (fd.gouvernerat !== undefined) setGouvernerat(fd.gouvernerat);
-      if (fd.license !== undefined) setLicense(fd.license);
+      if (fd.license !== undefined) {
+        const parsedLicense = parseLicenseValue(fd.license);
+        setLicenseFront(parsedLicense.front);
+        setLicenseBack(parsedLicense.back);
+      }
       if (fd.matricule !== undefined) setMatricule(fd.matricule);
       if (fd.password !== undefined) setPassword(fd.password);
       if (fd.confirmPassword !== undefined) setConfirmPassword(fd.confirmPassword);
@@ -59,7 +91,7 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
 
   const currentFormData = () => ({
     firstName, lastName, phone, email, gouvernerat,
-    license, matricule, password, confirmPassword, acceptedTerms,
+    license: buildLicenseValue(licenseFront, licenseBack), matricule, password, confirmPassword, acceptedTerms,
   });
 
   const gouverneratOptions = [
@@ -91,6 +123,7 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
 
   const handleRegister = async () => {
     setError('');
+    const license = buildLicenseValue(licenseFront, licenseBack);
 
     // Per-field validation
     const errors: Record<string, string> = {};
@@ -182,11 +215,10 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.content}>
-        <TouchableOpacity onPress={() => onNavigate('roleSelection')} style={styles.backButton}>
-          <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
-        </TouchableOpacity>
-
         <View style={styles.header}>
+          <TouchableOpacity onPress={() => onNavigate('roleSelection')} style={styles.backButton}>
+            <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
+          </TouchableOpacity>
           <Text style={styles.title}>Inscription</Text>
           <Text style={styles.subtitle}>Compte Transporteur</Text>
         </View>
@@ -253,15 +285,42 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
           />
           {fieldErrors.gouvernerat ? <Text style={styles.fieldError}>{fieldErrors.gouvernerat}</Text> : null}
 
-          <Input
-            label="Immatriculation du véhicule"
-            placeholder="123 TN 4567"
-            value={license}
-            onChangeText={(v) => { setLicense(v); setFieldErrors(e => ({ ...e, license: '' })); }}
-            keyboardType="default"
-            maxLength={12}
-            icon={<AppIcon name="truck" size={18} color={Colors.textMuted} />}
-          />
+          <View>
+            <Text style={styles.licenseLabel}>Immatriculation du véhicule</Text>
+            <View style={[styles.licenseRow, fieldErrors.license ? styles.licenseRowError : null]}>
+              <View style={styles.licenseIconWrap}>
+                <AppIcon name="truck" size={18} color={Colors.textMuted} />
+              </View>
+              <TextInput
+                style={styles.licenseInput}
+                placeholder="123"
+                placeholderTextColor={Colors.placeholder}
+                value={licenseFront}
+                onChangeText={(value) => {
+                  setLicenseFront(value.replace(/\D/g, '').slice(0, 3));
+                  setFieldErrors((prev) => ({ ...prev, license: '' }));
+                }}
+                keyboardType="numeric"
+                maxLength={3}
+              />
+              <View style={styles.licenseChip}>
+                <Text style={styles.licenseChipText}>تونس</Text>
+              </View>
+              <TextInput
+                style={styles.licenseInput}
+                placeholder="4567"
+                placeholderTextColor={Colors.placeholder}
+                value={licenseBack}
+                onChangeText={(value) => {
+                  setLicenseBack(value.replace(/\D/g, '').slice(0, 4));
+                  setFieldErrors((prev) => ({ ...prev, license: '' }));
+                }}
+                keyboardType="numeric"
+                maxLength={4}
+              />
+            </View>
+            <Text style={styles.licenseHint}>Saisissez 3 chiffres puis 4 chiffres séparés par la mention fixe تونس.</Text>
+          </View>
           {fieldErrors.license ? <Text style={styles.fieldError}>{fieldErrors.license}</Text> : null}
 
           <Input
@@ -337,21 +396,75 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 24,
-    paddingTop: 16,
+    paddingTop: 24,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
-    marginLeft: -8,
-  },
-  backIcon: {
-    fontSize: 28,
-    color: '#1A1A1A',
+    alignItems: 'center',
+    marginBottom: 20,
+    marginLeft: -6,
+    marginTop: 20,
   },
   header: {
-    marginTop: 24,
     marginBottom: 24,
+  },
+  licenseLabel: {
+    color: '#3E4957',
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 8,
+  },
+  licenseRow: {
+    alignItems: 'center',
+    backgroundColor: '#F7F3EC',
+    borderColor: 'transparent',
+    borderRadius: 12,
+    borderWidth: 1.5,
+    flexDirection: 'row',
+    gap: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  licenseRowError: {
+    borderColor: Colors.error,
+  },
+  licenseIconWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 2,
+  },
+  licenseInput: {
+    backgroundColor: Colors.surface,
+    borderRadius: 10,
+    color: '#3E4957',
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    minHeight: 44,
+    paddingHorizontal: 12,
+    textAlign: 'center',
+  },
+  licenseChip: {
+    alignItems: 'center',
+    backgroundColor: Colors.primarySurface,
+    borderRadius: 10,
+    justifyContent: 'center',
+    minHeight: 44,
+    paddingHorizontal: 12,
+  },
+  licenseChipText: {
+    color: Colors.primaryDark,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  licenseHint: {
+    color: '#666',
+    fontSize: 12,
+    marginLeft: 2,
+    marginTop: 8,
   },
   title: {
     fontSize: 24,
@@ -434,6 +547,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 16,
+  },
+  required: {
+    color: Colors.error,
   },
   footerText: {
     color: '#666',

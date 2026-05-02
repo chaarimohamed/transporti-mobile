@@ -32,7 +32,17 @@ interface CarrierInformationFormUser {
   phone?: string;
   gouvernerat?: string;
   vehicleType?: string;
+  vehicleSize?: string;
+  license?: string;
+  matricule?: string;
 }
+
+const vehicleSizeOptions = [
+  { label: 'Moins de 500 kg', value: 'S' },
+  { label: '500 kg à 1 T', value: 'M' },
+  { label: '1 T à 3 T', value: 'L' },
+  { label: 'Plus de 3 T', value: 'XL' },
+];
 
 const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScreenProps> = ({
   onNavigate,
@@ -46,6 +56,9 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
   const [phone, setPhone] = useState('');
   const [gouvernorat, setGouvernorat] = useState('');
   const [vehicleType, setVehicleType] = useState('');
+  const [vehicleSize, setVehicleSize] = useState('');
+  const [license, setLicense] = useState('');
+  const [matricule, setMatricule] = useState('');
   const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -71,6 +84,9 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
     setPhone(u.phone || '');
     setGouvernorat(u.gouvernerat || '');
     setVehicleType(u.vehicleType || '');
+    setVehicleSize(u.vehicleSize || '');
+    setLicense(u.license || '');
+    setMatricule(u.matricule || '');
     if (u.dateOfBirth) {
       setDateOfBirth(u.dateOfBirth);
       setSelectedDate(parseDateString(u.dateOfBirth));
@@ -95,30 +111,30 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
   }, []);
 
   const gouvernoratOptions = [
-    { label: 'Tunis', value: 'TUNIS' },
-    { label: 'Ariana', value: 'ARIANA' },
-    { label: 'Ben Arous', value: 'BEN_AROUS' },
-    { label: 'Manouba', value: 'MANOUBA' },
-    { label: 'Nabeul', value: 'NABEUL' },
-    { label: 'Zaghouan', value: 'ZAGHOUAN' },
-    { label: 'Bizerte', value: 'BIZERTE' },
-    { label: 'Béja', value: 'BEJA' },
-    { label: 'Jendouba', value: 'JENDOUBA' },
-    { label: 'Le Kef', value: 'LE_KEF' },
-    { label: 'Siliana', value: 'SILIANA' },
-    { label: 'Sousse', value: 'SOUSSE' },
-    { label: 'Monastir', value: 'MONASTIR' },
-    { label: 'Mahdia', value: 'MAHDIA' },
-    { label: 'Sfax', value: 'SFAX' },
-    { label: 'Kairouan', value: 'KAIROUAN' },
-    { label: 'Kasserine', value: 'KASSERINE' },
-    { label: 'Sidi Bouzid', value: 'SIDI_BOUZID' },
-    { label: 'Gabès', value: 'GABES' },
-    { label: 'Médenine', value: 'MEDENINE' },
-    { label: 'Tataouine', value: 'TATAOUINE' },
-    { label: 'Gafsa', value: 'GAFSA' },
-    { label: 'Tozeur', value: 'TOZEUR' },
-    { label: 'Kébili', value: 'KEBILI' },
+    { label: 'Ariana', value: 'ariana' },
+    { label: 'Béja', value: 'beja' },
+    { label: 'Ben Arous', value: 'ben_arous' },
+    { label: 'Bizerte', value: 'bizerte' },
+    { label: 'Gabès', value: 'gabes' },
+    { label: 'Gafsa', value: 'gafsa' },
+    { label: 'Jendouba', value: 'jendouba' },
+    { label: 'Kairouan', value: 'kairouan' },
+    { label: 'Kasserine', value: 'kasserine' },
+    { label: 'Kébili', value: 'kebili' },
+    { label: 'La Manouba', value: 'manouba' },
+    { label: 'Le Kef', value: 'kef' },
+    { label: 'Mahdia', value: 'mahdia' },
+    { label: 'Médenine', value: 'medenine' },
+    { label: 'Monastir', value: 'monastir' },
+    { label: 'Nabeul', value: 'nabeul' },
+    { label: 'Sfax', value: 'sfax' },
+    { label: 'Sidi Bouzid', value: 'sidi_bouzid' },
+    { label: 'Siliana', value: 'siliana' },
+    { label: 'Sousse', value: 'sousse' },
+    { label: 'Tataouine', value: 'tataouine' },
+    { label: 'Tozeur', value: 'tozeur' },
+    { label: 'Tunis', value: 'tunis' },
+    { label: 'Zaghouan', value: 'zaghouan' },
   ];
 
   const vehicleTypeOptions = [
@@ -145,6 +161,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
         // BUG-05 fix: send carrier-specific fields so the backend persists them
         ...(gouvernorat && { gouvernorat }),
         ...(vehicleType && { vehicleType }),
+        ...(vehicleSize && { vehicleSize }),
       });
       
       if (result.success && result.user) {
@@ -379,6 +396,32 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
             onValueChange={setVehicleType}
             options={vehicleTypeOptions}
           />
+
+          <Dropdown
+            label="Charge maximale"
+            placeholder="Sélectionnez la charge maximale"
+            value={vehicleSize}
+            onValueChange={setVehicleSize}
+            options={vehicleSizeOptions}
+          />
+
+          <View style={styles.readonlyCard}>
+            <View style={styles.readonlyRow}>
+              <AppIcon name="truck" size={18} color={Colors.primaryDark} />
+              <View style={styles.readonlyTextWrap}>
+                <Text style={styles.readonlyLabel}>Immatriculation</Text>
+                <Text style={styles.readonlyValue}>{license || 'Non renseignée'}</Text>
+              </View>
+            </View>
+            <View style={styles.readonlyDivider} />
+            <View style={styles.readonlyRow}>
+              <AppIcon name="document" size={18} color={Colors.primaryDark} />
+              <View style={styles.readonlyTextWrap}>
+                <Text style={styles.readonlyLabel}>Matricule fiscale</Text>
+                <Text style={styles.readonlyValue}>{matricule || 'Non renseignée'}</Text>
+              </View>
+            </View>
+          </View>
         </View>
 
         {/* Save Button */}
@@ -480,6 +523,37 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: Spacing.md,
+  },
+  readonlyCard: {
+    backgroundColor: Colors.surface,
+    borderColor: Colors.border,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    padding: Spacing.md,
+  },
+  readonlyRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  readonlyTextWrap: {
+    flex: 1,
+    marginLeft: Spacing.sm + 4,
+  },
+  readonlyLabel: {
+    color: Colors.textSecondary,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    marginBottom: 2,
+  },
+  readonlyValue: {
+    color: Colors.textPrimary,
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.sm,
+  },
+  readonlyDivider: {
+    backgroundColor: Colors.borderLight,
+    height: 1,
+    marginVertical: Spacing.sm + 4,
   },
   row: {
     flexDirection: 'row',

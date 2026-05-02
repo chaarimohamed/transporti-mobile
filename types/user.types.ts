@@ -11,6 +11,7 @@ export interface User {
   license?: string;
   matricule?: string;
   vehicleType?: string;
+  vehicleSize?: string;
   verified?: boolean;
   // Timestamps
   createdAt: string;
