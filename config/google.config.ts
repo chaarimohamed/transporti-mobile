@@ -13,8 +13,7 @@
  * 5. Replace 'YOUR_GOOGLE_MAPS_API_KEY' below with your API key
  */
 
-// Replace this with your actual Google Maps API key
-export const GOOGLE_MAPS_API_KEY = 'AIzaSyDAQzYlsMsPGQKSBkz7KGgXLXxrdUOSFRI';
+export const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 
 // Google Places API configuration
 export const GOOGLE_PLACES_CONFIG = {
