@@ -257,6 +257,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     marginLeft: -6,
+    marginTop: 20,
   },
   header: {
     marginBottom: 24,
