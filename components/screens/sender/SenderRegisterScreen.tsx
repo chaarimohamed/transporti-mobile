@@ -125,11 +125,10 @@ export const SenderRegisterScreen: React.FC<SenderRegisterScreenProps> = ({ onNa
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.content}>
-        <TouchableOpacity onPress={() => onNavigate('roleSelection')} style={styles.backButton}>
-          <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
-        </TouchableOpacity>
-
         <View style={styles.header}>
+          <TouchableOpacity onPress={() => onNavigate('roleSelection')} style={styles.backButton}>
+            <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
+          </TouchableOpacity>
           <Text style={styles.title}>Inscription</Text>
           <Text style={styles.subtitle}>Compte Expéditeur</Text>
         </View>
@@ -248,20 +247,18 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 24,
-    paddingTop: 16,
+    paddingTop: 24,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
-    marginLeft: -8,
-  },
-  backIcon: {
-    fontSize: 28,
-    color: '#1A1A1A',
+    alignItems: 'center',
+    marginBottom: 20,
+    marginLeft: -6,
   },
   header: {
-    marginTop: 24,
     marginBottom: 24,
   },
   title: {

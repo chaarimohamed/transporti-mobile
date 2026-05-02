@@ -99,10 +99,6 @@ const CarrierOnboarding3Screen: React.FC<CarrierOnboarding3ScreenProps> = ({
 
   // --- Navigation ---
   const handleNext = () => {
-    if (!cinDoc.uri || !permisDoc.uri) {
-      Alert.alert('Documents requis', 'Veuillez fournir votre CIN et votre Permis de conduire.');
-      return;
-    }
     onNavigate?.('carrierOnboarding4', {
       ...initialData,
       documents: { cinBase64: cinDoc.base64, permisBase64: permisDoc.base64 },
@@ -126,9 +122,7 @@ const CarrierOnboarding3Screen: React.FC<CarrierOnboarding3ScreenProps> = ({
       <View style={styles.docCard}>
         <View style={styles.docCardHeader}>
           <View style={{ flex: 1, marginRight: 8 }}>
-            <Text style={styles.docLabel}>
-              {label} <Text style={styles.required}>*</Text>
-            </Text>
+            <Text style={styles.docLabel}>{label}</Text>
             <Text style={styles.docDescription}>{description}</Text>
           </View>
           {hasPhoto && (
@@ -158,20 +152,6 @@ const CarrierOnboarding3Screen: React.FC<CarrierOnboarding3ScreenProps> = ({
             </View>
           )}
         </TouchableOpacity>
-
-        {!hasPhoto && (
-          <View style={styles.quickActions}>
-            <TouchableOpacity style={styles.quickBtn} onPress={() => launchCamera(setter)}>
-              <AppIcon name="camera" size={16} color={Colors.primary} />
-              <Text style={styles.quickBtnText}>Caméra</Text>
-            </TouchableOpacity>
-            <View style={styles.quickBtnDivider} />
-            <TouchableOpacity style={styles.quickBtn} onPress={() => launchGallery(setter)}>
-              <AppIcon name="gallery-image" size={16} color={Colors.primary} />
-              <Text style={styles.quickBtnText}>Galerie</Text>
-            </TouchableOpacity>
-          </View>
-        )}
       </View>
     );
   };
@@ -194,7 +174,7 @@ const CarrierOnboarding3Screen: React.FC<CarrierOnboarding3ScreenProps> = ({
         <View style={styles.header}>
           <Text style={styles.title}>Documents</Text>
           <Text style={styles.subtitle}>
-            Photographiez ou importez vos documents officiels. Ils seront chiffrés et stockés en sécurité.
+            Photographiez ou importez vos documents officiels. Cette étape reste optionnelle pour le moment et vous pourrez les mettre à jour plus tard dans votre profil.
           </Text>
         </View>
 
@@ -241,7 +221,6 @@ const styles = StyleSheet.create({
   docCard: { borderWidth: 1, borderColor: Colors.border, borderRadius: Radius.lg, overflow: 'hidden', backgroundColor: Colors.backgroundAlt },
   docCardHeader: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', padding: Spacing.md, paddingBottom: Spacing.sm + 4 },
   docLabel: { fontFamily: Fonts.semiBold, fontSize: FontSizes.sm, color: Colors.textPrimary, marginBottom: 2 },
-  required: { color: Colors.error },
   docDescription: { fontFamily: Fonts.regular, fontSize: FontSizes.xs, color: Colors.textSecondary },
   doneBadge: { width: 24, height: 24, borderRadius: Radius.full, backgroundColor: Colors.success, justifyContent: 'center', alignItems: 'center' },
   // upload zone
@@ -253,12 +232,6 @@ const styles = StyleSheet.create({
   preview: { width: '100%', height: '100%' },
   previewOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingVertical: 6, backgroundColor: Colors.overlay, alignItems: 'center' },
   previewOverlayText: { color: Colors.textInverse, fontFamily: Fonts.regular, fontSize: FontSizes.xs },
-  // quick actions
-  quickActions: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: Colors.borderLight, marginTop: Spacing.sm + 4 },
-  quickBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: Spacing.sm + 4, gap: 6 },
-  quickBtnDivider: { width: 1, backgroundColor: Colors.borderLight },
-  quickBtnIcon: { fontSize: 16 },
-  quickBtnText: { fontFamily: Fonts.medium, fontSize: FontSizes.sm, color: Colors.primary },
   // info
   infoContainer: { flexDirection: 'row', marginTop: 20, padding: 14, backgroundColor: Colors.primarySurface, borderRadius: Radius.md, alignItems: 'flex-start', gap: Spacing.sm },
   infoText: { flex: 1, fontFamily: Fonts.regular, fontSize: FontSizes.xs, color: Colors.primary, lineHeight: 18 },

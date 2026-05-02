@@ -8,7 +8,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
-import { AppIcon } from '../../ui/Icon';
+import { AppIcon, AppIconName } from '../../ui/Icon';
 import { Button } from '../../ui/Button';
 
 interface CarrierOnboarding2ScreenProps {
@@ -21,19 +21,19 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
   const [selectedOptions, setSelectedOptions] = useState<{
     palette: boolean;
     refrigere: boolean;
-    volume: string;
+    vehicleType: string;
   }>({
     palette: false,
     refrigere: false,
-    volume: '',
+    vehicleType: '',
   });
   const [volumeError, setVolumeError] = useState(false);
 
-  const volumeOptions = [
-    { value: 'S', label: 'S — Petit véhicule', description: 'Caddy, Berlingo (~3m³)' },
-    { value: 'M', label: 'M — Fourgonnette', description: 'Transit, Sprinter (~10m³)' },
-    { value: 'L', label: 'L — Camion léger', description: 'Jusqu\'à 3.5T (~20m³)' },
-    { value: 'XL', label: 'XL — Camion plateau', description: 'Plus de 3.5T (~40m³)' },
+  const vehicleTypeOptions: { value: string; label: string; description: string; example: string; icon: AppIconName }[] = [
+    { value: 'VAN', label: 'Camionnette', description: 'Petits colis et livraisons urbaines', example: 'Berlingo, Doblo, utilitaire léger', icon: 'vehicle-berlingo' },
+    { value: 'DELIVERY_VAN', label: 'Fourgon', description: 'Chargement moyen pour tournées régionales', example: 'Transit, Sprinter, Master', icon: 'vehicle-sprinter' },
+    { value: 'TRUCK', label: 'Camion', description: 'Marchandises lourdes pour PME et commerces', example: 'Porteur, camion léger ≤ 3.5T', icon: 'vehicle-camion' },
+    { value: 'SEMI_TRAILER', label: 'Semi-remorque', description: 'Charges volumineuses ou palettes complètes', example: 'Grand porteur, ensemble articulé', icon: 'vehicle-semi-remorque' },
   ];
 
   const handleToggleOption = (option: 'palette' | 'refrigere') => {
@@ -44,7 +44,7 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
   };
 
   const handleNext = () => {
-    if (!selectedOptions.volume) {
+    if (!selectedOptions.vehicleType) {
       setVolumeError(true);
       return;
     }
@@ -135,7 +135,7 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
                 <AppIcon name="truck" size={24} color={Colors.charcoal} />
               </View>
               <View style={styles.volumeHeaderText}>
-                <Text style={styles.volumeTitle}>Taille du véhicule <Text style={styles.required}>*</Text></Text>
+                <Text style={styles.volumeTitle}>Type de véhicule <Text style={styles.required}>*</Text></Text>
                 <Text style={styles.volumeSubtitle}>
                   Sélectionnez la catégorie correspondant à votre véhicule
                 </Text>
@@ -143,30 +143,37 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
             </View>
 
             <View style={styles.volumeOptionsContainer}>
-              {volumeOptions.map((option) => (
+              {vehicleTypeOptions.map((option) => (
                 <TouchableOpacity
                   key={option.value}
                   style={[
                     styles.volumeOption,
-                    selectedOptions.volume === option.value &&
+                    selectedOptions.vehicleType === option.value &&
                       styles.volumeOptionSelected,
                   ]}
                   onPress={() => {
-                    setSelectedOptions(prev => ({ ...prev, volume: option.value }));
+                    setSelectedOptions(prev => ({ ...prev, vehicleType: option.value }));
                     setVolumeError(false);
                   }}
                   activeOpacity={0.7}
                 >
                   <View style={styles.volumeRadio}>
-                    {selectedOptions.volume === option.value && (
+                    {selectedOptions.vehicleType === option.value && (
                       <View style={styles.volumeRadioChecked} />
                     )}
+                  </View>
+                  <View style={styles.volumeOptionIconWrap}>
+                    <AppIcon
+                      name={option.icon}
+                      size={24}
+                      color={selectedOptions.vehicleType === option.value ? Colors.primaryDark : Colors.textSecondary}
+                    />
                   </View>
                   <View style={styles.volumeOptionTextContainer}>
                     <Text
                       style={[
                         styles.volumeOptionText,
-                        selectedOptions.volume === option.value &&
+                        selectedOptions.vehicleType === option.value &&
                           styles.volumeOptionTextSelected,
                       ]}
                     >
@@ -175,6 +182,7 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
                     <Text style={styles.volumeOptionDescription}>
                       {option.description}
                     </Text>
+                    <Text style={styles.volumeOptionExample}>{option.example}</Text>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -194,7 +202,7 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
           onPress={handleNext}
           size="lg"
           style={styles.nextButton}
-          disabled={!selectedOptions.volume}
+          disabled={!selectedOptions.vehicleType}
         >
           Suivant
         </Button>
@@ -366,6 +374,15 @@ const styles = StyleSheet.create({
   volumeOptionTextContainer: {
     flex: 1,
   },
+  volumeOptionIconWrap: {
+    alignItems: 'center',
+    backgroundColor: Colors.backgroundAlt,
+    borderRadius: Radius.md,
+    height: 38,
+    justifyContent: 'center',
+    marginRight: Spacing.sm,
+    width: 38,
+  },
   volumeOptionText: {
     fontFamily: Fonts.regular,
     fontSize: FontSizes.sm,
@@ -380,6 +397,12 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.xs,
     color: Colors.textSecondary,
     marginTop: 2,
+  },
+  volumeOptionExample: {
+    color: Colors.textMuted,
+    fontFamily: Fonts.medium,
+    fontSize: FontSizes.xs,
+    marginTop: 4,
   },
   volumeCardError: {
     borderColor: Colors.error,

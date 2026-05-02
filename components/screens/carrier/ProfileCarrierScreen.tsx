@@ -64,6 +64,13 @@ const ProfileCarrierScreen: React.FC<ProfileCarrierScreenProps> = ({
       },
     },
     {
+      icon: 'document',
+      label: 'Documents du véhicule',
+      onPress: () => {
+        onNavigate?.('carrierDocuments');
+      },
+    },
+    {
       icon: 'wallet',
       label: 'Moyens de paiement',
       onPress: () => {

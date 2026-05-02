@@ -50,13 +50,14 @@ import TermsAndConditionsScreen from './components/screens/sender/TermsAndCondit
 import PrivacySecurityScreen from './components/screens/sender/PrivacySecurityScreen';
 import ProfileCarrierScreen from './components/screens/carrier/ProfileCarrierScreen';
 import PersonalInformationCarrierScreen from './components/screens/carrier/PersonalInformationCarrierScreen';
+import DocumentsCarrierScreen from './components/screens/carrier/DocumentsCarrierScreen';
 import NotificationSettingsCarrierScreen from './components/screens/carrier/NotificationSettingsCarrierScreen';
 import TermsAndConditionsCarrierScreen from './components/screens/carrier/TermsAndConditionsCarrierScreen';
 import PrivacySecurityCarrierScreen from './components/screens/carrier/PrivacySecurityCarrierScreen';
 import ShipmentFeedbackScreen from './components/screens/shared/ShipmentFeedbackScreen';
 import ShipmentFeedbackSuccessScreen from './components/screens/shared/ShipmentFeedbackSuccessScreen';
 
-type ScreenName = 'splash' | 'roleSelection' | 'login' | 'forgotPassword' | 'senderRegister' | 'carrierRegister' | 'carrierOnboarding2' | 'carrierOnboarding3' | 'carrierOnboarding4' | 'verifyEmail' | 'dashboard' | 'shipmentList' | 'newShipment' | 'createShipmentStep1' | 'addressPickup' | 'addressDelivery' | 'mapPicker' | 'createShipmentStep2' | 'createShipmentStep3' | 'shipmentDetails' | 'missionList' | 'missionDetails' | 'activeMissions' | 'updateStatus' | 'notificationList' | 'applicationList' | 'applicationDetails' | 'applicationAccepted' | 'suggestedTransporters' | 'transporterProfile' | 'invitationSent' | 'paymentCodeInput' | 'paymentSuccess' | 'paymentError' | 'paymentBlocked' | 'paymentReceipt' | 'paymentHistory' | 'shipmentFeedback' | 'shipmentFeedbackSuccess' | 'notifications' | 'notificationListSender' | 'profile' | 'notificationSettings' | 'personalInformation' | 'termsAndConditions' | 'privacySecurity' | 'profileCarrier' | 'personalInformationCarrier' | 'notificationSettingsCarrier' | 'termsAndConditionsCarrier' | 'privacySecurityCarrier';
+type ScreenName = 'splash' | 'roleSelection' | 'login' | 'forgotPassword' | 'senderRegister' | 'carrierRegister' | 'carrierOnboarding2' | 'carrierOnboarding3' | 'carrierOnboarding4' | 'verifyEmail' | 'dashboard' | 'shipmentList' | 'newShipment' | 'createShipmentStep1' | 'addressPickup' | 'addressDelivery' | 'mapPicker' | 'createShipmentStep2' | 'createShipmentStep3' | 'shipmentDetails' | 'missionList' | 'missionDetails' | 'activeMissions' | 'updateStatus' | 'notificationList' | 'applicationList' | 'applicationDetails' | 'applicationAccepted' | 'suggestedTransporters' | 'transporterProfile' | 'invitationSent' | 'paymentCodeInput' | 'paymentSuccess' | 'paymentError' | 'paymentBlocked' | 'paymentReceipt' | 'paymentHistory' | 'shipmentFeedback' | 'shipmentFeedbackSuccess' | 'notifications' | 'notificationListSender' | 'profile' | 'notificationSettings' | 'personalInformation' | 'termsAndConditions' | 'privacySecurity' | 'profileCarrier' | 'personalInformationCarrier' | 'carrierDocuments' | 'notificationSettingsCarrier' | 'termsAndConditionsCarrier' | 'privacySecurityCarrier';
 
 SplashScreenNative.preventAutoHideAsync();
 
@@ -208,6 +209,8 @@ function AppContent() {
           return <ProfileCarrierScreen onNavigate={navigate} />;
         case 'personalInformationCarrier':
           return <PersonalInformationCarrierScreen onNavigate={navigate} />;
+        case 'carrierDocuments':
+          return <DocumentsCarrierScreen onNavigate={navigate} />;
         case 'notificationSettingsCarrier':
           return <NotificationSettingsCarrierScreen onNavigate={navigate} />;
         case 'termsAndConditionsCarrier':

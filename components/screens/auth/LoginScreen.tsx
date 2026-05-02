@@ -72,7 +72,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
               value={email}
               onChangeText={setEmail}
               keyboardType="email-address"
-              icon={<AppIcon name="map-pin" size={18} color={Colors.textMuted} />}
+              icon={<AppIcon name="email" size={18} color={Colors.textMuted} />}
             />
 
             <View>
