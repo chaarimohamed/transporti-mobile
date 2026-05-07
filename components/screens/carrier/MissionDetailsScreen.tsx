@@ -17,7 +17,7 @@ import Badge from '../../ui/Badge';
 import { AppIcon } from '../../ui/Icon';
 import { GOOGLE_MAPS_API_KEY } from '../../../config/google.config';
 import * as shipmentService from '../../../services/shipment.service';
-import { Shipment } from '../../../services/shipment.service';
+import { Shipment, ShipmentApplication } from '../../../services/shipment.service';
 import { useAuth } from '../../../contexts/AuthContext';
 
 interface MissionDetailsScreenProps {
@@ -41,6 +41,7 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [proposedPrice, setProposedPrice] = useState('');
+  const [myApplication, setMyApplication] = useState<ShipmentApplication | null>(null);
   const [routeDistance, setRouteDistance] = useState<string | null>(null);
   const [routeDuration, setRouteDuration] = useState<string | null>(null);
 
@@ -67,6 +68,22 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
       fetchRouteInfo(shipment.from, shipment.to);
     }
   }, [shipment?.id]);
+
+  // Fetch carrier's own application to show proposed price when awaiting sender's decision
+  useEffect(() => {
+    if (
+      shipment?.status === 'REQUESTED' &&
+      shipment.requestedCarrierId === user?.id &&
+      shipmentId
+    ) {
+      shipmentService.getShipmentApplications(shipmentId).then(result => {
+        if (result.success && result.applications) {
+          const mine = result.applications.find(a => a.carrierId === user?.id);
+          setMyApplication(mine ?? null);
+        }
+      });
+    }
+  }, [shipment?.id, shipment?.status]);
 
   const fetchRouteInfo = async (from: string, to: string) => {
     try {
@@ -399,6 +416,11 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
               <>
                 <Text style={styles.priceAmount}>{shipment.price} TND</Text>
                 <Text style={styles.priceLabel}>Prix convenu</Text>
+              </>
+            ) : myApplication != null ? (
+              <>
+                <Text style={styles.priceAmount}>{myApplication.proposedPrice} TND</Text>
+                <Text style={styles.priceLabel}>Votre prix proposé</Text>
               </>
             ) : (
               <>

@@ -147,108 +147,6 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
     }
   };
 
-  const handleAcceptCarrier = async () => {
-    if (!shipment) return;
-
-    const confirmMsg = 'Voulez-vous accepter ce transporteur ?';
-    
-    const onConfirm = async () => {
-      try {
-        setLoading(true);
-        const result = await shipmentService.acceptCarrier(shipment.id, '');
-
-        if (result.success) {
-          // Refresh shipment data
-          await fetchShipment(shipment.id);
-          const successMsg = result.message || 'Transporteur accepté avec succès';
-          if (Platform.OS === 'web') {
-            window.alert(successMsg);
-          } else {
-            Alert.alert('Succès', successMsg);
-          }
-        } else {
-          const errorMsg = result.error || 'Impossible d\'accepter';
-          if (Platform.OS === 'web') {
-            window.alert(errorMsg);
-          } else {
-            Alert.alert('Erreur', errorMsg);
-          }
-        }
-      } catch (err) {
-        console.error('Error accepting carrier:', err);
-        if (Platform.OS === 'web') {
-          window.alert('Erreur de connexion');
-        } else {
-          Alert.alert('Erreur', 'Erreur de connexion');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (Platform.OS === 'web') {
-      if (window.confirm(confirmMsg)) {
-        onConfirm();
-      }
-    } else {
-      Alert.alert('Accepter le transporteur', confirmMsg, [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Accepter', onPress: onConfirm },
-      ]);
-    }
-  };
-
-  const handleRejectCarrier = async () => {
-    if (!shipment) return;
-
-    const confirmMsg = 'Voulez-vous refuser ce transporteur ?';
-    
-    const onConfirm = async () => {
-      try {
-        setLoading(true);
-        const result = await shipmentService.rejectCarrier(shipment.id, '');
-
-        if (result.success) {
-          // Refresh shipment data
-          await fetchShipment(shipment.id);
-          const successMsg = result.message || 'Transporteur refusé';
-          if (Platform.OS === 'web') {
-            window.alert(successMsg);
-          } else {
-            Alert.alert('Succès', successMsg);
-          }
-        } else {
-          const errorMsg = result.error || 'Impossible de refuser';
-          if (Platform.OS === 'web') {
-            window.alert(errorMsg);
-          } else {
-            Alert.alert('Erreur', errorMsg);
-          }
-        }
-      } catch (err) {
-        console.error('Error rejecting carrier:', err);
-        if (Platform.OS === 'web') {
-          window.alert('Erreur de connexion');
-        } else {
-          Alert.alert('Erreur', 'Erreur de connexion');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (Platform.OS === 'web') {
-      if (window.confirm(confirmMsg)) {
-        onConfirm();
-      }
-    } else {
-      Alert.alert('Refuser le transporteur', confirmMsg, [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Refuser', style: 'destructive', onPress: onConfirm },
-      ]);
-    }
-  };
-
   const handleConfirmHandover = async () => {
     if (!shipment) return;
 
@@ -458,24 +356,13 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
                 </View>
               </TouchableOpacity>
               <View style={styles.infoDivider} />
-              <View style={styles.requestActions}>
-                <TouchableOpacity
-                  style={styles.rejectButton}
-                  onPress={handleRejectCarrier}
-                  disabled={loading}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.rejectButtonText}>Refuser</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.acceptButton}
-                  onPress={handleAcceptCarrier}
-                  disabled={loading}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.acceptButtonText}>Accepter</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                style={styles.acceptButton}
+                onPress={() => onNavigate?.('applicationDetails', { shipment })}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.acceptButtonText}>Voir les candidatures</Text>
+              </TouchableOpacity>
             </Card>
           </>
         )}
@@ -574,7 +461,9 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
             <AppIcon name="wallet" size={16} color={Colors.textSecondary} />
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Prix</Text>
-              <Text style={styles.infoPriceValue}>{shipment.price} TND</Text>
+              <Text style={styles.infoPriceValue}>
+                {shipment.price != null ? `${shipment.price} TND` : 'À négocier'}
+              </Text>
             </View>
           </View>
         </Card>

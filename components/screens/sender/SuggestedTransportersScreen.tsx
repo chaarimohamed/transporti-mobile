@@ -16,7 +16,7 @@ import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import { AppIcon } from '../../ui/Icon';
 import * as shipmentService from '../../../services/shipment.service';
-import { Shipment, Carrier } from '../../../services/shipment.service';
+import { Carrier, ShipmentApplication } from '../../../services/shipment.service';
 
 interface SuggestedTransportersScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
@@ -34,7 +34,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
   const [loading, setLoading] = useState(true);
   const [carriers, setCarriers] = useState<Carrier[]>([]);
   const [invitedCarrierIds, setInvitedCarrierIds] = useState<Set<string>>(new Set());
-  const [applications, setApplications] = useState<Shipment[]>([]);
+  const [applications, setApplications] = useState<ShipmentApplication[]>([]);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const shipmentId = initialData?.shipmentId;
@@ -56,17 +56,14 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
       
       // Fetch applications, available carriers, and already-invited carrier IDs
       const [applicationsResult, carriersResult, invitedResult] = await Promise.all([
-        shipmentService.getMyShipments(),
+        shipmentService.getShipmentApplications(shipmentId),
         shipmentService.getAvailableCarriers(shipmentId),
         shipmentService.getInvitedCarriers(shipmentId),
       ]);
 
-      // Filter applications for current shipment
-      if (applicationsResult.success && applicationsResult.shipments) {
-        const shipmentApplications = applicationsResult.shipments.filter(
-          s => s.id === shipmentId && s.status === 'REQUESTED' && s.requestedCarrierId
-        );
-        setApplications(shipmentApplications);
+      // Set applications for current shipment
+      if (applicationsResult.success && applicationsResult.applications) {
+        setApplications(applicationsResult.applications.filter(a => a.status === 'PENDING'));
       }
 
       // Store invited carrier IDs from the dedicated endpoint
@@ -93,13 +90,13 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
     onNavigate?.('transporterProfile', { transporter: carrier, shipmentId, shipment: currentShipment, shipmentRefNumber: currentShipment?.refNumber });
   };
 
-  const handleAcceptCarrier = async (shipment: Shipment) => {
+  const handleAcceptCarrier = async (app: ShipmentApplication) => {
     const confirmMsg = 'Voulez-vous accepter ce transporteur pour cette expédition ?';
     
     const onConfirm = async () => {
       try {
-        setAcceptingId(shipment.id);
-        const result = await shipmentService.acceptCarrier(shipment.id, '');
+        setAcceptingId(app.id);
+        const result = await shipmentService.acceptCarrier(shipmentId, app.id);
 
         if (result.success) {
           const successMsg = result.message || 'Transporteur accepté avec succès.';
@@ -142,13 +139,13 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
     }
   };
 
-  const handleRejectCarrier = async (shipment: Shipment) => {
+  const handleRejectCarrier = async (app: ShipmentApplication) => {
     const confirmMsg = 'Voulez-vous refuser ce transporteur ? ';
     
     const onConfirm = async () => {
       try {
-        setRejectingId(shipment.id);
-        const result = await shipmentService.rejectCarrier(shipment.id, '');
+        setRejectingId(app.id);
+        const result = await shipmentService.rejectCarrier(shipmentId, app.id);
 
         if (result.success) {
           const successMsg = result.message || 'Transporteur refusé.';
@@ -235,7 +232,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
 
             <View style={styles.applicationsList}>
               {applications.map((application) => {
-                const appCarrier = application.requestedCarrier;
+                const appCarrier = application.carrier;
                 const initials = appCarrier
                   ? `${appCarrier.firstName?.[0] ?? ''}${appCarrier.lastName?.[0] ?? ''}`
                   : 'TR';
@@ -260,7 +257,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
                           <Text style={styles.applicationName}>
                             {appCarrier
                               ? `${appCarrier.firstName} ${appCarrier.lastName}`
-                              : `Transporteur #${application.requestedCarrierId?.slice(0, 6)}`}
+                              : `Transporteur #${application.carrierId?.slice(0, 6)}`}
                           </Text>
                           {appCarrier && <AppIcon name="chevron-right" size={12} color={Colors.primary} />}
                         </View>
@@ -281,7 +278,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
                           </View>
                         )}
                       </View>
-                      <Text style={styles.applicationPrice}>{application.price} DT</Text>
+                      <Text style={styles.applicationPrice}>{application.proposedPrice} TND</Text>
                     </View>
                   </TouchableOpacity>
 
