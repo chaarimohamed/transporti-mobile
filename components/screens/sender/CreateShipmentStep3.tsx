@@ -97,7 +97,6 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
         from: initialData?.pickupAddress || 'Tunis',
         to: initialData?.deliveryAddress || 'Sfax',
         cargo: `Colis ${initialData?.format || 'M'}`,
-        price: estimatedPrice,
         pickupDate: initialData?.pickupDate || new Date().toISOString(),
         weight: initialData?.weightRange || 'Non spécifié',
         packageFormat: initialData?.format || 'M',
@@ -278,11 +277,11 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
         {/* Price */}
         <Card style={styles.priceCard}>
           <View style={styles.priceRow}>
-            <Text style={styles.priceLabel}>Prix estimé</Text>
+            <Text style={styles.priceLabel}>À négocier</Text>
             <Text style={styles.priceValue}>{estimatedPrice} TND</Text>
           </View>
           <Text style={styles.priceNote}>
-            Le prix final sera confirmé par le transporteur
+            Le prix sera négocié avec le transporteur
           </Text>
         </Card>
       </ScrollView>

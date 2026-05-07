@@ -99,7 +99,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
     const onConfirm = async () => {
       try {
         setAcceptingId(shipment.id);
-        const result = await shipmentService.acceptCarrier(shipment.id);
+        const result = await shipmentService.acceptCarrier(shipment.id, '');
 
         if (result.success) {
           const successMsg = result.message || 'Transporteur accepté avec succès.';
@@ -148,7 +148,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
     const onConfirm = async () => {
       try {
         setRejectingId(shipment.id);
-        const result = await shipmentService.rejectCarrier(shipment.id);
+        const result = await shipmentService.rejectCarrier(shipment.id, '');
 
         if (result.success) {
           const successMsg = result.message || 'Transporteur refusé.';

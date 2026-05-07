@@ -52,7 +52,7 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
         setMissions(result.shipments);
         
         // Calculate stats from delivered missions only
-        const totalEarnings = result.shipments.reduce((sum, m) => sum + m.price, 0);
+        const totalEarnings = result.shipments.reduce((sum, m) => sum + (m.price ?? 0), 0);
         
         setStats({
           totalEarnings,
@@ -95,7 +95,7 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
     return {
       id: mission.id,
       status,
-      amount: mission.price,
+      amount: mission.price ?? 0,
       date: formattedDate,
       orderId: mission.refNumber.replace('EXP-', ''),
       clientName: 'Client',

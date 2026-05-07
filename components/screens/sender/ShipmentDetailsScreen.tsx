@@ -155,7 +155,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
     const onConfirm = async () => {
       try {
         setLoading(true);
-        const result = await shipmentService.acceptCarrier(shipment.id);
+        const result = await shipmentService.acceptCarrier(shipment.id, '');
 
         if (result.success) {
           // Refresh shipment data
@@ -206,7 +206,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
     const onConfirm = async () => {
       try {
         setLoading(true);
-        const result = await shipmentService.rejectCarrier(shipment.id);
+        const result = await shipmentService.rejectCarrier(shipment.id, '');
 
         if (result.success) {
           // Refresh shipment data

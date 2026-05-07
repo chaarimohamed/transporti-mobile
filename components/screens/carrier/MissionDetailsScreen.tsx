@@ -40,6 +40,7 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
   const [loading, setLoading] = useState(!route?.params?.shipment);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [proposedPrice, setProposedPrice] = useState('');
   const [routeDistance, setRouteDistance] = useState<string | null>(null);
   const [routeDuration, setRouteDuration] = useState<string | null>(null);
 
@@ -123,15 +124,21 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
   const handleAcceptShipment = async () => {
     if (!shipmentId) return;
 
+    const priceNum = parseFloat(proposedPrice);
+    if (!proposedPrice || isNaN(priceNum) || priceNum <= 0) {
+      Alert.alert('Prix requis', 'Veuillez saisir un prix valide pour postuler.');
+      return;
+    }
+
     try {
       setSubmitting(true);
 
-      const result = await shipmentService.requestShipment(shipmentId);
+      const result = await shipmentService.requestShipment(shipmentId, priceNum);
 
       if (result.success) {
         Alert.alert(
           'Succès',
-          'Votre demande a été envoyée à l\'expéditeur. Vous serez notifié de sa décision.',
+          'Votre candidature a été envoyée à l\'expéditeur. Vous serez notifié de sa décision.',
           [
             {
               text: 'OK',
@@ -140,10 +147,9 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
           ]
         );
       } else {
-        // Show specific error message and offer to go back to list
         Alert.alert(
-          'Erreur', 
-          result.error || 'Échec de la demande',
+          'Erreur',
+          result.error || 'Échec de la candidature',
           [
             {
               text: 'Retour à la liste',
@@ -163,10 +169,16 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
   const handleAcceptInvitation = async () => {
     if (!shipmentId) return;
 
+    const priceNum = parseFloat(proposedPrice);
+    if (!proposedPrice || isNaN(priceNum) || priceNum <= 0) {
+      Alert.alert('Prix requis', 'Veuillez saisir votre prix proposé pour accepter l\'invitation.');
+      return;
+    }
+
     try {
       setSubmitting(true);
 
-      const result = await shipmentService.acceptInvitation(shipmentId);
+      const result = await shipmentService.acceptInvitation(shipmentId, priceNum);
 
       if (result.success) {
         Alert.alert(
@@ -381,10 +393,19 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
 
         {/* Price Section */}
         <Card style={styles.section}>
-          <Text style={styles.sectionTitle}>Tarif proposé</Text>
+          <Text style={styles.sectionTitle}>Tarif</Text>
           <View style={styles.priceContainer}>
-            <Text style={styles.priceAmount}>{shipment.price} TND</Text>
-            <Text style={styles.priceLabel}>Prix de la mission</Text>
+            {shipment.price != null ? (
+              <>
+                <Text style={styles.priceAmount}>{shipment.price} TND</Text>
+                <Text style={styles.priceLabel}>Prix convenu</Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.priceNegotiable}>À négocier</Text>
+                <Text style={styles.priceLabel}>Proposez votre prix lors de la candidature</Text>
+              </>
+            )}
           </View>
         </Card>
       </ScrollView>
@@ -419,26 +440,40 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
 
       {/* Action Buttons - Show different buttons based on context */}
       {fromInvitation && shipment.status === 'PENDING' ? (
-        /* Invitation buttons */
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            style={styles.refuseButton}
-            onPress={handleRefuseInvitation}
-            disabled={submitting}
-          >
-            <Text style={styles.refuseButtonText}>Refuser</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.acceptButton, submitting && styles.buttonDisabled]}
-            onPress={handleAcceptInvitation}
-            disabled={submitting}
-          >
-            {submitting ? (
-              <ActivityIndicator size="small" color="#FFF" />
-            ) : (
-              <Text style={styles.acceptButtonText}>Accepter</Text>
-            )}
-          </TouchableOpacity>
+        /* Invitation buttons with price input */
+        <View style={styles.actionsContainerColumn}>
+          <View style={styles.priceInputContainer}>
+            <Text style={styles.priceInputLabel}>Votre prix proposé (TND)</Text>
+            <TextInput
+              style={styles.priceInput}
+              value={proposedPrice}
+              onChangeText={setProposedPrice}
+              keyboardType="numeric"
+              placeholder="Ex : 150"
+              placeholderTextColor="#999999"
+              editable={!submitting}
+            />
+          </View>
+          <View style={styles.invitationButtonRow}>
+            <TouchableOpacity
+              style={styles.refuseButton}
+              onPress={handleRefuseInvitation}
+              disabled={submitting}
+            >
+              <Text style={styles.refuseButtonText}>Refuser</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.acceptButton, submitting && styles.buttonDisabled]}
+              onPress={handleAcceptInvitation}
+              disabled={submitting}
+            >
+              {submitting ? (
+                <ActivityIndicator size="small" color="#FFF" />
+              ) : (
+                <Text style={styles.acceptButtonText}>Accepter</Text>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       ) : shipment.status === 'REQUESTED' && shipment.requestedCarrierId === user?.id ? (
         /* Carrier already applied — awaiting sender's decision */
@@ -448,8 +483,20 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
           </View>
         </View>
       ) : shipment.status === 'PENDING' ? (
-        /* Available mission — carrier can apply */
-        <View style={styles.actionsContainer}>
+        /* Available mission — carrier can apply with proposed price */
+        <View style={styles.actionsContainerColumn}>
+          <View style={styles.priceInputContainer}>
+            <Text style={styles.priceInputLabel}>Votre prix proposé (TND)</Text>
+            <TextInput
+              style={styles.priceInput}
+              value={proposedPrice}
+              onChangeText={setProposedPrice}
+              keyboardType="numeric"
+              placeholder="Ex : 150"
+              placeholderTextColor="#999999"
+              editable={!submitting}
+            />
+          </View>
           <TouchableOpacity
             style={[styles.fullWidthButton, submitting && styles.buttonDisabled]}
             onPress={handleAcceptShipment}
@@ -785,6 +832,46 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E9E9E9',
+  },
+  actionsContainerColumn: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'column',
+    gap: 10,
+    padding: 16,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E9E9E9',
+  },
+  invitationButtonRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  priceInputContainer: {
+    gap: 4,
+  },
+  priceInputLabel: {
+    color: '#666666',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  priceInput: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E9E9E9',
+    color: '#1A1A1A',
+    fontSize: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  priceNegotiable: {
+    color: Colors.primary,
+    fontSize: 22,
+    fontWeight: '700',
+    marginBottom: 4,
   },
   refuseButton: {
     flex: 1,

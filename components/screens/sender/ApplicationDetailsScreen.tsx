@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  SafeAreaView,
+  ActivityIndicator,
   Alert,
   Platform,
-  ActivityIndicator,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
-import { Button } from '../../ui/Button';
-import Badge from '../../ui/Badge';
 import { AppIcon } from '../../ui/Icon';
 import * as shipmentService from '../../../services/shipment.service';
-import { Shipment } from '../../../services/shipment.service';
+import { Shipment, ShipmentApplication } from '../../../services/shipment.service';
 
 interface ApplicationDetailsScreenProps {
   onNavigate?: (screen: string, params?: any) => void;
@@ -24,15 +22,31 @@ interface ApplicationDetailsScreenProps {
 }
 
 /**
- * ApplicationDetailsScreen - View and manage a specific carrier application (GROUPE 2)
- * Shows shipment details and allows sender to accept or reject the carrier
+ * ApplicationDetailsScreen – TC-106
+ * Sender views all carrier applications for a shipment and accepts/rejects them.
  */
 const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
   onNavigate,
   initialData,
 }) => {
   const [shipment] = useState<Shipment | null>(initialData?.shipment || null);
-  const [loading, setLoading] = useState(false);
+  const [applications, setApplications] = useState<ShipmentApplication[]>([]);
+  const [loadingApps, setLoadingApps] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const fetchApplications = useCallback(async () => {
+    if (!shipment?.id) return;
+    setLoadingApps(true);
+    const result = await shipmentService.getShipmentApplications(shipment.id);
+    if (result.success && result.applications) {
+      setApplications(result.applications);
+    }
+    setLoadingApps(false);
+  }, [shipment?.id]);
+
+  useEffect(() => {
+    fetchApplications();
+  }, [fetchApplications]);
 
   if (!shipment) {
     return (
@@ -40,108 +54,89 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
         <View style={styles.errorContainer}>
           <AppIcon name="alert-triangle" size={24} color={Colors.error} />
           <Text style={styles.errorText}>Expédition introuvable</Text>
-          <Button onPress={() => onNavigate?.('applicationList')}>
-            <Text style={styles.buttonText}>Retour</Text>
-          </Button>
+          <TouchableOpacity style={styles.backBtn} onPress={() => onNavigate?.('applicationList')}>
+            <Text style={styles.backBtnText}>Retour</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
   }
 
-  const handleAcceptCarrier = async () => {
-    const confirmMsg = 'Voulez-vous accepter ce transporteur pour cette expédition ?';
-    
-    const onConfirm = async () => {
-      try {
-        setLoading(true);
-        const result = await shipmentService.acceptCarrier(shipment.id);
+  const handleAccept = (app: ShipmentApplication) => {
+    const confirmMsg = `Accepter la candidature de ${app.carrier?.firstName ?? 'ce transporteur'} pour ${app.proposedPrice} TND ?`;
 
+    const doAccept = async () => {
+      try {
+        setActionLoading(app.id);
+        const result = await shipmentService.acceptCarrier(shipment.id, app.id);
         if (result.success) {
-          // Navigate to confirmation screen (M6)
           onNavigate?.('applicationAccepted', { shipment: result.shipment });
         } else {
-          const errorMsg = result.error || 'Impossible d\'accepter le transporteur';
+          const msg = result.error || "Impossible d'accepter";
           if (Platform.OS === 'web') {
-            window.alert(errorMsg);
+            window.alert(msg);
           } else {
-            Alert.alert('Erreur', errorMsg);
+            Alert.alert('Erreur', msg);
           }
         }
-      } catch (err) {
-        console.error('Error accepting carrier:', err);
-        if (Platform.OS === 'web') {
-          window.alert('Erreur de connexion');
-        } else {
-          Alert.alert('Erreur', 'Erreur de connexion');
-        }
+      } catch {
+        Alert.alert('Erreur', 'Erreur de connexion');
       } finally {
-        setLoading(false);
+        setActionLoading(null);
       }
     };
 
     if (Platform.OS === 'web') {
       if (window.confirm(confirmMsg)) {
-        onConfirm();
+        doAccept();
       }
     } else {
-      Alert.alert('Accepter le transporteur', confirmMsg, [
+      Alert.alert('Accepter', confirmMsg, [
         { text: 'Annuler', style: 'cancel' },
-        { text: 'Accepter', style: 'default', onPress: onConfirm },
+        { text: 'Accepter', onPress: doAccept },
       ]);
     }
   };
 
-  const handleRejectCarrier = async () => {
-    const confirmMsg = 'Voulez-vous refuser ce transporteur ? L\'expédition redeviendra disponible.';
-    
-    const onConfirm = async () => {
-      try {
-        setLoading(true);
-        const result = await shipmentService.rejectCarrier(shipment.id);
+  const handleReject = (app: ShipmentApplication) => {
+    const confirmMsg = `Refuser la candidature de ${app.carrier?.firstName ?? 'ce transporteur'} ?`;
 
+    const doReject = async () => {
+      try {
+        setActionLoading(app.id);
+        const result = await shipmentService.rejectCarrier(shipment.id, app.id);
         if (result.success) {
-          const successMsg = result.message || 'Transporteur refusé. L\'expédition est à nouveau disponible.';
-          if (Platform.OS === 'web') {
-            window.alert(successMsg);
-            onNavigate?.('dashboard', { refresh: Date.now() });
-          } else {
-            Alert.alert('Succès', successMsg, [
-              {
-                text: 'OK',
-                onPress: () => onNavigate?.('dashboard', { refresh: Date.now() }),
-              },
-            ]);
-          }
+          fetchApplications();
         } else {
-          const errorMsg = result.error || 'Impossible de refuser le transporteur';
+          const msg = result.error || 'Impossible de refuser';
           if (Platform.OS === 'web') {
-            window.alert(errorMsg);
+            window.alert(msg);
           } else {
-            Alert.alert('Erreur', errorMsg);
+            Alert.alert('Erreur', msg);
           }
         }
-      } catch (err) {
-        console.error('Error rejecting carrier:', err);
-        if (Platform.OS === 'web') {
-          window.alert('Erreur de connexion');
-        } else {
-          Alert.alert('Erreur', 'Erreur de connexion');
-        }
+      } catch {
+        Alert.alert('Erreur', 'Erreur de connexion');
       } finally {
-        setLoading(false);
+        setActionLoading(null);
       }
     };
 
     if (Platform.OS === 'web') {
       if (window.confirm(confirmMsg)) {
-        onConfirm();
+        doReject();
       }
     } else {
-      Alert.alert('Refuser le transporteur', confirmMsg, [
+      Alert.alert('Refuser', confirmMsg, [
         { text: 'Annuler', style: 'cancel' },
-        { text: 'Refuser', style: 'destructive', onPress: onConfirm },
+        { text: 'Refuser', style: 'destructive', onPress: doReject },
       ]);
     }
+  };
+
+  const renderStars = (rating?: number) => {
+    if (!rating) return null;
+    return `⭐ ${rating.toFixed(1)}`;
   };
 
   return (
@@ -149,474 +144,330 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
+          activeOpacity={0.7}
           onPress={() => onNavigate?.('applicationList')}
           style={styles.backButton}
-          activeOpacity={0.7}
         >
           <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Candidature</Text>
+        <View style={styles.headerCenter}>
+          <Text style={styles.headerTitle}>Candidatures</Text>
+          <Text style={styles.headerSub}>{shipment.refNumber}</Text>
+        </View>
         <View style={styles.headerRight} />
       </View>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        {/* Status Alert */}
-        <Card style={styles.alertCard}>
-          <View style={styles.alertContent}>
-            <AppIcon name="refresh" size={22} color={Colors.warning} />
-            <View style={styles.alertTextContainer}>
-              <Text style={styles.alertTitle}>Décision en attente</Text>
-              <Text style={styles.alertText}>
-                Un transporteur souhaite prendre cette expédition
-              </Text>
-            </View>
+        {/* Route summary */}
+        <Card style={styles.routeCard}>
+          <View style={styles.routeRow}>
+            <AppIcon name="map-pin" size={14} color={Colors.primary} />
+            <Text style={styles.routeText} numberOfLines={1}>{shipment.from}</Text>
           </View>
-        </Card>
-
-        {/* Shipment Info */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Détails de l'expédition</Text>
-        </View>
-
-        <Card style={styles.infoCard}>
-          <View style={styles.infoHeader}>
-            <Text style={styles.refNumber}>{shipment.refNumber}</Text>
-            <Badge status="warning" text="Demandé" />
-          </View>
-
-          <View style={styles.divider} />
-
-          {/* Route */}
-          <View style={styles.routeSection}>
-            <View style={styles.routePoint}>
-              <View style={styles.pointDot}>
-                <AppIcon name="location-pin" size={16} color={Colors.primary} />
-              </View>
-              <View style={styles.pointInfo}>
-                <Text style={styles.pointLabel}>Départ</Text>
-                <Text style={styles.pointValue}>{shipment.from}</Text>
-              </View>
-            </View>
-
+          <View style={styles.routeArrow}>
             <View style={styles.routeLine} />
-
-            <View style={styles.routePoint}>
-              <View style={styles.pointDot}>
-                <AppIcon name="location-pin" size={16} color={Colors.primary} />
-              </View>
-              <View style={styles.pointInfo}>
-                <Text style={styles.pointLabel}>Arrivée</Text>
-                <Text style={styles.pointValue}>{shipment.to}</Text>
-              </View>
-            </View>
+            <AppIcon name="chevron-down" size={12} color={Colors.textSecondary} />
           </View>
-
-          <View style={styles.divider} />
-
-          {/* Details */}
-          <View style={styles.detailsGrid}>
-            <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Type de colis</Text>
-              <Text style={styles.detailValue}>{shipment.cargo || 'Colis standard'}</Text>
-            </View>
-            <View style={styles.detailItem}>
-              <Text style={styles.detailLabel}>Prix</Text>
-              <Text style={styles.detailPrice}>{shipment.price} TND</Text>
-            </View>
-          </View>
-
-          {shipment.description && (
-            <>
-              <View style={styles.divider} />
-              <View style={styles.descriptionSection}>
-                <Text style={styles.detailLabel}>Description</Text>
-                <Text style={styles.descriptionText}>{shipment.description}</Text>
-              </View>
-            </>
-          )}
-        </Card>
-
-        {/* Carrier Info (Placeholder - would need carrier details from API) */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Transporteur</Text>
-        </View>
-
-        <Card style={styles.carrierCard}>
-          <View style={styles.carrierHeader}>
-            <View style={styles.carrierAvatar}>
-              <AppIcon name="profile-user" size={28} color={Colors.primary} />
-            </View>
-            <View style={styles.carrierInfo}>
-              <Text style={styles.carrierName}>Transporteur qualifié</Text>
-              <Text style={styles.carrierMeta}>⭐ 4.8 (124 courses)</Text>
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          <View style={styles.carrierStats}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>124</Text>
-              <Text style={styles.statLabel}>Courses</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>4.8</Text>
-              <Text style={styles.statLabel}>Note</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>98%</Text>
-              <Text style={styles.statLabel}>Succès</Text>
-            </View>
+          <View style={styles.routeRow}>
+            <AppIcon name="location-pin" size={14} color={Colors.accent} />
+            <Text style={styles.routeText} numberOfLines={1}>{shipment.to}</Text>
           </View>
         </Card>
 
-        {/* Actions Info */}
-        <Card style={styles.infoBox}>
-          <AppIcon name="info-circle" size={18} color={Colors.primary} />
-          <Text style={styles.infoBoxText}>
-            En acceptant, l'expédition sera confiée au transporteur et passera en transit.
-            En refusant, elle redeviendra disponible pour d'autres transporteurs.
-          </Text>
-        </Card>
+        {/* Applications list */}
+        <Text style={styles.sectionTitle}>
+          {loadingApps
+            ? 'Chargement des candidatures\u2026'
+            : `${applications.filter(a => a.status === 'PENDING').length} candidature(s) en attente`}
+        </Text>
+
+        {loadingApps ? (
+          <View style={styles.loadingApps}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+          </View>
+        ) : applications.filter(a => a.status === 'PENDING').length === 0 ? (
+          <Card style={styles.emptyCard}>
+            <AppIcon name="info-circle" size={24} color={Colors.textSecondary} />
+            <Text style={styles.emptyText}>Aucune candidature en attente pour le moment</Text>
+          </Card>
+        ) : (
+          applications
+            .filter(a => a.status === 'PENDING')
+            .map(app => {
+              const isActioning = actionLoading === app.id;
+              const carrierName = app.carrier
+                ? `${app.carrier.firstName} ${app.carrier.lastName}`
+                : 'Transporteur';
+              const initial = app.carrier?.firstName?.[0]?.toUpperCase() ?? 'T';
+              return (
+                <Card key={app.id} style={styles.applicationCard}>
+                  <View style={styles.applicationHeader}>
+                    <View style={styles.carrierAvatar}>
+                      <Text style={styles.carrierAvatarText}>{initial}</Text>
+                    </View>
+                    <View style={styles.carrierInfo}>
+                      <Text style={styles.carrierName}>{carrierName}</Text>
+                      {app.carrier?.gouvernerat ? (
+                        <Text style={styles.carrierMeta}>{app.carrier.gouvernerat}</Text>
+                      ) : null}
+                      {app.carrier?.averageRating ? (
+                        <Text style={styles.carrierMeta}>
+                          {renderStars(app.carrier.averageRating)}{' '}
+                          {app.carrier.totalReviews != null
+                            ? `(${app.carrier.totalReviews} avis)`
+                            : ''}
+                        </Text>
+                      ) : null}
+                    </View>
+                    <View style={styles.priceContainer}>
+                      <Text style={styles.priceValue}>{app.proposedPrice}</Text>
+                      <Text style={styles.priceLabel}>TND</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.applicationActions}>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      disabled={isActioning || actionLoading !== null}
+                      onPress={() => handleReject(app)}
+                      style={[
+                        styles.rejectBtn,
+                        (isActioning || actionLoading !== null) && styles.btnDisabled,
+                      ]}
+                    >
+                      {isActioning ? (
+                        <ActivityIndicator size="small" color={Colors.error} />
+                      ) : (
+                        <Text style={styles.rejectBtnText}>Refuser</Text>
+                      )}
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      disabled={isActioning || actionLoading !== null}
+                      onPress={() => handleAccept(app)}
+                      style={[
+                        styles.acceptBtn,
+                        (isActioning || actionLoading !== null) && styles.btnDisabled,
+                      ]}
+                    >
+                      {isActioning ? (
+                        <ActivityIndicator size="small" color="#FFFFFF" />
+                      ) : (
+                        <Text style={styles.acceptBtnText}>Accepter</Text>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                </Card>
+              );
+            })
+        )}
       </ScrollView>
-
-      {/* Bottom Actions */}
-      {loading ? (
-        <View style={styles.bottomActions}>
-          <ActivityIndicator size="small" color={Colors.primary} />
-          <Text style={styles.loadingText}>Traitement...</Text>
-        </View>
-      ) : (
-        <View style={styles.bottomActions}>
-          <TouchableOpacity
-            style={styles.rejectButton}
-            onPress={handleRejectCarrier}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.rejectButtonText}>Refuser</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.acceptButton}
-            onPress={handleAcceptCarrier}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.acceptButtonText}>Accepter</Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  header: {
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E9E9E9',
-    paddingHorizontal: 20,
-    paddingTop: 72,
-    paddingBottom: 20,
-    flexDirection: 'row',
+  acceptBtn: {
     alignItems: 'center',
-    justifyContent: 'space-between',
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    flex: 1,
+    paddingVertical: 10,
+  },
+  acceptBtnText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  applicationActions: {
+    borderTopColor: '#F0F0F0',
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 12,
+    paddingTop: 12,
+  },
+  applicationCard: {
+    marginBottom: 12,
+    padding: 16,
+  },
+  applicationHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+  },
+  backBtn: {
+    backgroundColor: Colors.primary,
+    borderRadius: 8,
+    marginTop: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+  },
+  backBtnText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '600',
   },
   backButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.background,
     alignItems: 'center',
+    backgroundColor: Colors.background,
+    borderRadius: 16,
+    height: 32,
     justifyContent: 'center',
+    width: 32,
   },
-  backIcon: {
-    fontSize: 20,
-    color: '#1A1A1A',
+  btnDisabled: {
+    opacity: 0.5,
   },
-  headerTitle: {
-    fontSize: 20,
+  carrierAvatar: {
+    alignItems: 'center',
+    backgroundColor: Colors.primary,
+    borderRadius: 22,
+    height: 44,
+    justifyContent: 'center',
+    width: 44,
+  },
+  carrierAvatarText: {
+    color: '#FFFFFF',
+    fontSize: 18,
     fontWeight: '700',
-    color: '#1A1A1A',
+  },
+  carrierInfo: {
     flex: 1,
+    gap: 2,
+  },
+  carrierMeta: {
+    color: '#666666',
+    fontSize: 12,
+  },
+  carrierName: {
+    color: '#1A1A1A',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  container: {
+    backgroundColor: Colors.background,
+    flex: 1,
+  },
+  emptyCard: {
+    alignItems: 'center',
+    gap: 12,
+    padding: 32,
+  },
+  emptyText: {
+    color: '#666666',
+    fontSize: 14,
     textAlign: 'center',
+  },
+  errorContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    padding: 40,
+  },
+  errorText: {
+    color: '#666666',
+    fontSize: 16,
+    marginBottom: 24,
+    marginTop: 12,
+  },
+  header: {
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderBottomColor: '#E9E9E9',
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    paddingTop: 72,
+  },
+  headerCenter: {
+    alignItems: 'center',
+    flex: 1,
   },
   headerRight: {
     width: 32,
   },
-  scrollView: {
+  headerSub: {
+    color: '#666666',
+    fontSize: 12,
+    marginTop: 2,
+  },
+  headerTitle: {
+    color: '#1A1A1A',
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  loadingApps: {
+    alignItems: 'center',
+    paddingVertical: 48,
+  },
+  priceContainer: {
+    alignItems: 'flex-end',
+  },
+  priceLabel: {
+    color: '#666666',
+    fontSize: 11,
+  },
+  priceValue: {
+    color: Colors.primary,
+    fontSize: 22,
+    fontWeight: '800',
+  },
+  rejectBtn: {
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderColor: Colors.error,
+    borderRadius: 8,
+    borderWidth: 1,
     flex: 1,
+    paddingVertical: 10,
+  },
+  rejectBtnText: {
+    color: Colors.error,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  routeArrow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 4,
+    paddingLeft: 4,
+    paddingVertical: 2,
+  },
+  routeCard: {
+    marginBottom: 16,
+    padding: 14,
+  },
+  routeLine: {
+    backgroundColor: Colors.textSecondary,
+    height: 1,
+    width: 16,
+  },
+  routeRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+  },
+  routeText: {
+    color: '#1A1A1A',
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '600',
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 120,
+    paddingBottom: 40,
   },
-  alertCard: {
-    backgroundColor: '#FFF9E6',
-    borderWidth: 1,
-    borderColor: '#F59E0B',
-    padding: 16,
-    marginBottom: 24,
-  },
-  alertContent: {
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'center',
-  },
-  alertIcon: {
-    fontSize: 32,
-  },
-  alertTextContainer: {
+  scrollView: {
     flex: 1,
-  },
-  alertTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 4,
-  },
-  alertText: {
-    fontSize: 13,
-    color: '#666666',
-  },
-  sectionHeader: {
-    marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
     color: '#1A1A1A',
-  },
-  infoCard: {
-    padding: 16,
-    marginBottom: 24,
-  },
-  infoHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  refNumber: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#F0F0F0',
-    marginVertical: 16,
-  },
-  routeSection: {
-    gap: 8,
-  },
-  routePoint: {
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'flex-start',
-  },
-  pointDot: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F0F0F0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pointIcon: {
-    fontSize: 20,
-  },
-  pointInfo: {
-    flex: 1,
-    paddingTop: 4,
-  },
-  pointLabel: {
-    fontSize: 12,
-    color: '#999999',
-    marginBottom: 2,
-  },
-  pointValue: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1A1A',
-  },
-  routeLine: {
-    width: 2,
-    height: 24,
-    backgroundColor: '#E0E0E0',
-    marginLeft: 19,
-  },
-  detailsGrid: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  detailItem: {
-    flex: 1,
-  },
-  detailLabel: {
-    fontSize: 12,
-    color: '#999999',
-    marginBottom: 4,
-  },
-  detailValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
-  },
-  detailPrice: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: Colors.primary,
-  },
-  descriptionSection: {
-    gap: 8,
-  },
-  descriptionText: {
-    fontSize: 14,
-    color: '#666666',
-    lineHeight: 20,
-  },
-  carrierCard: {
-    padding: 16,
-    marginBottom: 24,
-  },
-  carrierHeader: {
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'center',
-  },
-  carrierAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#F0F0F0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  carrierAvatarText: {
-    fontSize: 28,
-  },
-  carrierInfo: {
-    flex: 1,
-  },
-  carrierName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 4,
-  },
-  carrierMeta: {
-    fontSize: 13,
-    color: '#666666',
-  },
-  carrierStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  statItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.primary,
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#999999',
-  },
-  statDivider: {
-    width: 1,
-    backgroundColor: '#F0F0F0',
-  },
-  infoBox: {
-    padding: 16,
-    backgroundColor: '#F0F7FF',
-    borderWidth: 1,
-    borderColor: Colors.primary,
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'flex-start',
-  },
-  infoBoxIcon: {
-    fontSize: 20,
-  },
-  infoBoxText: {
-    flex: 1,
-    fontSize: 13,
-    color: '#666666',
-    lineHeight: 18,
-  },
-  bottomActions: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#FFFFFF',
-    borderTopWidth: 1,
-    borderTopColor: '#E9E9E9',
-    padding: 20,
-    flexDirection: 'row',
-    gap: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loadingText: {
-    fontSize: 14,
-    color: '#666666',
-    marginLeft: 8,
-  },
-  rejectButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: Colors.error,
-    alignItems: 'center',
-  },
-  rejectButtonText: {
     fontSize: 15,
     fontWeight: '700',
-    color: Colors.error,
-  },
-  acceptButton: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
-    backgroundColor: Colors.primary,
-    alignItems: 'center',
-  },
-  acceptButtonText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  errorContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 40,
-  },
-  errorIcon: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
-  errorText: {
-    fontSize: 16,
-    color: '#666666',
-    marginBottom: 24,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '600',
+    marginBottom: 12,
   },
 });
 

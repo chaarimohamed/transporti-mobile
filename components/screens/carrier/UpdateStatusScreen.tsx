@@ -150,7 +150,7 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
     onNavigate?.('paymentCodeInput', {
       missionId: missionId,
       shipmentId: mission.id,
-      amount: mission.price,
+      amount: mission.price ?? 0,
       clientName: senderName,
       address: mission.to,
     });

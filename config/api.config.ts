@@ -63,6 +63,8 @@ export const API_ENDPOINTS = {
     DELETE: (id: string) => `/shipments/${id}`,
     STATS: '/shipments/stats',
     PHOTOS: (id: string) => `/shipments/${id}/photos`,
+    APPLICATIONS: (id: string) => `/shipments/${id}/applications`,
+    FEEDBACK: (id: string) => `/shipments/${id}/feedback`,
   },
   
   // Missions (for Carriers)

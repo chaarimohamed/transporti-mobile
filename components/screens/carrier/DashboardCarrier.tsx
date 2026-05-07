@@ -102,7 +102,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
       // Calculate earnings from completed shipments
       if (completedShipmentsResult.success && completedShipmentsResult.shipments) {
         const completedShipments = completedShipmentsResult.shipments.filter(s => s.status === 'DELIVERED');
-        const earnings = completedShipments.reduce((sum, shipment) => sum + shipment.price, 0);
+        const earnings = completedShipments.reduce((sum, shipment) => sum + (shipment.price ?? 0), 0);
         setTotalEarnings(earnings);
       } else {
         setTotalEarnings(0);

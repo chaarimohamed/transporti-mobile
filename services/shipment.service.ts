@@ -10,7 +10,7 @@ export interface Shipment {
   from: string;
   to: string;
   cargo?: string;
-  price: number;
+  price?: number | null;
   status: 'PENDING' | 'REQUESTED' | 'CONFIRMED' | 'HANDOVER_PENDING' | 'IN_TRANSIT' | 'DELIVERED' | 'CANCELLED';
   description?: string;
   senderId: string;
@@ -56,6 +56,28 @@ export interface Shipment {
   deliveryMeetingPoint?: string;
   feedback?: ShipmentFeedback;
   feedbackSummary?: ShipmentFeedbackSummary;
+}
+
+export type ApplicationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
+
+export interface ShipmentApplication {
+  id: string;
+  proposedPrice: number;
+  status: ApplicationStatus;
+  carrierId: string;
+  shipmentId: string;
+  createdAt: string;
+  updatedAt: string;
+  carrier?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    gouvernerat?: string;
+    averageRating?: number;
+    totalReviews?: number;
+    vehicleType?: string;
+  };
 }
 
 export interface ShipmentFeedback {
@@ -104,7 +126,7 @@ export interface CreateShipmentData {
   from: string;
   to: string;
   cargo?: string;
-  price: number;
+  price?: number;
   description?: string;
   pickupDate?: string;
   weight?: string;
@@ -279,12 +301,13 @@ export const getShipmentById = async (id: string): Promise<{ success: boolean; s
 };
 
 /**
- * Request a shipment (carrier expresses interest)
+ * Request a shipment (carrier expresses interest, with a proposed price)
  */
-export const requestShipment = async (id: string): Promise<{ success: boolean; shipment?: Shipment; error?: string; message?: string }> => {
+export const requestShipment = async (id: string, proposedPrice: number): Promise<{ success: boolean; shipment?: Shipment; error?: string; message?: string }> => {
   try {
     const response = await apiClient.post<ApiResponse<Shipment>>(
-      `${API_ENDPOINTS.SHIPMENTS.LIST}/${id}/request`
+      `${API_ENDPOINTS.SHIPMENTS.LIST}/${id}/request`,
+      { proposedPrice }
     );
 
     if (response.data.success) {
@@ -298,6 +321,35 @@ export const requestShipment = async (id: string): Promise<{ success: boolean; s
     return {
       success: false,
       error: response.data.error || 'Échec de la demande',
+    };
+  } catch (error) {
+    const apiError = handleApiError(error);
+    return {
+      success: false,
+      error: apiError.message,
+    };
+  }
+};
+
+/**
+ * Get all applications for a shipment (sender view)
+ */
+export const getShipmentApplications = async (shipmentId: string): Promise<{ success: boolean; applications?: ShipmentApplication[]; error?: string }> => {
+  try {
+    const response = await apiClient.get<ApiResponse<ShipmentApplication[]>>(
+      API_ENDPOINTS.SHIPMENTS.APPLICATIONS(shipmentId)
+    );
+
+    if (response.data.success && response.data.data) {
+      return {
+        success: true,
+        applications: response.data.data,
+      };
+    }
+
+    return {
+      success: false,
+      error: response.data.error || 'Échec de la récupération des candidatures',
     };
   } catch (error) {
     const apiError = handleApiError(error);
@@ -339,12 +391,13 @@ export const inviteCarrier = async (shipmentId: string, carrierId: string): Prom
 };
 
 /**
- * Accept invitation (carrier accepts sender's invitation)
+ * Accept invitation (carrier accepts sender's invitation, with a proposed price)
  */
-export const acceptInvitation = async (id: string): Promise<{ success: boolean; shipment?: Shipment; error?: string; message?: string }> => {
+export const acceptInvitation = async (id: string, proposedPrice: number): Promise<{ success: boolean; shipment?: Shipment; error?: string; message?: string }> => {
   try {
     const response = await apiClient.post<ApiResponse<Shipment>>(
-      `${API_ENDPOINTS.SHIPMENTS.LIST}/${id}/accept-invitation`
+      `${API_ENDPOINTS.SHIPMENTS.LIST}/${id}/accept-invitation`,
+      { proposedPrice }
     );
 
     if (response.data.success) {
@@ -371,10 +424,11 @@ export const acceptInvitation = async (id: string): Promise<{ success: boolean; 
 /**
  * Accept carrier request (sender accepts a carrier's application)
  */
-export const acceptCarrier = async (id: string): Promise<{ success: boolean; shipment?: Shipment; error?: string; message?: string }> => {
+export const acceptCarrier = async (id: string, applicationId: string): Promise<{ success: boolean; shipment?: Shipment; error?: string; message?: string }> => {
   try {
     const response = await apiClient.post<ApiResponse<Shipment>>(
-      `${API_ENDPOINTS.SHIPMENTS.LIST}/${id}/accept-carrier`
+      `${API_ENDPOINTS.SHIPMENTS.LIST}/${id}/accept-carrier`,
+      { applicationId }
     );
 
     if (response.data.success) {
@@ -401,10 +455,11 @@ export const acceptCarrier = async (id: string): Promise<{ success: boolean; shi
 /**
  * Reject carrier request (sender rejects a carrier's application)
  */
-export const rejectCarrier = async (id: string): Promise<{ success: boolean; shipment?: Shipment; error?: string; message?: string }> => {
+export const rejectCarrier = async (id: string, applicationId: string): Promise<{ success: boolean; shipment?: Shipment; error?: string; message?: string }> => {
   try {
     const response = await apiClient.post<ApiResponse<Shipment>>(
-      `${API_ENDPOINTS.SHIPMENTS.LIST}/${id}/reject-carrier`
+      `${API_ENDPOINTS.SHIPMENTS.LIST}/${id}/reject-carrier`,
+      { applicationId }
     );
 
     if (response.data.success) {

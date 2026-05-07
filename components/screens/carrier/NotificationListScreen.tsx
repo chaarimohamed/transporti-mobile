@@ -75,7 +75,7 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
     setProcessingId(notification.id);
     try {
       // Accept the invitation — this sets status CONFIRMED and notifies the sender (BUG-01 fix)
-      const result = await shipmentService.acceptInvitation(notification.shipmentId);
+      const result = await shipmentService.acceptInvitation(notification.shipmentId, 0);
 
       if (result.success) {
         Alert.alert(

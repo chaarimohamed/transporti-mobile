@@ -86,7 +86,7 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
         list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         break;
       case 'Prix':
-        list.sort((a, b) => b.price - a.price);
+        list.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
         break;
       default:
         // 'Toutes' — keep backend order (date desc)
