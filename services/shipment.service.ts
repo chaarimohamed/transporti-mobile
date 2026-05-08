@@ -9,6 +9,11 @@ export interface Shipment {
   refNumber: string;
   from: string;
   to: string;
+  itemName?: string;
+  pickupDate?: string;
+  packageFormat?: string;
+  pickupCity?: string;
+  deliveryCity?: string;
   cargo?: string;
   price?: number | null;
   status: 'PENDING' | 'REQUESTED' | 'CONFIRMED' | 'HANDOVER_PENDING' | 'IN_TRANSIT' | 'DELIVERED' | 'CANCELLED';
@@ -50,6 +55,7 @@ export interface Shipment {
   // Only returned by the single-shipment detail endpoint (GET /api/shipments/:id)
   // Not included in list responses to keep payloads small
   packagePhotos?: string[];
+  photoPreviews?: string[];
   // Returned by list endpoints — number of attached photos (TC-107)
   photosCount?: number;
   helperCount?: number;
@@ -127,10 +133,13 @@ export interface CarrierStats {
 export interface CreateShipmentData {
   from: string;
   to: string;
+  itemName?: string;
   cargo?: string;
   price?: number;
   description?: string;
   pickupDate?: string;
+  pickupCity?: string;
+  deliveryCity?: string;
   weight?: string;
   format?: string;
   dimensions?: {

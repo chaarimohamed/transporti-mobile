@@ -53,41 +53,36 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
     return null;
   })();
 
-  const estimatedPrice = calculatePrice(initialData, distanceKm);
-
-  function calculatePrice(data: any, distKm: number | null): number {
-    let basePrice = 50;
-    
-    // Distance pricing
-    if (distKm !== null) {
-      basePrice += Math.round(distKm * 0.5);
+  const getCargoLabel = (format?: string) => {
+    switch (format) {
+      case 'S':
+        return 'Petit colis';
+      case 'M':
+        return 'Sac / Valise';
+      case 'L':
+        return 'Meuble / Électroménager';
+      case 'XL':
+        return 'Déménagement';
+      default:
+        return 'Marchandise';
     }
-    
-    // Weight pricing
-    if (data?.weightRange) {
-      if (data.weightRange === '<5') basePrice += 20;
-      else if (data.weightRange === '5-30') basePrice += 50;
-      else if (data.weightRange === '30-50') basePrice += 80;
-      else if (data.weightRange === '50-100') basePrice += 120;
-      else if (data.weightRange === '>100') basePrice += 200;
-    }
+  };
 
-    // Format pricing
-    if (data?.format) {
-      if (data.format === 'S') basePrice += 10;
-      else if (data.format === 'M') basePrice += 20;
-      else if (data.format === 'L') basePrice += 40;
-      else if (data.format === 'XL') basePrice += 80;
+  const formatPickupDate = (pickupDate?: string) => {
+    if (!pickupDate) {
+      return 'Date non spécifiée';
     }
 
-    // Helper fees
-    if (data?.helperCount === 1) basePrice += 15;
-    else if (data?.helperCount === 2) basePrice += 30;
-    if (data?.deliveryHelperCount === 1) basePrice += 15;
-    else if (data?.deliveryHelperCount === 2) basePrice += 30;
+    if (pickupDate.includes('/')) {
+      return pickupDate;
+    }
 
-    return basePrice;
-  }
+    return new Date(pickupDate).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
 
   const handleConfirm = async () => {
     try {
@@ -96,10 +91,14 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
       const shipmentData = {
         from: initialData?.pickupAddress || 'Tunis',
         to: initialData?.deliveryAddress || 'Sfax',
-        cargo: `Colis ${initialData?.format || 'M'}`,
-        pickupDate: initialData?.pickupDate || new Date().toISOString(),
+        itemName: initialData?.itemName || undefined,
+        cargo: getCargoLabel(initialData?.format),
+        pickupDate: initialData?.pickupDate || undefined,
+        pickupCity: initialData?.pickupCity || undefined,
+        deliveryCity: initialData?.deliveryCity || undefined,
         weight: initialData?.weightRange || 'Non spécifié',
         packageFormat: initialData?.format || 'M',
+        format: initialData?.format || 'M',
         dimensions: initialData?.dimensions || null,
         specialInstructions: initialData?.specialInstructions || '',
         declaredValue: 0,
@@ -201,12 +200,7 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
               </Text>
               {initialData?.pickupDate && (
                 <Text style={styles.routeDate}>
-                  {new Date(initialData.pickupDate).toLocaleDateString('fr-FR', {
-                    day: 'numeric',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {formatPickupDate(initialData.pickupDate)}
                 </Text>
               )}
             </View>
@@ -274,16 +268,6 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
           </Card>
         )}
 
-        {/* Price */}
-        <Card style={styles.priceCard}>
-          <View style={styles.priceRow}>
-            <Text style={styles.priceLabel}>À négocier</Text>
-            <Text style={styles.priceValue}>{estimatedPrice} TND</Text>
-          </View>
-          <Text style={styles.priceNote}>
-            Le prix sera négocié avec le transporteur
-          </Text>
-        </Card>
       </ScrollView>
 
       {/* Bottom Actions */}

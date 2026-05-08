@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
@@ -80,8 +81,20 @@ const ShipmentListScreen: React.FC<ShipmentListScreenProps> = ({ onNavigate, ini
   };
 
   const formatDate = (dateString: string) => {
+    if (dateString.includes('/')) {
+      return dateString;
+    }
+
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  };
+
+  const getPhotoUri = (photo: string) => {
+    if (photo.startsWith('data:') || photo.startsWith('http')) {
+      return photo;
+    }
+
+    return `data:image/jpeg;base64,${photo}`;
   };
 
   return (
@@ -152,6 +165,9 @@ const ShipmentListScreen: React.FC<ShipmentListScreenProps> = ({ onNavigate, ini
         ) : (
           shipments.map((shipment) => {
             const badge = getStatusBadge(shipment.status);
+            const routeFrom = shipment.pickupCity || shipment.from;
+            const routeTo = shipment.deliveryCity || shipment.to;
+            const summaryDate = shipment.pickupDate || shipment.createdAt;
             return (
               <Card key={shipment.id} style={styles.shipmentCard}>
                 <View style={styles.shipmentHeader}>
@@ -160,31 +176,42 @@ const ShipmentListScreen: React.FC<ShipmentListScreenProps> = ({ onNavigate, ini
                 </View>
 
                 <View style={styles.shipmentBody}>
+                  <Text style={styles.itemNameText} numberOfLines={1}>
+                    {shipment.itemName || shipment.cargo || 'Article'}
+                  </Text>
                   <View style={styles.routeContainer}>
                     <View style={styles.routeRow}>
                       <Text style={styles.routePoint} numberOfLines={1}>
-                        {shipment.from}
+                        {routeFrom}
                       </Text>
                       <AppIcon name="arrow-right" size={14} color={Colors.textMuted} />
                       <Text style={styles.routePoint} numberOfLines={1}>
-                        {shipment.to}
+                        {routeTo}
                       </Text>
                     </View>
                   </View>
                   <View style={styles.badgesRow}>
-                    <Badge status="neutral" text={shipment.cargo || 'Colis'} />
-                    {(shipment.photosCount ?? 0) > 0 && (
-                      <Badge status="neutral" text={`📷 ${shipment.photosCount}`} />
-                    )}
+                    <Badge status="neutral" text={shipment.cargo || 'Marchandise'} />
                   </View>
+                  {(shipment.photoPreviews?.length ?? 0) > 0 && (
+                    <View style={styles.photoStrip}>
+                      {shipment.photoPreviews?.map((photo, index) => (
+                        <Image
+                          key={`${shipment.id}-preview-${index}`}
+                          source={{ uri: getPhotoUri(photo) }}
+                          style={styles.photoPreview}
+                        />
+                      ))}
+                    </View>
+                  )}
                   <View style={styles.dateRow}>
                     <AppIcon name="calendar" size={12} color={Colors.textMuted} />
-                    <Text style={styles.metaText}>{formatDate(shipment.createdAt)}</Text>
+                    <Text style={styles.metaText}>{formatDate(summaryDate)}</Text>
                   </View>
                 </View>
 
                 <View style={styles.shipmentFooter}>
-                  <Text style={styles.priceText}>{shipment.price} TND</Text>
+                  <Text style={styles.summaryHint}>Résumé de la demande</Text>
                   <TouchableOpacity
                     onPress={() =>
                       onNavigate && onNavigate('shipmentDetails', { id: shipment.id })
@@ -275,6 +302,12 @@ const styles = StyleSheet.create({
   shipmentBody: {
     marginBottom: 12,
   },
+  itemNameText: {
+    color: '#1A1A1A',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
   routeContainer: {
     marginBottom: 4,
     overflow: 'hidden',
@@ -302,6 +335,17 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     marginTop: 6,
   },
+  photoStrip: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 6,
+    marginTop: 4,
+  },
+  photoPreview: {
+    borderRadius: 8,
+    height: 44,
+    width: 44,
+  },
   dateRow: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -316,10 +360,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  priceText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
+  summaryHint: {
+    color: Colors.textMuted,
+    fontSize: 12,
   },
   detailsLink: {
     fontSize: 14,

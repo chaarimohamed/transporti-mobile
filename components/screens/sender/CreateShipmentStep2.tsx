@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   TextInput,
+  KeyboardAvoidingView,
   Platform,
 } from 'react-native';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
@@ -47,9 +48,14 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
   const isFormValid = format;
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 24 : 0}
+      style={styles.keyboardAvoidingView}
+    >
+      <SafeAreaView style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
         <TouchableOpacity
           onPress={() => onNavigate?.('addressDelivery', {
             ...initialData,
@@ -67,20 +73,21 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
           <Text style={styles.headerTitle}>Détails supplémentaires</Text>
           <Text style={styles.stepIndicator}>2/3</Text>
         </View>
-      </View>
-
-      {/* Progress Bar */}
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBar}>
-          <View style={[styles.progressFill, { width: '66.66%' }]} />
         </View>
-      </View>
 
-      {/* Form Content */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-      >
+        {/* Progress Bar */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBar}>
+            <View style={[styles.progressFill, { width: '66.66%' }]} />
+          </View>
+        </View>
+
+        {/* Form Content */}
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
         {/* Package Format */}
         <View style={styles.section}>
           <Text style={styles.label}>Format du colis</Text>
@@ -229,10 +236,10 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
           </View>
           <Text style={styles.insuranceOffLabel}>Non</Text>
         </Card>
-      </ScrollView>
+        </ScrollView>
 
-      {/* Bottom Actions */}
-      <View style={styles.bottomActions}>
+        {/* Bottom Actions */}
+        <View style={styles.bottomActions}>
         <Button
           onPress={() => onNavigate?.('addressDelivery', {
             ...initialData,
@@ -254,12 +261,16 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
         >
           <Text style={styles.nextButtonText}>Suivant</Text>
         </Button>
-      </View>
-    </SafeAreaView>
+        </View>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  keyboardAvoidingView: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: Colors.background,

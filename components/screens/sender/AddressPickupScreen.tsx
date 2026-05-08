@@ -30,6 +30,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
   initialData,
 }) => {
   const [pickupAddress, setPickupAddress] = useState('');
+  const [pickupCity, setPickupCity] = useState('');
   const [pickupCoordinates, setPickupCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [helperCount, setHelperCount] = useState(0);
   const [isNotSender, setIsNotSender] = useState(false);
@@ -44,6 +45,9 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
     }
     if (initialData?.pickupCoordinates) {
       setPickupCoordinates(initialData.pickupCoordinates);
+    }
+    if (initialData?.pickupCity) {
+      setPickupCity(initialData.pickupCity);
     }
     if (initialData?.helperCount !== undefined) {
       setHelperCount(initialData.helperCount);
@@ -66,6 +70,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
     const data = {
       ...initialData,
       pickupAddress,
+      pickupCity,
       pickupCoordinates,
       helperCount,
       isNotSender,
@@ -77,6 +82,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
   };
 
   const handleSelectAddress = (address: AddressDetails) => {
+    setPickupCity(address.city || '');
     setPickupCoordinates({
       lat: address.latitude,
       lng: address.longitude,
@@ -99,6 +105,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
         const parts = [place.streetNumber, place.street, place.city, place.region].filter(Boolean);
         const address = parts.join(', ');
         setPickupAddress(address);
+        setPickupCity(place.city || place.region || '');
         setPickupCoordinates({ lat: loc.coords.latitude, lng: loc.coords.longitude });
       } else {
         Alert.alert('Erreur', 'Impossible de déterminer votre adresse');
@@ -118,6 +125,7 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
           onPress={() => onNavigate?.('createShipmentStep1', {
             ...initialData,
             pickupAddress,
+            pickupCity,
             pickupCoordinates,
             helperCount,
             isNotSender,
@@ -140,7 +148,10 @@ const AddressPickupScreen: React.FC<AddressPickupScreenProps> = ({
           <View style={styles.inputWrapper}>
             <AddressAutocomplete
               value={pickupAddress}
-              onChangeText={setPickupAddress}
+              onChangeText={(text) => {
+                setPickupAddress(text);
+                setPickupCity('');
+              }}
               onSelectAddress={handleSelectAddress}
               placeholder="Rechercher une adresse de collecte"
               iconText=""

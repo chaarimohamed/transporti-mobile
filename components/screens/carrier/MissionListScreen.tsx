@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
@@ -95,6 +96,14 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
     return list;
   }, [shipments, activeFilter, user?.gouvernerat]);
 
+  const getPhotoUri = (photo: string) => {
+    if (photo.startsWith('data:') || photo.startsWith('http')) {
+      return photo;
+    }
+
+    return `data:image/jpeg;base64,${photo}`;
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
@@ -170,6 +179,8 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
             const isNew = !isInvited &&
               shipment.createdAt &&
               new Date(shipment.createdAt) >= new Date(Date.now() - 86400000);
+            const routeFrom = shipment.pickupCity || shipment.from;
+            const routeTo = shipment.deliveryCity || shipment.to;
             return (
               <TouchableOpacity
                 key={shipment.id}
@@ -179,13 +190,16 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
                 <Card style={styles.missionCard}>
                   <View style={styles.missionHeader}>
                     <View style={styles.routeContainer}>
+                      <Text style={styles.routeText} numberOfLines={1}>
+                        {shipment.itemName || shipment.cargo || 'Article'}
+                      </Text>
                       <View style={styles.routeRow}>
                         <Text style={styles.routePoint} numberOfLines={1}>
-                          {shipment.from}
+                          {routeFrom}
                         </Text>
                         <AppIcon name="arrow-right" size={14} color={Colors.textMuted} />
                         <Text style={styles.routePoint} numberOfLines={1}>
-                          {shipment.to}
+                          {routeTo}
                         </Text>
                       </View>
                     </View>
@@ -196,15 +210,24 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
                     <Badge status="neutral" text={shipment.cargo || 'Marchandise'} />
                     {isInvited && <Badge status="warning" text="Invité" />}
                     {isNew && <Badge status="warning" text="Nouveau" />}
-                    {(shipment.photosCount ?? 0) > 0 && (
-                      <Badge status="neutral" text={`📷 ${shipment.photosCount}`} />
-                    )}
                   </View>
+
+                  {(shipment.photoPreviews?.length ?? 0) > 0 && (
+                    <View style={styles.photoStrip}>
+                      {shipment.photoPreviews?.map((photo, index) => (
+                        <Image
+                          key={`${shipment.id}-mission-preview-${index}`}
+                          source={{ uri: getPhotoUri(photo) }}
+                          style={styles.photoPreview}
+                        />
+                      ))}
+                    </View>
+                  )}
 
                   <View style={styles.dateRow}>
                     <AppIcon name="calendar" size={14} color={Colors.textMuted} />
                     <Text style={styles.dateText}>
-                      {new Date(shipment.createdAt).toLocaleDateString('fr-FR', {
+                      {shipment.pickupDate || new Date(shipment.createdAt).toLocaleDateString('fr-FR', {
                         day: 'numeric',
                         month: 'short',
                       })}
@@ -317,6 +340,16 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8,
     marginBottom: 8,
+  },
+  photoStrip: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+  },
+  photoPreview: {
+    borderRadius: 8,
+    height: 44,
+    width: 44,
   },
   dateRow: {
     flexDirection: 'row',

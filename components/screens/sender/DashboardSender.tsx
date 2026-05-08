@@ -10,6 +10,7 @@ import {
   Platform,
   ActivityIndicator,
   AppState,
+  Image,
 } from 'react-native';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
@@ -122,6 +123,29 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
       default:
         return { status: 'neutral' as const, text: status };
     }
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) {
+      return 'Date non spécifiée';
+    }
+
+    if (dateString.includes('/')) {
+      return dateString;
+    }
+
+    return new Date(dateString).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'short',
+    });
+  };
+
+  const getPhotoUri = (photo: string) => {
+    if (photo.startsWith('data:') || photo.startsWith('http')) {
+      return photo;
+    }
+
+    return `data:image/jpeg;base64,${photo}`;
   };
 
   const handleLogout = async () => {
@@ -272,6 +296,8 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
             shipments.map((shipment) => {
               const badge = getStatusBadge(shipment.status);
               const isPendingOrRequested = shipment.status === 'PENDING' || shipment.status === 'REQUESTED';
+              const routeFrom = shipment.pickupCity || shipment.from;
+              const routeTo = shipment.deliveryCity || shipment.to;
               return (
                 <TouchableOpacity
                   key={shipment.id}
@@ -283,18 +309,32 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
                       <Text style={styles.shipmentId}>{shipment.refNumber}</Text>
                       <Badge status={badge.status} text={badge.text} />
                     </View>
+                    <Text style={styles.shipmentItemName} numberOfLines={1}>
+                      {shipment.itemName || shipment.cargo || 'Article'}
+                    </Text>
                     <View style={styles.shipmentRoute}>
                       <AppIcon name="map-pin" size={14} color={Colors.primary} />
                       <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
-                        {shipment.from}
+                        {routeFrom}
                       </Text>
                       <AppIcon name="arrow-right" size={14} color={Colors.textMuted} />
                       <Text style={styles.locationText} numberOfLines={1} ellipsizeMode="tail">
-                        {shipment.to}
+                        {routeTo}
                       </Text>
                     </View>
+                    {(shipment.photoPreviews?.length ?? 0) > 0 && (
+                      <View style={styles.photoStrip}>
+                        {shipment.photoPreviews?.map((photo, index) => (
+                          <Image
+                            key={`${shipment.id}-dashboard-preview-${index}`}
+                            source={{ uri: getPhotoUri(photo) }}
+                            style={styles.photoPreview}
+                          />
+                        ))}
+                      </View>
+                    )}
                     <View style={styles.shipmentFooter}>
-                      <Text style={styles.priceText}>{shipment.price} TND</Text>
+                      <Text style={styles.priceText}>{formatDate(shipment.pickupDate || shipment.createdAt)}</Text>
                       {isPendingOrRequested && (
                         <TouchableOpacity
                           activeOpacity={0.7}
@@ -468,11 +508,27 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 12,
   },
+  shipmentItemName: {
+    color: Colors.charcoal,
+    fontFamily: Fonts.bold,
+    fontSize: FontSizes.base,
+    marginBottom: 8,
+  },
   locationText: {
     flex: 1,
     fontFamily: Fonts.regular,
     fontSize: FontSizes.sm,
     color: Colors.textSecondary,
+  },
+  photoStrip: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 10,
+  },
+  photoPreview: {
+    borderRadius: Radius.sm,
+    height: 40,
+    width: 40,
   },
   shipmentFooter: {
     flexDirection: 'row',

@@ -161,7 +161,7 @@ const ApplicationListScreen: React.FC<ApplicationListScreenProps> = ({ onNavigat
                     </View>
                   </View>
                   <Text style={styles.cardDate}>
-                    {new Date(shipment.createdAt).toLocaleDateString('fr-FR', {
+                    {shipment.pickupDate || new Date(shipment.createdAt).toLocaleDateString('fr-FR', {
                       day: 'numeric',
                       month: 'short',
                     })}
@@ -169,23 +169,26 @@ const ApplicationListScreen: React.FC<ApplicationListScreenProps> = ({ onNavigat
                 </View>
 
                 <View style={styles.cardBody}>
+                  <Text style={styles.itemNameText}>
+                    {shipment.itemName || shipment.cargo || 'Article'}
+                  </Text>
                   <View style={styles.routeInfo}>
                     <View style={styles.locationRow}>
                       <AppIcon name="location-pin" size={16} color={Colors.primary} />
-                      <Text style={styles.locationText}>{shipment.from}</Text>
+                      <Text style={styles.locationText}>{shipment.pickupCity || shipment.from}</Text>
                     </View>
                     <View style={styles.routeArrow}>
                       <AppIcon name="arrow-right" size={16} color={Colors.textMuted} />
                     </View>
                     <View style={styles.locationRow}>
                       <AppIcon name="location-pin" size={16} color={Colors.primary} />
-                      <Text style={styles.locationText}>{shipment.to}</Text>
+                      <Text style={styles.locationText}>{shipment.deliveryCity || shipment.to}</Text>
                     </View>
                   </View>
 
                   <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Prix:</Text>
-                    <Text style={styles.infoValue}>{shipment.price} TND</Text>
+                    <Text style={styles.infoLabel}>Type:</Text>
+                    <Text style={styles.infoValue}>{shipment.cargo || 'Marchandise'}</Text>
                   </View>
 
                   <View style={styles.notification}>
@@ -317,6 +320,12 @@ const styles = StyleSheet.create({
     padding: 48,
     alignItems: 'center',
     gap: 12,
+  },
+  itemNameText: {
+    color: '#1A1A1A',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 12,
   },
   emptyIcon: {
     fontSize: 64,

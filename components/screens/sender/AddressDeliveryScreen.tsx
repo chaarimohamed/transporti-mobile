@@ -29,6 +29,7 @@ const AddressDeliveryScreen: React.FC<AddressDeliveryScreenProps> = ({
   initialData,
 }) => {
   const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [deliveryCity, setDeliveryCity] = useState('');
   const [deliveryCoordinates, setDeliveryCoordinates] = useState<{ lat: number; lng: number } | null>(null);
   const [deliveryHelperCount, setDeliveryHelperCount] = useState(0);
   const [isNotRecipient, setIsNotRecipient] = useState(false);
@@ -43,6 +44,9 @@ const AddressDeliveryScreen: React.FC<AddressDeliveryScreenProps> = ({
     }
     if (initialData?.deliveryCoordinates) {
       setDeliveryCoordinates(initialData.deliveryCoordinates);
+    }
+    if (initialData?.deliveryCity) {
+      setDeliveryCity(initialData.deliveryCity);
     }
     if (initialData?.deliveryHelperCount !== undefined) {
       setDeliveryHelperCount(initialData.deliveryHelperCount);
@@ -65,6 +69,7 @@ const AddressDeliveryScreen: React.FC<AddressDeliveryScreenProps> = ({
     const data = {
       ...initialData,
       deliveryAddress,
+      deliveryCity,
       deliveryCoordinates,
       deliveryHelperCount,
       isNotRecipient,
@@ -76,6 +81,7 @@ const AddressDeliveryScreen: React.FC<AddressDeliveryScreenProps> = ({
   };
 
   const handleSelectAddress = (address: AddressDetails) => {
+    setDeliveryCity(address.city || '');
     setDeliveryCoordinates({
       lat: address.latitude,
       lng: address.longitude,
@@ -98,6 +104,7 @@ const AddressDeliveryScreen: React.FC<AddressDeliveryScreenProps> = ({
         const parts = [place.streetNumber, place.street, place.city, place.region].filter(Boolean);
         const address = parts.join(', ');
         setDeliveryAddress(address);
+        setDeliveryCity(place.city || place.region || '');
         setDeliveryCoordinates({ lat: loc.coords.latitude, lng: loc.coords.longitude });
       } else {
         Alert.alert('Erreur', 'Impossible de déterminer votre adresse');
@@ -117,6 +124,7 @@ const AddressDeliveryScreen: React.FC<AddressDeliveryScreenProps> = ({
           onPress={() => onNavigate?.('addressPickup', {
             ...initialData,
             deliveryAddress,
+            deliveryCity,
             deliveryCoordinates,
             deliveryHelperCount,
             isNotRecipient,
@@ -139,7 +147,10 @@ const AddressDeliveryScreen: React.FC<AddressDeliveryScreenProps> = ({
           <View style={styles.inputWrapper}>
             <AddressAutocomplete
               value={deliveryAddress}
-              onChangeText={setDeliveryAddress}
+              onChangeText={(text) => {
+                setDeliveryAddress(text);
+                setDeliveryCity('');
+              }}
               onSelectAddress={handleSelectAddress}
               placeholder="Rechercher une adresse de livraison"
               iconText=""
