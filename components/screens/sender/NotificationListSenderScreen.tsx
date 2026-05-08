@@ -82,7 +82,10 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
     // Navigate based on notification type
     const shipmentId = notification.shipmentId || notification.data?.shipmentId;
     if (shipmentId) {
-      if (notification.type === 'SHIPMENT_DELIVERED') {
+      if (notification.type === 'HANDOVER_REQUESTED') {
+        console.log('🚀 Navigating to shipmentDetails for handover confirmation:', shipmentId);
+        onNavigate?.('shipmentDetails', { id: shipmentId, highlightHandover: true });
+      } else if (notification.type === 'SHIPMENT_DELIVERED') {
         console.log('🚀 Navigating to shipmentFeedback with ID:', shipmentId);
         onNavigate?.('shipmentFeedback', {
           shipmentId,
@@ -94,7 +97,7 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
         onNavigate?.('shipmentDetails', { id: shipmentId });
       }
     } else {
-      console.log('⚠️ No shipmentId found in notification');
+      console.log('⚠️ No shipmentId found in notification', notification.type);
     }
   };
 
@@ -107,9 +110,9 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
         return 'notification-bell';
       case 'REQUEST_REJECTED':
         return 'x-circle';
-      case 'SHIPMENT_IN_TRANSIT':
-        return 'truck';
       case 'HANDOVER_REQUESTED':
+        return 'alert-triangle';
+      case 'SHIPMENT_IN_TRANSIT':
         return 'truck';
       case 'SHIPMENT_DELIVERED':
         return 'package-open';
@@ -127,9 +130,13 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
           bg: 'rgba(46, 139, 87, 0.1)',
           text: '#2E8B57',
         };
+      case 'HANDOVER_REQUESTED':
+        return {
+          bg: Colors.warningSurface,
+          text: Colors.warning,
+        };
       case 'SHIPMENT_INVITATION':
       case 'SHIPMENT_IN_TRANSIT':
-      case 'HANDOVER_REQUESTED':
         return {
           bg: 'rgba(20, 100, 246, 0.1)',
           text: Colors.primary,
@@ -164,6 +171,8 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
     }
   };
 
+  const isActionRequired = (type: string) => type === 'HANDOVER_REQUESTED';
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -194,12 +203,14 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
           notifications.map((notification) => {
             const colors = getNotificationColor(notification.type);
             const icon = getNotificationIcon(notification.type);
+            const requiresAction = isActionRequired(notification.type);
 
             return (
               <TouchableOpacity
                 key={notification.id}
                 style={[
                   styles.notificationCard,
+                  requiresAction && styles.notificationCardAction,
                   !notification.read && styles.notificationCardUnread,
                 ]}
                 onPress={() => handleNotificationPress(notification)}
@@ -216,14 +227,21 @@ const NotificationListSenderScreen: React.FC<NotificationListSenderScreenProps> 
 
                 <View style={styles.notificationContent}>
                   <View style={styles.notificationHeader}>
-                    <Text
-                      style={[
-                        styles.notificationTitle,
-                        !notification.read && styles.notificationTitleUnread,
-                      ]}
-                    >
-                      {notification.title}
-                    </Text>
+                    <View style={styles.notificationTitleGroup}>
+                      {requiresAction && (
+                        <View style={styles.actionBadge}>
+                          <Text style={styles.actionBadgeText}>Action requise</Text>
+                        </View>
+                      )}
+                      <Text
+                        style={[
+                          styles.notificationTitle,
+                          !notification.read && styles.notificationTitleUnread,
+                        ]}
+                      >
+                        {notification.title}
+                      </Text>
+                    </View>
                     <Text style={styles.notificationTime}>
                       {getTimeAgo(notification.createdAt)}
                     </Text>
@@ -286,6 +304,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(20, 100, 246, 0.02)',
     borderColor: 'rgba(20, 100, 246, 0.2)',
   },
+  notificationCardAction: {
+    borderColor: Colors.warning,
+    borderWidth: 1.5,
+  },
   iconContainer: {
     width: 40,
     height: 40,
@@ -306,6 +328,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 4,
   },
+  notificationTitleGroup: {
+    flex: 1,
+    marginRight: 8,
+  },
   notificationTitle: {
     fontSize: 14,
     fontWeight: '600',
@@ -314,6 +340,19 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   notificationTitleUnread: {
+    fontWeight: '700',
+  },
+  actionBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: Colors.warningSurface,
+    borderRadius: 999,
+    marginBottom: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  actionBadgeText: {
+    color: Colors.warning,
+    fontSize: 10,
     fontWeight: '700',
   },
   notificationTime: {

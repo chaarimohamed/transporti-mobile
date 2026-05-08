@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import * as SplashScreenNative from 'expo-splash-screen';
@@ -59,6 +60,10 @@ import ShipmentFeedbackSuccessScreen from './components/screens/shared/ShipmentF
 
 type ScreenName = 'splash' | 'roleSelection' | 'login' | 'forgotPassword' | 'senderRegister' | 'carrierRegister' | 'carrierOnboarding2' | 'carrierOnboarding3' | 'carrierOnboarding4' | 'verifyEmail' | 'dashboard' | 'shipmentList' | 'newShipment' | 'createShipmentStep1' | 'addressPickup' | 'addressDelivery' | 'mapPicker' | 'createShipmentStep2' | 'createShipmentStep3' | 'shipmentDetails' | 'missionList' | 'missionDetails' | 'activeMissions' | 'updateStatus' | 'notificationList' | 'applicationList' | 'applicationDetails' | 'applicationAccepted' | 'suggestedTransporters' | 'transporterProfile' | 'invitationSent' | 'paymentCodeInput' | 'paymentSuccess' | 'paymentError' | 'paymentBlocked' | 'paymentReceipt' | 'paymentHistory' | 'shipmentFeedback' | 'shipmentFeedbackSuccess' | 'notifications' | 'notificationListSender' | 'profile' | 'notificationSettings' | 'personalInformation' | 'termsAndConditions' | 'privacySecurity' | 'profileCarrier' | 'personalInformationCarrier' | 'carrierDocuments' | 'notificationSettingsCarrier' | 'termsAndConditionsCarrier' | 'privacySecurityCarrier';
 
+interface NotificationRouteData {
+  shipmentId?: string;
+}
+
 SplashScreenNative.preventAutoHideAsync();
 
 function AppContent() {
@@ -66,6 +71,7 @@ function AppContent() {
   const [currentScreen, setCurrentScreen] = useState<ScreenName>('splash');
   const [, setUserRole] = useState<'sender' | 'carrier' | null>(null);
   const [screenParams, setScreenParams] = useState<any>(null);
+  const lastHandledNotificationId = useRef<string | null>(null);
 
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
@@ -79,6 +85,45 @@ function AppContent() {
       SplashScreenNative.hideAsync();
     }
   }, [fontsLoaded]);
+
+  const navigate = (screen: string, params?: any) => {
+    console.log('🚀 Navigate called:', { screen, params, currentScreen });
+    setCurrentScreen(screen as ScreenName);
+    setScreenParams(params);
+  };
+
+  const getNotificationRouteData = (
+    response: Notifications.NotificationResponse
+  ): NotificationRouteData => {
+    const data = response.notification.request.content.data as NotificationRouteData | undefined;
+
+    return {
+      shipmentId: data?.shipmentId,
+    };
+  };
+
+  const handleNotificationResponse = (
+    response: Notifications.NotificationResponse
+  ) => {
+    const notificationId = response.notification.request.identifier;
+
+    if (lastHandledNotificationId.current === notificationId) {
+      return;
+    }
+
+    lastHandledNotificationId.current = notificationId;
+
+    const { shipmentId } = getNotificationRouteData(response);
+
+    if (user?.role === 'sender' && shipmentId) {
+      navigate('shipmentDetails', { id: shipmentId });
+      return;
+    }
+
+    if (user?.role === 'sender') {
+      console.log('⚠️ Sender push missing shipmentId');
+    }
+  };
 
   // Reset to login when user logs out
   useEffect(() => {
@@ -98,15 +143,29 @@ function AppContent() {
     }
   }, [isAuthenticated, user]);
 
+  useEffect(() => {
+    if (!isAuthenticated || !user) {
+      return;
+    }
+
+    Notifications.getLastNotificationResponseAsync().then(response => {
+      if (response) {
+        handleNotificationResponse(response);
+      }
+    });
+
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      handleNotificationResponse(response);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [isAuthenticated, user]);
+
   if (!fontsLoaded) {
     return null;
   }
-
-  const navigate = (screen: string, params?: any) => {
-    console.log('🚀 Navigate called:', { screen, params, currentScreen });
-    setCurrentScreen(screen as ScreenName);
-    setScreenParams(params);
-  };
 
   // Show loading spinner while checking for saved session
   if (isLoading) {
