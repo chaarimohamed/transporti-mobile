@@ -171,10 +171,15 @@ const ShipmentListScreen: React.FC<ShipmentListScreenProps> = ({ onNavigate, ini
                       </Text>
                     </View>
                   </View>
-                  <View style={styles.shipmentMeta}>
-                    <Text style={styles.metaText}>
-                      {shipment.cargo || 'Colis'} • {formatDate(shipment.createdAt)}
-                    </Text>
+                  <View style={styles.badgesRow}>
+                    <Badge status="neutral" text={shipment.cargo || 'Colis'} />
+                    {(shipment.photosCount ?? 0) > 0 && (
+                      <Badge status="neutral" text={`📷 ${shipment.photosCount}`} />
+                    )}
+                  </View>
+                  <View style={styles.dateRow}>
+                    <AppIcon name="calendar" size={12} color={Colors.textMuted} />
+                    <Text style={styles.metaText}>{formatDate(shipment.createdAt)}</Text>
                   </View>
                 </View>
 
@@ -272,6 +277,7 @@ const styles = StyleSheet.create({
   },
   routeContainer: {
     marginBottom: 4,
+    overflow: 'hidden',
   },
   routeRow: {
     flexDirection: 'row',
@@ -289,9 +295,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1A1A1A',
   },
-  shipmentMeta: {
+  badgesRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginBottom: 4,
+    marginTop: 6,
+  },
+  dateRow: {
     alignItems: 'center',
+    flexDirection: 'row',
+    gap: 4,
   },
   metaText: {
     fontSize: 12,

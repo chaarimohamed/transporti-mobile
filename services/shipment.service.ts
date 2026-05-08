@@ -50,6 +50,8 @@ export interface Shipment {
   // Only returned by the single-shipment detail endpoint (GET /api/shipments/:id)
   // Not included in list responses to keep payloads small
   packagePhotos?: string[];
+  // Returned by list endpoints — number of attached photos (TC-107)
+  photosCount?: number;
   helperCount?: number;
   deliveryHelperCount?: number;
   pickupMeetingPoint?: string;

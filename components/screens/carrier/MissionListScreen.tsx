@@ -196,6 +196,9 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
                     <Badge status="neutral" text={shipment.cargo || 'Marchandise'} />
                     {isInvited && <Badge status="warning" text="Invité" />}
                     {isNew && <Badge status="warning" text="Nouveau" />}
+                    {(shipment.photosCount ?? 0) > 0 && (
+                      <Badge status="neutral" text={`📷 ${shipment.photosCount}`} />
+                    )}
                   </View>
 
                   <View style={styles.dateRow}>
