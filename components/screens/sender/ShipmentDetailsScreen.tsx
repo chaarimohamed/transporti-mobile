@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
+  AppState,
   View,
   Text,
   ScrollView,
@@ -33,14 +34,46 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
   );
   const [loading, setLoading] = useState(!initialData?.shipment);
   const [error, setError] = useState('');
+  const shipmentId = initialData?.id || initialData?.shipment?.id || shipment?.id;
 
   useEffect(() => {
-    const shipmentId = initialData?.id || initialData?.shipment?.id;
-
     if (shipmentId) {
       fetchShipment(shipmentId, !shipment);
     }
-  }, [initialData?.id, initialData?.shipment?.id]);
+  }, [shipmentId]);
+
+  useEffect(() => {
+    if (!shipmentId) {
+      return;
+    }
+
+    const subscription = AppState.addEventListener('change', nextState => {
+      if (nextState === 'active') {
+        fetchShipment(shipmentId, false);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [shipmentId]);
+
+  useEffect(() => {
+    if (
+      !shipmentId ||
+      (shipment?.status !== 'CONFIRMED' && shipment?.status !== 'HANDOVER_PENDING')
+    ) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      fetchShipment(shipmentId, false);
+    }, 15000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [shipment?.status, shipmentId]);
 
   const fetchShipment = async (id: string, showLoader = true) => {
     try {
@@ -292,70 +325,6 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
 
       {/* Content */}
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        {/* Status Card */}
-        <Card style={styles.statusCard}>
-          <View style={styles.statusHeader}>
-            <Text style={styles.statusLabel}>Statut actuel</Text>
-            <Badge status={badge.status} text={badge.text} />
-          </View>
-
-          {/* Timeline */}
-          <View style={styles.timeline}>
-            {['Créée', 'En transit', 'Livrée'].map((step, index) => {
-              const stepStatus = getStepStatus(index, shipment.status);
-              const level = STATUS_LEVEL[shipment.status] ?? 0;
-              const isLast = index === 2;
-
-              // Timestamps: step 0 always shows createdAt; the "current" step shows updatedAt
-              let timestamp: string | null = null;
-              if (stepStatus !== 'inactive') {
-                if (index === 0) timestamp = formatDateTime(shipment.createdAt);
-                else if (index === level) timestamp = formatDateTime(shipment.updatedAt);
-              }
-
-              return (
-                <View key={step} style={styles.timelineItem}>
-                  <View style={styles.timelineLeft}>
-                    <View
-                      style={[
-                        styles.timelineDot,
-                        stepStatus === 'completed' && styles.timelineDotCompleted,
-                        stepStatus === 'active' && styles.timelineDotActive,
-                      ]}
-                    >
-                      {stepStatus === 'completed' && (
-                        <Text style={styles.timelineCheck}>✓</Text>
-                      )}
-                    </View>
-                    {!isLast && (
-                      <View
-                        style={[
-                          styles.timelineLine,
-                          stepStatus === 'completed' && styles.timelineLineCompleted,
-                        ]}
-                      />
-                    )}
-                  </View>
-                  <View style={styles.timelineContent}>
-                    <Text
-                      style={[
-                        styles.timelineText,
-                        stepStatus === 'completed' && styles.timelineTextCompleted,
-                        stepStatus === 'active' && styles.timelineTextActive,
-                      ]}
-                    >
-                      {step}
-                    </Text>
-                    {timestamp && (
-                      <Text style={styles.timelineTimestamp}>{timestamp}</Text>
-                    )}
-                  </View>
-                </View>
-              );
-            })}
-          </View>
-        </Card>
-
         {/* Carrier Request (if REQUESTED status) */}
         {shipment.status === 'REQUESTED' && shipment.requestedCarrierId && (
           <>
@@ -606,6 +575,70 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
             </Card>
           </>
         )}
+
+        {/* Status Card */}
+        <Card style={styles.statusCard}>
+          <View style={styles.statusHeader}>
+            <Text style={styles.statusLabel}>Statut actuel</Text>
+            <Badge status={badge.status} text={badge.text} />
+          </View>
+
+          {/* Timeline */}
+          <View style={styles.timeline}>
+            {['Créée', 'En transit', 'Livrée'].map((step, index) => {
+              const stepStatus = getStepStatus(index, shipment.status);
+              const level = STATUS_LEVEL[shipment.status] ?? 0;
+              const isLast = index === 2;
+
+              // Timestamps: step 0 always shows createdAt; the "current" step shows updatedAt
+              let timestamp: string | null = null;
+              if (stepStatus !== 'inactive') {
+                if (index === 0) timestamp = formatDateTime(shipment.createdAt);
+                else if (index === level) timestamp = formatDateTime(shipment.updatedAt);
+              }
+
+              return (
+                <View key={step} style={styles.timelineItem}>
+                  <View style={styles.timelineLeft}>
+                    <View
+                      style={[
+                        styles.timelineDot,
+                        stepStatus === 'completed' && styles.timelineDotCompleted,
+                        stepStatus === 'active' && styles.timelineDotActive,
+                      ]}
+                    >
+                      {stepStatus === 'completed' && (
+                        <Text style={styles.timelineCheck}>✓</Text>
+                      )}
+                    </View>
+                    {!isLast && (
+                      <View
+                        style={[
+                          styles.timelineLine,
+                          stepStatus === 'completed' && styles.timelineLineCompleted,
+                        ]}
+                      />
+                    )}
+                  </View>
+                  <View style={styles.timelineContent}>
+                    <Text
+                      style={[
+                        styles.timelineText,
+                        stepStatus === 'completed' && styles.timelineTextCompleted,
+                        stepStatus === 'active' && styles.timelineTextActive,
+                      ]}
+                    >
+                      {step}
+                    </Text>
+                    {timestamp && (
+                      <Text style={styles.timelineTimestamp}>{timestamp}</Text>
+                    )}
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        </Card>
 
         {/* Handover Confirmation (if HANDOVER_PENDING) */}
         {shipment.status === 'HANDOVER_PENDING' && (
