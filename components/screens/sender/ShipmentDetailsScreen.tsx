@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Alert,
+  Image,
   Platform,
 } from 'react-native';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
@@ -34,26 +35,40 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (initialData?.id && !shipment) {
-      fetchShipment(initialData.id);
-    }
-  }, [initialData?.id]);
+    const shipmentId = initialData?.id || initialData?.shipment?.id;
 
-  const fetchShipment = async (id: string) => {
+    if (shipmentId) {
+      fetchShipment(shipmentId, !shipment);
+    }
+  }, [initialData?.id, initialData?.shipment?.id]);
+
+  const fetchShipment = async (id: string, showLoader = true) => {
     try {
-      setLoading(true);
+      if (showLoader) {
+        setLoading(true);
+      }
+
       const result = await shipmentService.getShipmentById(id);
 
       if (result.success && result.shipment) {
         setShipment(result.shipment);
       } else {
-        setError(result.error || 'Erreur de chargement');
+        const message = result.error || 'Erreur de chargement';
+
+        if (showLoader || !shipment) {
+          setError(message);
+        }
       }
     } catch (err) {
       console.error('Error fetching shipment:', err);
-      setError('Erreur de connexion');
+
+      if (showLoader || !shipment) {
+        setError('Erreur de connexion');
+      }
     } finally {
-      setLoading(false);
+      if (showLoader) {
+        setLoading(false);
+      }
     }
   };
 
@@ -99,6 +114,37 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
     const hh = d.getHours().toString().padStart(2, '0');
     const mm = d.getMinutes().toString().padStart(2, '0');
     return `${day} ${month}, ${hh}:${mm}`;
+  };
+
+  const formatPickupDate = (pickupDate?: string): string | null => {
+    if (!pickupDate) {
+      return null;
+    }
+
+    if (pickupDate.includes('/')) {
+      return pickupDate;
+    }
+
+    return new Date(pickupDate).toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+  const getPackageFormatLabel = (packageFormat?: string): string | null => {
+    switch (packageFormat) {
+      case 'S':
+        return 'Petit colis';
+      case 'M':
+        return 'Sac / Valise';
+      case 'L':
+        return 'Meuble / Électroménager';
+      case 'XL':
+        return 'Déménagement';
+      default:
+        return packageFormat || null;
+    }
   };
 
   const handleCancelShipment = () => {
@@ -223,6 +269,13 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
   }
 
   const badge = getStatusBadge(shipment.status);
+  const shipmentTitle = shipment.itemName || shipment.cargo || 'Colis';
+  const pickupDateLabel = formatPickupDate(shipment.pickupDate);
+  const packageFormatLabel = getPackageFormatLabel(shipment.packageFormat);
+  const shipmentPhotos = shipment.packagePhotos?.length
+    ? shipment.packagePhotos
+    : shipment.photoPreviews || [];
+  const totalPhotos = shipment.photosCount ?? shipment.packagePhotos?.length ?? shipment.photoPreviews?.length ?? 0;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -450,12 +503,70 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
           <View style={styles.infoRow}>
             <AppIcon name="package" size={16} color={Colors.textSecondary} />
             <View style={styles.infoContent}>
-              <Text style={styles.infoLabel}>Type de colis</Text>
-              <Text style={styles.infoValue}>{shipment.cargo || 'Colis'}</Text>
+              <Text style={styles.infoLabel}>Article</Text>
+              <Text style={styles.infoValue}>{shipmentTitle}</Text>
             </View>
           </View>
 
           <View style={styles.infoDivider} />
+
+          {pickupDateLabel && (
+            <>
+              <View style={styles.infoRow}>
+                <AppIcon name="calendar" size={16} color={Colors.textSecondary} />
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Date de collecte</Text>
+                  <Text style={styles.infoValue}>{pickupDateLabel}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoDivider} />
+            </>
+          )}
+
+          {packageFormatLabel && (
+            <>
+              <View style={styles.infoRow}>
+                <AppIcon name="package-box" size={16} color={Colors.textSecondary} />
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Format</Text>
+                  <Text style={styles.infoValue}>{packageFormatLabel}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoDivider} />
+            </>
+          )}
+
+          {(shipment.pickupCity || shipment.deliveryCity) && (
+            <>
+              <View style={styles.infoRow}>
+                <AppIcon name="route" size={16} color={Colors.textSecondary} />
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Trajet</Text>
+                  <Text style={styles.infoValue}>
+                    {shipment.pickupCity || shipment.from} - {shipment.deliveryCity || shipment.to}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.infoDivider} />
+            </>
+          )}
+
+          {shipment.description && (
+            <>
+              <View style={styles.infoRowTop}>
+                <AppIcon name="document" size={16} color={Colors.textSecondary} />
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Description</Text>
+                  <Text style={styles.infoValue}>{shipment.description}</Text>
+                </View>
+              </View>
+
+              <View style={styles.infoDivider} />
+            </>
+          )}
 
           <View style={styles.infoRow}>
             <AppIcon name="wallet" size={16} color={Colors.textSecondary} />
@@ -467,6 +578,34 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
             </View>
           </View>
         </Card>
+
+        {shipmentPhotos.length > 0 && (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Photos du colis</Text>
+            </View>
+            <Card style={styles.photosCard}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.photosScrollContent}
+              >
+                {shipmentPhotos.map((photo, index) => (
+                  <Image
+                    key={`${shipment.id}-photo-${index}`}
+                    source={{ uri: photo }}
+                    style={styles.photoThumb}
+                  />
+                ))}
+              </ScrollView>
+              {totalPhotos > shipmentPhotos.length && (
+                <Text style={styles.photosCaption}>
+                  {totalPhotos} photos enregistrées pour cette expédition.
+                </Text>
+              )}
+            </Card>
+          </>
+        )}
 
         {/* Handover Confirmation (if HANDOVER_PENDING) */}
         {shipment.status === 'HANDOVER_PENDING' && (
@@ -687,6 +826,11 @@ const styles = StyleSheet.create({
     gap: Spacing.sm + 4,
     alignItems: 'center',
   },
+  infoRowTop: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    gap: Spacing.sm + 4,
+  },
   infoContent: {
     flex: 1,
   },
@@ -710,6 +854,25 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: Colors.border,
     marginVertical: Spacing.md,
+  },
+  photosCard: {
+    marginBottom: 24,
+    padding: 16,
+  },
+  photosCaption: {
+    color: Colors.textSecondary,
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    marginTop: 12,
+  },
+  photosScrollContent: {
+    gap: 12,
+  },
+  photoThumb: {
+    backgroundColor: Colors.backgroundAlt,
+    borderRadius: Radius.md,
+    height: 96,
+    width: 96,
   },
   carrierCard: {
     flexDirection: 'row',
