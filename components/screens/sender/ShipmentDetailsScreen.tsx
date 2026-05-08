@@ -710,15 +710,15 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
             onPress={handleCancelShipment}
             disabled={loading}
           >
-            <Text style={styles.cancelButtonText}>Annuler l'expédition</Text>
+            Annuler l'expédition
           </Button>
         ) : shipment.status === 'IN_TRANSIT' ? (
           <Button style={styles.trackButton} onPress={() => {}}>
-            <Text style={styles.trackButtonText}>Suivre la livraison</Text>
+            Suivre la livraison
           </Button>
         ) : (
           <Button onPress={() => onNavigate?.('dashboard')}>
-            <Text style={styles.backButtonText}>Retour au dashboard</Text>
+            Retour au dashboard
           </Button>
         )}
       </View>

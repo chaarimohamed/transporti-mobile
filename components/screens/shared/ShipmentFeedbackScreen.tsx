@@ -183,7 +183,7 @@ const ShipmentFeedbackScreen: React.FC<ShipmentFeedbackScreenProps> = ({ route, 
         <View style={styles.headerSpacer} />
       </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
         <Card style={styles.heroCard}>
           <Text style={styles.heroEyebrow}>{shipment.refNumber}</Text>
           <Text style={styles.heroTitle}>{targetName}</Text>
@@ -260,6 +260,7 @@ const ShipmentFeedbackScreen: React.FC<ShipmentFeedbackScreenProps> = ({ route, 
                 multiline
                 maxLength={500}
                 textAlignVertical="top"
+                underlineColorAndroid="transparent"
                 value={comment}
                 onChangeText={setComment}
               />

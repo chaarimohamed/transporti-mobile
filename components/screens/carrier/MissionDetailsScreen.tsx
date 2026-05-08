@@ -17,7 +17,7 @@ import Badge from '../../ui/Badge';
 import { AppIcon } from '../../ui/Icon';
 import { GOOGLE_MAPS_API_KEY } from '../../../config/google.config';
 import * as shipmentService from '../../../services/shipment.service';
-import { Shipment, ShipmentApplication } from '../../../services/shipment.service';
+import { Shipment } from '../../../services/shipment.service';
 import { useAuth } from '../../../contexts/AuthContext';
 
 interface MissionDetailsScreenProps {
@@ -41,20 +41,14 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [proposedPrice, setProposedPrice] = useState('');
-  const [myApplication, setMyApplication] = useState<ShipmentApplication | null>(null);
   const [routeDistance, setRouteDistance] = useState<string | null>(null);
   const [routeDuration, setRouteDuration] = useState<string | null>(null);
+  const myApplication = shipment?.myApplication ?? null;
 
   useEffect(() => {
     if (shipmentId) {
       console.log('🔍 Fetching shipment details for ID:', shipmentId);
-      // Only fetch if we don't already have the shipment data
-      if (!route?.params?.shipment) {
-        fetchShipmentDetails();
-      } else {
-        console.log('✅ Shipment data already provided, skipping fetch');
-        setLoading(false);
-      }
+      fetchShipmentDetails(!route?.params?.shipment);
     } else {
       console.error('❌ No shipment ID provided');
       setError('ID d\'expédition manquant');
@@ -68,22 +62,6 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
       fetchRouteInfo(shipment.from, shipment.to);
     }
   }, [shipment?.id]);
-
-  // Fetch carrier's own application to show proposed price when awaiting sender's decision
-  useEffect(() => {
-    if (
-      shipment?.status === 'REQUESTED' &&
-      shipment.requestedCarrierId === user?.id &&
-      shipmentId
-    ) {
-      shipmentService.getShipmentApplications(shipmentId).then(result => {
-        if (result.success && result.applications) {
-          const mine = result.applications.find(a => a.carrierId === user?.id);
-          setMyApplication(mine ?? null);
-        }
-      });
-    }
-  }, [shipment?.id, shipment?.status]);
 
   const fetchRouteInfo = async (from: string, to: string) => {
     try {
@@ -105,7 +83,7 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
     }
   };
 
-  const fetchShipmentDetails = async () => {
+  const fetchShipmentDetails = async (showLoader = true) => {
     if (!shipmentId) {
       console.error('❌ No shipment ID in fetchShipmentDetails');
       setError('ID d\'expédition manquant');
@@ -115,7 +93,9 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
 
     try {
       console.log('📡 Calling shipment service for ID:', shipmentId);
-      setLoading(true);
+      if (showLoader) {
+        setLoading(true);
+      }
       setError('');
 
       const result = await shipmentService.getShipmentById(shipmentId);
@@ -133,8 +113,10 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
       console.error('❌ Error fetching shipment:', err);
       setError('Erreur de connexion');
     } finally {
-      console.log('✅ Setting loading to false');
-      setLoading(false);
+      if (showLoader) {
+        console.log('✅ Setting loading to false');
+        setLoading(false);
+      }
     }
   };
 
@@ -286,9 +268,7 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
             <AppIcon name="alert-triangle" size={18} color={Colors.error} />
             <Text style={styles.errorText}>{error}</Text>
           </View>
-          <Button onPress={fetchShipmentDetails}>
-            <Text style={{ color: '#FFF' }}>Réessayer</Text>
-          </Button>
+          <Button onPress={fetchShipmentDetails}>Réessayer</Button>
         </View>
       </SafeAreaView>
     );
@@ -799,20 +779,20 @@ const styles = StyleSheet.create({
   feedbackCard: {
     marginBottom: 16,
     padding: 16,
-    backgroundColor: '#FFF7E8',
+    backgroundColor: Colors.primarySurface,
     borderWidth: 1,
-    borderColor: '#F3D9A6',
+    borderColor: Colors.primaryLight,
   },
   feedbackTitle: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#7C4A03',
+    color: Colors.primaryDark,
     marginBottom: 8,
   },
   feedbackText: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#6B5A3D',
+    color: Colors.textSecondary,
     marginBottom: 14,
   },
   counterOfferSection: {
@@ -940,7 +920,7 @@ const styles = StyleSheet.create({
     color: '#8B5CF6',
   },
   fullWidthButton: {
-    flex: 1,
+    width: '100%',
     paddingVertical: 16,
     borderRadius: 8,
     backgroundColor: Colors.primary,

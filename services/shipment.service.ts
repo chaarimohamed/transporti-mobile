@@ -58,6 +58,8 @@ export interface Shipment {
   photoPreviews?: string[];
   // Returned by list endpoints — number of attached photos (TC-107)
   photosCount?: number;
+  // Returned by the single-shipment detail endpoint for the authenticated carrier.
+  myApplication?: ShipmentApplication | null;
   helperCount?: number;
   deliveryHelperCount?: number;
   pickupMeetingPoint?: string;
