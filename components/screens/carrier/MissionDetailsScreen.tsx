@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   TextInput,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
@@ -51,6 +53,25 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
     : shipment?.photoPreviews || [];
   const packageFormatLabel = getShipmentFormatLabel(shipment?.packageFormat);
   const totalPhotos = shipment?.photosCount ?? shipment?.packagePhotos?.length ?? shipment?.photoPreviews?.length ?? 0;
+  const canAcceptInvitation = Boolean(
+    fromInvitation &&
+    shipment &&
+    !shipment.carrierId &&
+    (shipment.status === 'PENDING' || shipment.status === 'REQUESTED')
+  );
+  const isAwaitingSenderDecision = Boolean(
+    shipment &&
+    !shipment.carrierId &&
+    shipment.status === 'REQUESTED' &&
+    myApplication?.status === 'PENDING'
+  );
+  const canApplyToShipment = Boolean(
+    !fromInvitation &&
+    shipment &&
+    !shipment.carrierId &&
+    !myApplication &&
+    (shipment.status === 'PENDING' || shipment.status === 'REQUESTED')
+  );
 
   useEffect(() => {
     if (shipmentId) {
@@ -282,20 +303,29 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => onNavigate?.(returnScreen || 'missionList')}
-          style={styles.backButton}
-        >
-          <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Détails Mission</Text>
-        <Badge status="neutral" text={shipment.refNumber} />
-      </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 24 : 0}
+      style={styles.keyboardAvoidingView}
+    >
+      <SafeAreaView style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => onNavigate?.(returnScreen || 'missionList')}
+            style={styles.backButton}
+          >
+            <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Détails Mission</Text>
+          <Badge status="neutral" text={shipment.refNumber} />
+        </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
         {/* Sender Info */}
         <Card style={styles.section}>
           <Text style={styles.sectionTitle}>Expéditeur</Text>
@@ -438,121 +468,122 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
             )}
           </View>
         </Card>
-      </ScrollView>
-      
-      {shipment.status === 'DELIVERED' && shipment.feedbackSummary?.canSubmit && (
-        <Card style={styles.feedbackCard}>
-          <Text style={styles.sectionTitle}>Votre évaluation</Text>
-          <Text style={styles.feedbackTitle}>
-            {shipment.feedbackSummary.hasSubmitted
-              ? 'Votre retour sur l\'expéditeur est déjà enregistré'
-              : 'La livraison est terminée'}
-          </Text>
-          <Text style={styles.feedbackText}>
-            {shipment.feedbackSummary.hasSubmitted
-              ? 'Vous pouvez encore ajuster votre note et votre commentaire si besoin.'
-              : 'Ajoutez une évaluation de l\'expéditeur maintenant que la mission est livrée.'}
-          </Text>
-          <TouchableOpacity
-            style={styles.fullWidthButton}
-            onPress={() => onNavigate?.('shipmentFeedback', {
-              shipmentId: shipment.id,
-              returnScreen: 'missionDetails',
-              returnParams: { shipmentId: shipment.id },
-            })}
-          >
-            <Text style={styles.fullWidthButtonText}>
-              {shipment.feedbackSummary.hasSubmitted ? 'Modifier mon évaluation' : 'Évaluer l\'expéditeur'}
+        </ScrollView>
+        
+        {shipment.status === 'DELIVERED' && shipment.feedbackSummary?.canSubmit && (
+          <Card style={styles.feedbackCard}>
+            <Text style={styles.sectionTitle}>Votre évaluation</Text>
+            <Text style={styles.feedbackTitle}>
+              {shipment.feedbackSummary.hasSubmitted
+                ? 'Votre retour sur l\'expéditeur est déjà enregistré'
+                : 'La livraison est terminée'}
             </Text>
-          </TouchableOpacity>
-        </Card>
-      )}
-
-      {/* Action Buttons - Show different buttons based on context */}
-      {fromInvitation && shipment.status === 'PENDING' ? (
-        /* Invitation buttons with price input */
-        <View style={styles.actionsContainerColumn}>
-          <View style={styles.priceInputContainer}>
-            <Text style={styles.priceInputLabel}>Votre prix proposé (TND)</Text>
-            <TextInput
-              style={styles.priceInput}
-              value={proposedPrice}
-              onChangeText={setProposedPrice}
-              keyboardType="numeric"
-              placeholder="Ex : 150"
-              placeholderTextColor="#999999"
-              editable={!submitting}
-            />
-          </View>
-          <View style={styles.invitationButtonRow}>
+            <Text style={styles.feedbackText}>
+              {shipment.feedbackSummary.hasSubmitted
+                ? 'Vous pouvez encore ajuster votre note et votre commentaire si besoin.'
+                : 'Ajoutez une évaluation de l\'expéditeur maintenant que la mission est livrée.'}
+            </Text>
             <TouchableOpacity
-              style={styles.refuseButton}
-              onPress={handleRefuseInvitation}
-              disabled={submitting}
+              style={styles.fullWidthButton}
+              onPress={() => onNavigate?.('shipmentFeedback', {
+                shipmentId: shipment.id,
+                returnScreen: 'missionDetails',
+                returnParams: { shipmentId: shipment.id },
+              })}
             >
-              <Text style={styles.refuseButtonText}>Refuser</Text>
+              <Text style={styles.fullWidthButtonText}>
+                {shipment.feedbackSummary.hasSubmitted ? 'Modifier mon évaluation' : 'Évaluer l\'expéditeur'}
+              </Text>
             </TouchableOpacity>
+          </Card>
+        )}
+
+        {/* Action Buttons - Show different buttons based on context */}
+        {canAcceptInvitation ? (
+          /* Invitation buttons with price input */
+          <View style={styles.actionsContainerColumn}>
+            <View style={styles.priceInputContainer}>
+              <Text style={styles.priceInputLabel}>Votre prix proposé (TND)</Text>
+              <TextInput
+                style={styles.priceInput}
+                value={proposedPrice}
+                onChangeText={setProposedPrice}
+                keyboardType="numeric"
+                placeholder="Ex : 150"
+                placeholderTextColor="#999999"
+                editable={!submitting}
+              />
+            </View>
+            <View style={styles.invitationButtonRow}>
+              <TouchableOpacity
+                style={styles.refuseButton}
+                onPress={handleRefuseInvitation}
+                disabled={submitting}
+              >
+                <Text style={styles.refuseButtonText}>Refuser</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.acceptButton, submitting && styles.buttonDisabled]}
+                onPress={handleAcceptInvitation}
+                disabled={submitting}
+              >
+                {submitting ? (
+                  <ActivityIndicator size="small" color="#FFF" />
+                ) : (
+                  <Text style={styles.acceptButtonText}>Accepter</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : isAwaitingSenderDecision ? (
+          /* Carrier already applied — awaiting sender's decision */
+          <View style={styles.actionsContainer}>
+            <View style={styles.pendingResponseBadge}>
+              <Text style={styles.pendingResponseText}>⏳ En attente de réponse</Text>
+            </View>
+          </View>
+        ) : canApplyToShipment ? (
+          /* Available mission — carrier can apply with proposed price */
+          <View style={styles.actionsContainerColumn}>
+            <View style={styles.priceInputContainer}>
+              <Text style={styles.priceInputLabel}>Votre prix proposé (TND)</Text>
+              <TextInput
+                style={styles.priceInput}
+                value={proposedPrice}
+                onChangeText={setProposedPrice}
+                keyboardType="numeric"
+                placeholder="Ex : 150"
+                placeholderTextColor="#999999"
+                editable={!submitting}
+              />
+            </View>
             <TouchableOpacity
-              style={[styles.acceptButton, submitting && styles.buttonDisabled]}
-              onPress={handleAcceptInvitation}
+              style={[styles.fullWidthButton, submitting && styles.buttonDisabled]}
+              onPress={handleAcceptShipment}
               disabled={submitting}
             >
               {submitting ? (
                 <ActivityIndicator size="small" color="#FFF" />
               ) : (
-                <Text style={styles.acceptButtonText}>Accepter</Text>
+                <Text style={styles.fullWidthButtonText}>Postuler</Text>
               )}
             </TouchableOpacity>
           </View>
-        </View>
-      ) : shipment.status === 'REQUESTED' && shipment.requestedCarrierId === user?.id ? (
-        /* Carrier already applied — awaiting sender's decision */
-        <View style={styles.actionsContainer}>
-          <View style={styles.pendingResponseBadge}>
-            <Text style={styles.pendingResponseText}>⏳ En attente de réponse</Text>
+        ) : (shipment.status === 'CONFIRMED' || shipment.status === 'IN_TRANSIT') ? (
+          /* Active mission button */
+          <View style={styles.actionsContainer}>
+            <TouchableOpacity
+              style={styles.fullWidthButton}
+              onPress={() => onNavigate?.('updateStatus', { id: shipment.id })}
+            >
+              <Text style={styles.fullWidthButtonText}>
+                {shipment.status === 'CONFIRMED' ? 'Commencer la mission' : 'Mettre à jour le statut'}
+              </Text>
+            </TouchableOpacity>
           </View>
-        </View>
-      ) : shipment.status === 'PENDING' ? (
-        /* Available mission — carrier can apply with proposed price */
-        <View style={styles.actionsContainerColumn}>
-          <View style={styles.priceInputContainer}>
-            <Text style={styles.priceInputLabel}>Votre prix proposé (TND)</Text>
-            <TextInput
-              style={styles.priceInput}
-              value={proposedPrice}
-              onChangeText={setProposedPrice}
-              keyboardType="numeric"
-              placeholder="Ex : 150"
-              placeholderTextColor="#999999"
-              editable={!submitting}
-            />
-          </View>
-          <TouchableOpacity
-            style={[styles.fullWidthButton, submitting && styles.buttonDisabled]}
-            onPress={handleAcceptShipment}
-            disabled={submitting}
-          >
-            {submitting ? (
-              <ActivityIndicator size="small" color="#FFF" />
-            ) : (
-              <Text style={styles.fullWidthButtonText}>Postuler</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      ) : (shipment.status === 'CONFIRMED' || shipment.status === 'IN_TRANSIT') ? (
-        /* Active mission button */
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            style={styles.fullWidthButton}
-            onPress={() => onNavigate?.('updateStatus', { id: shipment.id })}
-          >
-            <Text style={styles.fullWidthButtonText}>
-              {shipment.status === 'CONFIRMED' ? 'Commencer la mission' : 'Mettre à jour le statut'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      ) : null}
-    </SafeAreaView>
+        ) : null}
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -560,6 +591,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',

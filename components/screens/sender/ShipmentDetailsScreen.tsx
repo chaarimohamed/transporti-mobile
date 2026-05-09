@@ -375,6 +375,66 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
           </>
         )}
 
+        {shipment.status === 'HANDOVER_PENDING' && (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Remise du colis</Text>
+            </View>
+            <Card style={styles.handoverCard}>
+              <View style={styles.handoverHeader}>
+                <AppIcon name="package" size={32} color={Colors.primary} />
+                <View style={styles.handoverInfo}>
+                  <Text style={styles.handoverTitle}>Le transporteur est arrivé</Text>
+                  <Text style={styles.handoverSubtitle}>
+                    Confirmez que vous avez remis le colis au transporteur pour qu'il puisse démarrer la livraison.
+                  </Text>
+                </View>
+              </View>
+              <TouchableOpacity
+                style={styles.handoverButton}
+                onPress={handleConfirmHandover}
+                disabled={loading}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.handoverButtonText}>
+                  {loading ? 'Confirmation...' : "J'ai remis le colis au transporteur"}
+                </Text>
+              </TouchableOpacity>
+            </Card>
+          </>
+        )}
+
+        {shipment.status === 'DELIVERED' && shipment.feedbackSummary?.canSubmit && (
+          <>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Votre évaluation</Text>
+            </View>
+            <Card style={styles.feedbackCard}>
+              <Text style={styles.feedbackTitle}>
+                {shipment.feedbackSummary.hasSubmitted
+                  ? 'Votre avis a déjà été enregistré'
+                  : 'La livraison est terminée'}
+              </Text>
+              <Text style={styles.feedbackText}>
+                {shipment.feedbackSummary.hasSubmitted
+                  ? 'Vous pouvez ajuster votre note et votre commentaire sur ce transporteur.'
+                  : 'Évaluez le transporteur pour finaliser cette expédition côté expérience client.'}
+              </Text>
+              <Button
+                onPress={() => onNavigate?.('shipmentFeedback', {
+                  shipmentId: shipment.id,
+                  returnScreen: 'shipmentDetails',
+                  returnParams: { id: shipment.id },
+                })}
+                size="lg"
+                fullWidth
+              >
+                {shipment.feedbackSummary.hasSubmitted ? 'Modifier mon évaluation' : 'Évaluer le transporteur'}
+              </Button>
+            </Card>
+          </>
+        )}
+
         {/* Carrier Info (if assigned) */}
         {shipment.carrier && (
           <>
@@ -620,66 +680,6 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
           </View>
         </Card>
 
-        {/* Handover Confirmation (if HANDOVER_PENDING) */}
-        {shipment.status === 'HANDOVER_PENDING' && (
-          <>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Remise du colis</Text>
-            </View>
-            <Card style={styles.handoverCard}>
-              <View style={styles.handoverHeader}>
-                <AppIcon name="package" size={32} color={Colors.primary} />
-                <View style={styles.handoverInfo}>
-                  <Text style={styles.handoverTitle}>Le transporteur est arrivé</Text>
-                  <Text style={styles.handoverSubtitle}>
-                    Confirmez que vous avez remis le colis au transporteur pour qu'il puisse démarrer la livraison.
-                  </Text>
-                </View>
-              </View>
-              <TouchableOpacity
-                style={styles.handoverButton}
-                onPress={handleConfirmHandover}
-                disabled={loading}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.handoverButtonText}>
-                  {loading ? 'Confirmation...' : "J'ai remis le colis au transporteur"}
-                </Text>
-              </TouchableOpacity>
-            </Card>
-          </>
-        )}
-        
-        {shipment.status === 'DELIVERED' && shipment.feedbackSummary?.canSubmit && (
-          <>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Votre évaluation</Text>
-            </View>
-            <Card style={styles.feedbackCard}>
-              <Text style={styles.feedbackTitle}>
-                {shipment.feedbackSummary.hasSubmitted
-                  ? 'Votre avis a déjà été enregistré'
-                  : 'La livraison est terminée'}
-              </Text>
-              <Text style={styles.feedbackText}>
-                {shipment.feedbackSummary.hasSubmitted
-                  ? 'Vous pouvez ajuster votre note et votre commentaire sur ce transporteur.'
-                  : 'Évaluez le transporteur pour finaliser cette expédition côté expérience client.'}
-              </Text>
-              <Button
-                onPress={() => onNavigate?.('shipmentFeedback', {
-                  shipmentId: shipment.id,
-                  returnScreen: 'shipmentDetails',
-                  returnParams: { id: shipment.id },
-                })}
-                size="lg"
-                fullWidth
-              >
-                {shipment.feedbackSummary.hasSubmitted ? 'Modifier mon évaluation' : 'Évaluer le transporteur'}
-              </Button>
-            </Card>
-          </>
-        )}
       </ScrollView>
 
       {/* Bottom Actions */}
