@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ActivityIndicator,
-  Image,
 } from 'react-native';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
@@ -95,14 +94,6 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
     }
     return list;
   }, [shipments, activeFilter, user?.gouvernerat]);
-
-  const getPhotoUri = (photo: string) => {
-    if (photo.startsWith('data:') || photo.startsWith('http')) {
-      return photo;
-    }
-
-    return `data:image/jpeg;base64,${photo}`;
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -211,18 +202,6 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
                     {isInvited && <Badge status="warning" text="Invité" />}
                     {isNew && <Badge status="warning" text="Nouveau" />}
                   </View>
-
-                  {(shipment.photoPreviews?.length ?? 0) > 0 && (
-                    <View style={styles.photoStrip}>
-                      {shipment.photoPreviews?.map((photo, index) => (
-                        <Image
-                          key={`${shipment.id}-mission-preview-${index}`}
-                          source={{ uri: getPhotoUri(photo) }}
-                          style={styles.photoPreview}
-                        />
-                      ))}
-                    </View>
-                  )}
 
                   <View style={styles.dateRow}>
                     <AppIcon name="calendar" size={14} color={Colors.textMuted} />
@@ -340,16 +319,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8,
     marginBottom: 8,
-  },
-  photoStrip: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 8,
-  },
-  photoPreview: {
-    borderRadius: 8,
-    height: 44,
-    width: 44,
   },
   dateRow: {
     flexDirection: 'row',

@@ -15,6 +15,8 @@ import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
 import { AppIcon } from '../../ui/Icon';
+import ShipmentFormatIcon, { getShipmentFormatLabel } from '../../ui/ShipmentFormatIcon';
+import ShipmentPhotoGallery from '../../ui/ShipmentPhotoGallery';
 import { GOOGLE_MAPS_API_KEY } from '../../../config/google.config';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
@@ -44,6 +46,11 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
   const [routeDistance, setRouteDistance] = useState<string | null>(null);
   const [routeDuration, setRouteDuration] = useState<string | null>(null);
   const myApplication = shipment?.myApplication ?? null;
+  const shipmentPhotos = shipment?.packagePhotos?.length
+    ? shipment.packagePhotos
+    : shipment?.photoPreviews || [];
+  const packageFormatLabel = getShipmentFormatLabel(shipment?.packageFormat);
+  const totalPhotos = shipment?.photosCount ?? shipment?.packagePhotos?.length ?? shipment?.photoPreviews?.length ?? 0;
 
   useEffect(() => {
     if (shipmentId) {
@@ -356,7 +363,21 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
         <Card style={styles.section}>
           <Text style={styles.sectionTitle}>Cargaison</Text>
           <View style={styles.cargoInfo}>
-            <Text style={styles.cargoType}>{shipment.cargo || shipment.description || 'Marchandise'}</Text>
+            <View style={styles.cargoHeader}>
+              <View style={styles.cargoIconBadge}>
+                <ShipmentFormatIcon
+                  format={shipment.packageFormat}
+                  size={24}
+                  color={Colors.primary}
+                />
+              </View>
+              <View style={styles.cargoHeaderContent}>
+                <Text style={styles.cargoType}>{shipment.cargo || shipment.description || 'Marchandise'}</Text>
+                {packageFormatLabel && (
+                  <Text style={styles.cargoFormatLabel}>{packageFormatLabel}</Text>
+                )}
+              </View>
+            </View>
 
             {/* Date de collecte — prominent badge */}
             <View style={styles.collecteDateBadge}>
@@ -387,6 +408,13 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
             )}
           </View>
         </Card>
+
+        {shipmentPhotos.length > 0 && (
+          <Card style={styles.section}>
+            <Text style={styles.sectionTitle}>Photos du colis</Text>
+            <ShipmentPhotoGallery photos={shipmentPhotos} totalPhotos={totalPhotos} />
+          </Card>
+        )}
 
         {/* Price Section */}
         <Card style={styles.section}>
@@ -720,6 +748,28 @@ const styles = StyleSheet.create({
   },
   cargoInfo: {
     gap: 10,
+  },
+  cargoFormatLabel: {
+    color: Colors.textSecondary,
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  cargoHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+  },
+  cargoHeaderContent: {
+    flex: 1,
+    gap: 2,
+  },
+  cargoIconBadge: {
+    alignItems: 'center',
+    backgroundColor: Colors.primarySurface,
+    borderRadius: 22,
+    height: 44,
+    justifyContent: 'center',
+    width: 44,
   },
   cargoType: {
     fontSize: 15,

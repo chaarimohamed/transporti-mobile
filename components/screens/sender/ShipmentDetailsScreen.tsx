@@ -9,13 +9,14 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Alert,
-  Image,
   Platform,
 } from 'react-native';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import { AppIcon } from '../../ui/Icon';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
+import ShipmentFormatIcon, { getShipmentFormatLabel } from '../../ui/ShipmentFormatIcon';
+import ShipmentPhotoGallery from '../../ui/ShipmentPhotoGallery';
 import Badge from '../../ui/Badge';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment, confirmHandover } from '../../../services/shipment.service';
@@ -165,21 +166,6 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
     });
   };
 
-  const getPackageFormatLabel = (packageFormat?: string): string | null => {
-    switch (packageFormat) {
-      case 'S':
-        return 'Petit colis';
-      case 'M':
-        return 'Sac / Valise';
-      case 'L':
-        return 'Meuble / Électroménager';
-      case 'XL':
-        return 'Déménagement';
-      default:
-        return packageFormat || null;
-    }
-  };
-
   const handleCancelShipment = () => {
     if (Platform.OS === 'web') {
       if (window.confirm('Êtes-vous sûr de vouloir annuler cette expédition ?')) {
@@ -304,7 +290,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
   const badge = getStatusBadge(shipment.status);
   const shipmentTitle = shipment.itemName || shipment.cargo || 'Colis';
   const pickupDateLabel = formatPickupDate(shipment.pickupDate);
-  const packageFormatLabel = getPackageFormatLabel(shipment.packageFormat);
+  const packageFormatLabel = getShipmentFormatLabel(shipment.packageFormat);
   const shipmentPhotos = shipment.packagePhotos?.length
     ? shipment.packagePhotos
     : shipment.photoPreviews || [];
@@ -470,7 +456,11 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
           <View style={styles.infoDivider} />
 
           <View style={styles.infoRow}>
-            <AppIcon name="package" size={16} color={Colors.textSecondary} />
+            <ShipmentFormatIcon
+              format={shipment.packageFormat}
+              size={16}
+              color={Colors.textSecondary}
+            />
             <View style={styles.infoContent}>
               <Text style={styles.infoLabel}>Article</Text>
               <Text style={styles.infoValue}>{shipmentTitle}</Text>
@@ -496,7 +486,11 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
           {packageFormatLabel && (
             <>
               <View style={styles.infoRow}>
-                <AppIcon name="package-box" size={16} color={Colors.textSecondary} />
+                <ShipmentFormatIcon
+                  format={shipment.packageFormat}
+                  size={16}
+                  color={Colors.textSecondary}
+                />
                 <View style={styles.infoContent}>
                   <Text style={styles.infoLabel}>Format</Text>
                   <Text style={styles.infoValue}>{packageFormatLabel}</Text>
@@ -554,24 +548,10 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
               <Text style={styles.sectionTitle}>Photos du colis</Text>
             </View>
             <Card style={styles.photosCard}>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.photosScrollContent}
-              >
-                {shipmentPhotos.map((photo, index) => (
-                  <Image
-                    key={`${shipment.id}-photo-${index}`}
-                    source={{ uri: photo }}
-                    style={styles.photoThumb}
-                  />
-                ))}
-              </ScrollView>
-              {totalPhotos > shipmentPhotos.length && (
-                <Text style={styles.photosCaption}>
-                  {totalPhotos} photos enregistrées pour cette expédition.
-                </Text>
-              )}
+              <ShipmentPhotoGallery
+                photos={shipmentPhotos}
+                totalPhotos={totalPhotos}
+              />
             </Card>
           </>
         )}

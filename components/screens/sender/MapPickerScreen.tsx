@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -144,7 +144,11 @@ const MapPickerScreen: React.FC<MapPickerScreenProps> = ({
     }
   };
 
-  const htmlContent = `
+  const htmlContent = useMemo(() => {
+    if (loading) return '';
+    const initialLat = location?.latitude ?? 36.8065;
+    const initialLng = location?.longitude ?? 10.1815;
+    return `
     <!DOCTYPE html>
     <html>
     <head>
@@ -158,8 +162,8 @@ const MapPickerScreen: React.FC<MapPickerScreenProps> = ({
     <body>
       <div id="map"></div>
       <script>
-        const initialLat = ${location?.latitude || 36.8065};
-        const initialLng = ${location?.longitude || 10.1815};
+        const initialLat = ${initialLat};
+        const initialLng = ${initialLng};
         
         const map = new google.maps.Map(document.getElementById('map'), {
           center: { lat: initialLat, lng: initialLng },
@@ -176,7 +180,7 @@ const MapPickerScreen: React.FC<MapPickerScreenProps> = ({
           icon: {
             path: google.maps.SymbolPath.CIRCLE,
             scale: 10,
-            fillColor: Colors.primary,
+            fillColor: '${Colors.primary}',
             fillOpacity: 1,
             strokeColor: '#FFFFFF',
             strokeWeight: 3,
@@ -230,6 +234,7 @@ const MapPickerScreen: React.FC<MapPickerScreenProps> = ({
     </body>
     </html>
   `;
+  }, [loading]);
 
   return (
     <SafeAreaView style={styles.container}>

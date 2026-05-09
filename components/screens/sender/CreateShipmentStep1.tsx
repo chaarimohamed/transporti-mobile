@@ -89,10 +89,31 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
     setShowDatePicker(true);
   };
 
-  const handleAddPhoto = async () => {
-    // Request permission to access photos
+  const handleTakePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permission requise',
+        'Transporti a besoin d\'accéder à la caméra pour prendre des photos.'
+      );
+      return;
+    }
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.3,
+      aspect: [4, 3],
+      base64: true,
+    });
+    if (!result.canceled && result.assets) {
+      const newPhotos = result.assets
+        .filter(asset => asset.base64)
+        .map(asset => ({ uri: asset.uri, base64: asset.base64! }));
+      setPhotos([...photos, ...newPhotos]);
+    }
+  };
+
+  const handlePickFromGallery = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    
     if (status !== 'granted') {
       Alert.alert(
         'Permission requise',
@@ -100,8 +121,6 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
       );
       return;
     }
-
-    // Open image picker
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
@@ -109,13 +128,33 @@ const CreateShipmentStep1: React.FC<CreateShipmentStep1Props> = ({
       aspect: [4, 3],
       base64: true,
     });
-
     if (!result.canceled && result.assets) {
       const newPhotos = result.assets
         .filter(asset => asset.base64)
         .map(asset => ({ uri: asset.uri, base64: asset.base64! }));
       setPhotos([...photos, ...newPhotos]);
     }
+  };
+
+  const handleAddPhoto = () => {
+    Alert.alert(
+      'Ajouter une photo',
+      'Choisissez une source',
+      [
+        {
+          text: 'Prendre une photo',
+          onPress: handleTakePhoto,
+        },
+        {
+          text: 'Choisir depuis la galerie',
+          onPress: handlePickFromGallery,
+        },
+        {
+          text: 'Annuler',
+          style: 'cancel',
+        },
+      ]
+    );
   };
 
   const handleRemovePhoto = (index: number) => {

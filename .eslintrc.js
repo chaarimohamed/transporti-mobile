@@ -18,6 +18,15 @@ module.exports = {
   env: {
     'react-native/react-native': true,
   },
+  overrides: [
+    {
+      files: ['metro.config.js'],
+      rules: {
+        // Metro config is executed as CommonJS by the toolchain.
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
+  ],
   rules: {
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',

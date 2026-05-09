@@ -11,10 +11,10 @@ import {
   Platform,
 } from 'react-native';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
-import { Armchair, Briefcase } from 'phosphor-react-native';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import { AppIcon } from '../../ui/Icon';
+import ShipmentFormatIcon from '../../ui/ShipmentFormatIcon';
 
 interface CreateShipmentStep2Props {
   onNavigate?: (screen: string, data?: any) => void;
@@ -98,28 +98,28 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
                 label: 'Petit colis',
                 subtitle: 'Document',
                 examples: 'Vêtements, chaussures, livres',
-                icon: <AppIcon name="package" size={26} color={format === 'S' ? Colors.primary : Colors.textMuted} />,
+                icon: <ShipmentFormatIcon format="S" size={26} color={format === 'S' ? Colors.primary : Colors.textMuted} />,
               },
               {
                 value: 'M',
                 label: 'Sac / Valise',
                 subtitle: 'Moyen',
                 examples: 'Bagages, électronique, caisses',
-                icon: <Briefcase size={26} color={format === 'M' ? Colors.primary : Colors.textMuted} weight="duotone" />,
+                icon: <ShipmentFormatIcon format="M" size={26} color={format === 'M' ? Colors.primary : Colors.textMuted} />,
               },
               {
                 value: 'L',
                 label: 'Meuble / Électroménager',
                 subtitle: 'Grand',
                 examples: 'Frigo, canapé, télévision',
-                icon: <Armchair size={26} color={format === 'L' ? Colors.primary : Colors.textMuted} weight="duotone" />,
+                icon: <ShipmentFormatIcon format="L" size={26} color={format === 'L' ? Colors.primary : Colors.textMuted} />,
               },
               {
                 value: 'XL',
                 label: 'Déménagement',
                 subtitle: 'Très grand',
                 examples: 'Piano, armoire, contenu entier',
-                icon: <AppIcon name="truck" size={26} color={format === 'XL' ? Colors.primary : Colors.textMuted} />,
+                icon: <ShipmentFormatIcon format="XL" size={26} color={format === 'XL' ? Colors.primary : Colors.textMuted} />,
               },
             ].map((option) => (
               <TouchableOpacity
