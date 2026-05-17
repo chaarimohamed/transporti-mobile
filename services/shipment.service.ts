@@ -16,6 +16,7 @@ export interface Shipment {
   deliveryCity?: string;
   cargo?: string;
   price?: number | null;
+  budget?: number | null;
   status: 'PENDING' | 'REQUESTED' | 'CONFIRMED' | 'HANDOVER_PENDING' | 'IN_TRANSIT' | 'DELIVERED' | 'CANCELLED';
   description?: string;
   senderId: string;
@@ -68,11 +69,12 @@ export interface Shipment {
   feedbackSummary?: ShipmentFeedbackSummary;
 }
 
-export type ApplicationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
+export type ApplicationStatus = 'PENDING' | 'COUNTER_OFFERED' | 'ACCEPTED' | 'REJECTED';
 
 export interface ShipmentApplication {
   id: string;
   proposedPrice: number;
+  counterPrice?: number | null;
   status: ApplicationStatus;
   carrierId: string;
   shipmentId: string;
@@ -779,5 +781,67 @@ export const submitShipmentFeedback = async (
       success: false,
       error: apiError.message,
     };
+  }
+};
+
+/**
+ * Sender sends a counter-offer on a carrier's application
+ */
+export const counterOffer = async (
+  shipmentId: string,
+  applicationId: string,
+  counterPrice: number
+): Promise<{ success: boolean; error?: string; message?: string }> => {
+  try {
+    const response = await apiClient.post<ApiResponse<any>>(
+      `${API_ENDPOINTS.SHIPMENTS.LIST}/${shipmentId}/counter-offer`,
+      { applicationId, counterPrice }
+    );
+
+    if (response.data.success) {
+      return {
+        success: true,
+        message: response.data.message || 'Contre-offre envoyée',
+      };
+    }
+
+    return {
+      success: false,
+      error: response.data.error || 'Échec de l\'envoi',
+    };
+  } catch (error) {
+    const apiError = handleApiError(error);
+    return { success: false, error: apiError.message };
+  }
+};
+
+/**
+ * Carrier responds to a sender's counter-offer
+ */
+export const respondToCounter = async (
+  shipmentId: string,
+  action: 'accept' | 'counter',
+  newPrice?: number
+): Promise<{ success: boolean; error?: string; message?: string }> => {
+  try {
+    const response = await apiClient.post<ApiResponse<any>>(
+      `${API_ENDPOINTS.SHIPMENTS.LIST}/${shipmentId}/respond-counter`,
+      { action, ...(newPrice != null && { newPrice }) }
+    );
+
+    if (response.data.success) {
+      return {
+        success: true,
+        message: response.data.message || 'Réponse envoyée',
+      };
+    }
+
+    return {
+      success: false,
+      error: response.data.error || 'Échec de la réponse',
+    };
+  } catch (error) {
+    const apiError = handleApiError(error);
+    return { success: false, error: apiError.message };
   }
 };

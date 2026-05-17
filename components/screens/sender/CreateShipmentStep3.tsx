@@ -5,12 +5,12 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
   Alert,
   Platform,
   Image,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import { AppIcon } from '../../ui/Icon';
 import { Card } from '../../ui/Card';
@@ -109,6 +109,8 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
         // Delivery helper & meeting point
         deliveryHelperCount: initialData?.deliveryHelperCount ?? 0,
         deliveryMeetingPoint: 'vehicle',
+        // Budget range (optional, set by sender)
+        budget: initialData?.budget ?? null,
         // Sender contact info (when not the logged-in user)
         senderName: initialData?.isNotSender ? (initialData?.senderName || null) : null,
         senderPhone: initialData?.isNotSender ? (initialData?.senderPhone || null) : null,
@@ -251,6 +253,18 @@ const CreateShipmentStep3: React.FC<CreateShipmentStep3Props> = ({
             </View>
           </View>
         </Card>
+
+        {/* Budget */}
+        {initialData?.budget && (
+          <Card style={styles.detailsCard}>
+            <View style={styles.detailsGrid}>
+              <View style={styles.detailItem}>
+                <Text style={styles.detailLabel}>Budget</Text>
+                <Text style={styles.detailValue}>{initialData.budget} DT</Text>
+              </View>
+            </View>
+          </Card>
+        )}
 
         {/* Photos */}
         {initialData?.photos?.length > 0 && (

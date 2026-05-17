@@ -4,11 +4,11 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
   Alert,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import { AppIcon } from '../../ui/Icon';
 import { WebView } from 'react-native-webview';

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import { AppIcon } from '../../ui/Icon';
 import { Card } from '../../ui/Card';
@@ -101,12 +101,7 @@ const ShipmentFeedbackScreen: React.FC<ShipmentFeedbackScreenProps> = ({ route, 
   const pendingForCurrentUser = shipment?.feedbackSummary?.pendingForCurrentUser ?? false;
 
   const handleGoBack = () => {
-    if (returnScreen) {
-      onNavigate?.(returnScreen, returnParams);
-      return;
-    }
-
-    onNavigate?.(isSender ? 'dashboard' : 'activeMissions');
+    onNavigate?.('back');
   };
 
   const handleSubmit = async () => {

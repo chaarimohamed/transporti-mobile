@@ -5,11 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
   Alert,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
@@ -204,11 +204,7 @@ const SuggestedTransportersScreen: React.FC<SuggestedTransportersScreenProps> = 
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() =>
-            shipmentId
-              ? onNavigate?.('shipmentDetails', { id: shipmentId })
-              : onNavigate?.('dashboard')
-          }
+          onPress={() => onNavigate?.('back')}
           style={styles.backButton}
           activeOpacity={0.7}
         >

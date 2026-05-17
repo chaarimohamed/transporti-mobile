@@ -82,25 +82,51 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   /**
-   * Register function
+   * Register function — now returns OTP data for phone verification
    */
-  const register = async (data: RegisterData): Promise<{ success: boolean; error?: string }> => {
+  const register = async (data: RegisterData): Promise<{ success: boolean; userId?: string; phone?: string; role?: string; requiresVerification?: boolean; error?: string }> => {
     try {
       const result = await authService.register(data);
 
+      if (result.success && result.requiresVerification) {
+        // OTP flow: don't auto-login, return data for phone verification screen
+        console.log('📱 Registration successful — OTP verification required');
+        return {
+          success: true,
+          userId: result.userId,
+          phone: result.phone,
+          role: result.role,
+          requiresVerification: true,
+        };
+      }
+
       if (result.success && result.user && result.token) {
-        // Auto-login after successful registration
+        // Legacy fallback: auto-login
         setUser(result.user);
         await storage.saveUser(result.user);
         await storage.saveToken(result.token);
         console.log('✅ Registration successful:', result.user.email);
         return { success: true };
-      } else {
-        return { success: false, error: result.error || 'Échec de l\'inscription' };
       }
+
+      return { success: false, error: result.error || 'Échec de l\'inscription' };
     } catch (error) {
       console.error('Registration error:', error);
       return { success: false, error: 'Une erreur est survenue' };
+    }
+  };
+
+  /**
+   * Complete phone verification — called after OTP is verified
+   */
+  const completeVerification = async (verifiedUser: User, token: string): Promise<void> => {
+    try {
+      setUser(verifiedUser);
+      await storage.saveUser(verifiedUser);
+      await storage.saveToken(token);
+      console.log('✅ Phone verification complete:', verifiedUser.email);
+    } catch (error) {
+      console.error('Complete verification error:', error);
     }
   };
 
@@ -136,6 +162,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     login,
     register,
+    completeVerification,
     logout,
     updateUser,
   };

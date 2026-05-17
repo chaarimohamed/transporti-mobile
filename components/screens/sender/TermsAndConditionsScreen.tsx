@@ -5,8 +5,8 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import { AppIcon } from '../../ui/Icon';
 
@@ -25,7 +25,7 @@ const TermsAndConditionsScreen: React.FC<TermsAndConditionsScreenProps> = ({
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => onNavigate?.(returnScreen)}
+          onPress={() => onNavigate?.('back')}
         >
           <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
         </TouchableOpacity>

@@ -5,10 +5,10 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
@@ -86,7 +86,7 @@ const ApplicationListScreen: React.FC<ApplicationListScreenProps> = ({ onNavigat
   };
 
   const handleViewApplication = (shipment: Shipment) => {
-    onNavigate?.('applicationDetails', { shipment });
+    onNavigate?.('applicationDetails', { shipment, returnScreen: 'applicationList' });
   };
 
   if (loading) {
@@ -105,7 +105,7 @@ const ApplicationListScreen: React.FC<ApplicationListScreenProps> = ({ onNavigat
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => onNavigate?.('dashboard')}
+          onPress={() => onNavigate?.('back')}
           style={styles.backButton}
           activeOpacity={0.7}
         >

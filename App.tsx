@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
@@ -12,6 +13,7 @@ import { RoleSelectionScreen } from './components/screens/auth/RoleSelectionScre
 import { LoginScreen } from './components/screens/auth/LoginScreen';
 import { ForgotPasswordScreen } from './components/screens/auth/ForgotPasswordScreen';
 import { SenderRegisterScreen } from './components/screens/sender/SenderRegisterScreen';
+import { PhoneVerificationScreen } from './components/screens/auth/PhoneVerificationScreen';
 import { CarrierRegisterScreen } from './components/screens/carrier/CarrierRegisterScreen';
 import CarrierOnboarding2Screen from './components/screens/carrier/CarrierOnboarding2Screen';
 import CarrierOnboarding3Screen from './components/screens/carrier/CarrierOnboarding3Screen';
@@ -26,6 +28,7 @@ import MapPickerScreen from './components/screens/sender/MapPickerScreen';
 import CreateShipmentStep2 from './components/screens/sender/CreateShipmentStep2';
 import CreateShipmentStep3 from './components/screens/sender/CreateShipmentStep3';
 import ShipmentDetailsScreen from './components/screens/sender/ShipmentDetailsScreen';
+import EditShipmentScreen from './components/screens/sender/EditShipmentScreen';
 import MissionListScreen from './components/screens/carrier/MissionListScreen';
 import MissionDetailsScreen from './components/screens/carrier/MissionDetailsScreen';
 import ActiveMissionsScreen from './components/screens/carrier/ActiveMissionsScreen';
@@ -55,10 +58,11 @@ import DocumentsCarrierScreen from './components/screens/carrier/DocumentsCarrie
 import NotificationSettingsCarrierScreen from './components/screens/carrier/NotificationSettingsCarrierScreen';
 import TermsAndConditionsCarrierScreen from './components/screens/carrier/TermsAndConditionsCarrierScreen';
 import PrivacySecurityCarrierScreen from './components/screens/carrier/PrivacySecurityCarrierScreen';
+import VerificationChecklistScreen from './components/screens/carrier/VerificationChecklistScreen';
 import ShipmentFeedbackScreen from './components/screens/shared/ShipmentFeedbackScreen';
 import ShipmentFeedbackSuccessScreen from './components/screens/shared/ShipmentFeedbackSuccessScreen';
 
-type ScreenName = 'splash' | 'roleSelection' | 'login' | 'forgotPassword' | 'senderRegister' | 'carrierRegister' | 'carrierOnboarding2' | 'carrierOnboarding3' | 'carrierOnboarding4' | 'verifyEmail' | 'dashboard' | 'shipmentList' | 'newShipment' | 'createShipmentStep1' | 'addressPickup' | 'addressDelivery' | 'mapPicker' | 'createShipmentStep2' | 'createShipmentStep3' | 'shipmentDetails' | 'missionList' | 'missionDetails' | 'activeMissions' | 'updateStatus' | 'notificationList' | 'applicationList' | 'applicationDetails' | 'applicationAccepted' | 'suggestedTransporters' | 'transporterProfile' | 'invitationSent' | 'paymentCodeInput' | 'paymentSuccess' | 'paymentError' | 'paymentBlocked' | 'paymentReceipt' | 'paymentHistory' | 'shipmentFeedback' | 'shipmentFeedbackSuccess' | 'notifications' | 'notificationListSender' | 'profile' | 'notificationSettings' | 'personalInformation' | 'termsAndConditions' | 'privacySecurity' | 'profileCarrier' | 'personalInformationCarrier' | 'carrierDocuments' | 'notificationSettingsCarrier' | 'termsAndConditionsCarrier' | 'privacySecurityCarrier';
+type ScreenName = 'splash' | 'roleSelection' | 'login' | 'forgotPassword' | 'senderRegister' | 'carrierRegister' | 'carrierOnboarding2' | 'carrierOnboarding3' | 'carrierOnboarding4' | 'verifyEmail' | 'dashboard' | 'shipmentList' | 'newShipment' | 'createShipmentStep1' | 'addressPickup' | 'addressDelivery' | 'mapPicker' | 'createShipmentStep2' | 'createShipmentStep3' | 'shipmentDetails' | 'missionList' | 'missionDetails' | 'activeMissions' | 'updateStatus' | 'notificationList' | 'applicationList' | 'applicationDetails' | 'applicationAccepted' | 'suggestedTransporters' | 'transporterProfile' | 'invitationSent' | 'paymentCodeInput' | 'paymentSuccess' | 'paymentError' | 'paymentBlocked' | 'paymentReceipt' | 'paymentHistory' | 'shipmentFeedback' | 'shipmentFeedbackSuccess' | 'notifications' | 'notificationListSender' | 'profile' | 'notificationSettings' | 'personalInformation' | 'termsAndConditions' | 'privacySecurity' | 'profileCarrier' | 'personalInformationCarrier' | 'carrierDocuments' | 'notificationSettingsCarrier' | 'termsAndConditionsCarrier' | 'privacySecurityCarrier' | 'verificationChecklist';
 
 interface NotificationRouteData {
   shipmentId?: string;
@@ -72,6 +76,7 @@ function AppContent() {
   const [, setUserRole] = useState<'sender' | 'carrier' | null>(null);
   const [screenParams, setScreenParams] = useState<any>(null);
   const lastHandledNotificationId = useRef<string | null>(null);
+  const historyRef = useRef<{ screen: ScreenName; params: any }[]>([]);
 
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,
@@ -86,8 +91,44 @@ function AppContent() {
     }
   }, [fontsLoaded]);
 
+  // Screens that act as tab roots — navigating to these resets history
+  const TAB_ROOTS = new Set<string>([
+    'dashboard', 'shipmentList', 'missionList', 'activeMissions',
+    'paymentHistory', 'profile', 'profileCarrier', 'notificationList',
+    'notificationListSender', 'notifications',
+  ]);
+
   const navigate = (screen: string, params?: any) => {
+    // 'back' pops to the previous screen in history
+    if (screen === 'back') {
+      const prev = historyRef.current.pop();
+      if (prev) {
+        console.log('🚀 Navigate back to:', prev.screen);
+        setCurrentScreen(prev.screen);
+        setScreenParams(prev.params);
+      } else {
+        // No history — fall back to dashboard
+        console.log('🚀 Navigate back: no history, going to dashboard');
+        setCurrentScreen('dashboard');
+        setScreenParams(null);
+      }
+      return;
+    }
+
     console.log('🚀 Navigate called:', { screen, params, currentScreen });
+
+    // Tab-root navigations reset the history stack
+    if (TAB_ROOTS.has(screen)) {
+      historyRef.current = [];
+    } else {
+      // Push current screen onto history before navigating away
+      historyRef.current.push({ screen: currentScreen, params: screenParams });
+      // Cap history at 20 entries to avoid unbounded growth
+      if (historyRef.current.length > 20) {
+        historyRef.current = historyRef.current.slice(-20);
+      }
+    }
+
     setCurrentScreen(screen as ScreenName);
     setScreenParams(params);
   };
@@ -179,7 +220,7 @@ function AppContent() {
 
   // If user is authenticated, handle authenticated screens
   // Unless they're explicitly on login/register/onboarding screens (after logout or during registration)
-  if (isAuthenticated && user && !['login', 'forgotPassword', 'roleSelection', 'senderRegister', 'carrierRegister', 'carrierOnboarding2', 'carrierOnboarding3', 'carrierOnboarding4'].includes(currentScreen)) {
+  if (isAuthenticated && user && !['login', 'forgotPassword', 'roleSelection', 'senderRegister', 'carrierRegister', 'phoneVerification', 'carrierOnboarding2', 'carrierOnboarding3', 'carrierOnboarding4'].includes(currentScreen)) {
     // Handle sender-specific screens
     if (user.role === 'sender') {
       switch (currentScreen) {
@@ -200,6 +241,8 @@ function AppContent() {
           return <CreateShipmentStep3 onNavigate={navigate} initialData={screenParams} />;
         case 'shipmentDetails':
           return <ShipmentDetailsScreen onNavigate={navigate} initialData={screenParams} />;
+        case 'editShipment':
+          return <EditShipmentScreen onNavigate={navigate} initialData={screenParams} />;
         case 'applicationList':
           return <ApplicationListScreen onNavigate={navigate} />;
         case 'applicationDetails':
@@ -270,6 +313,8 @@ function AppContent() {
           return <PersonalInformationCarrierScreen onNavigate={navigate} />;
         case 'carrierDocuments':
           return <DocumentsCarrierScreen onNavigate={navigate} />;
+        case 'verificationChecklist':
+          return <VerificationChecklistScreen onNavigate={navigate} />;
         case 'notificationSettingsCarrier':
           return <NotificationSettingsCarrierScreen onNavigate={navigate} />;
         case 'termsAndConditionsCarrier':
@@ -299,6 +344,8 @@ function AppContent() {
         return <SenderRegisterScreen onNavigate={navigate} />;
       case 'carrierRegister':
         return <CarrierRegisterScreen onNavigate={navigate} initialData={screenParams} />;
+      case 'phoneVerification':
+        return <PhoneVerificationScreen onNavigate={navigate} initialData={screenParams} />;
       case 'carrierOnboarding2':
         return <CarrierOnboarding2Screen onNavigate={navigate} />;
       case 'carrierOnboarding3':
@@ -343,9 +390,11 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }
 

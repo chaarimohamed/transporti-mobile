@@ -5,11 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
   Alert,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
@@ -182,7 +182,7 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => onNavigate?.('activeMissions')}
+            onPress={() => onNavigate?.('back')}
             style={styles.backButton}
           >
             <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
@@ -241,7 +241,7 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => onNavigate?.('activeMissions')}
+          onPress={() => onNavigate?.('back')}
           style={styles.backButton}
         >
           <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
@@ -253,15 +253,51 @@ const UpdateStatusScreen: React.FC<UpdateStatusScreenProps> = ({
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Mission Info Card */}
         <Card style={styles.infoCard}>
-          <View style={styles.routeHeader}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <Text style={styles.routeText}>{mission.from}</Text>
-              <AppIcon name="arrow-right" size={16} color={Colors.textMuted} />
-              <Text style={styles.routeText}>{mission.to}</Text>
+          {/* Route */}
+          <View style={styles.routeSection}>
+            <View style={styles.routeRow}>
+              <View style={[styles.routeDot, { backgroundColor: Colors.primary }]} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.routeLabel}>Départ</Text>
+                <Text style={styles.routeCity}>{mission.from}</Text>
+              </View>
             </View>
-            <Text style={styles.priceText}>{mission.price} TND</Text>
+            <View style={styles.routeDivider} />
+            <View style={styles.routeRow}>
+              <View style={[styles.routeDot, { backgroundColor: Colors.error }]} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.routeLabel}>Arrivée</Text>
+                <Text style={styles.routeCity}>{mission.to}</Text>
+              </View>
+            </View>
           </View>
-          <Text style={styles.cargoText}>{mission.cargo || mission.description || 'Marchandise'}</Text>
+
+          {/* Cargo & Price */}
+          <View style={styles.infoRow}>
+            <View style={styles.infoItem}>
+              <Text style={styles.infoLabel}>Cargaison</Text>
+              <Text style={styles.infoValue}>{mission.cargo || mission.description || 'Marchandise'}</Text>
+            </View>
+            <View style={[styles.infoItem, { alignItems: 'flex-end' }]}>
+              <Text style={styles.infoLabel}>Tarif</Text>
+              <Text style={styles.priceValue}>{mission.price ?? '—'} TND</Text>
+            </View>
+          </View>
+
+          {/* Sender */}
+          {mission.sender && (
+            <View style={styles.senderRow}>
+              <View style={styles.senderAvatar}>
+                <Text style={styles.senderAvatarText}>
+                  {(mission.sender.firstName?.[0] || '').toUpperCase()}
+                </Text>
+              </View>
+              <View>
+                <Text style={styles.infoLabel}>Expéditeur</Text>
+                <Text style={styles.senderName}>{mission.sender.firstName} {mission.sender.lastName}</Text>
+              </View>
+            </View>
+          )}
         </Card>
 
         {/* Timeline */}
@@ -441,31 +477,89 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     marginBottom: 16,
-    padding: 16,
+    padding: 20,
   },
-  routeHeader: {
+  routeSection: {
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  routeRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
+    alignItems: 'center',
+    gap: 12,
   },
-  routeText: {
-    fontSize: 16,
+  routeDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  routeLabel: {
+    fontSize: 12,
+    color: '#999',
+    marginBottom: 2,
+  },
+  routeCity: {
+    fontSize: 15,
     fontWeight: '600',
     color: '#1A1A1A',
+  },
+  routeDivider: {
+    width: 2,
+    height: 16,
+    backgroundColor: '#E0E0E0',
+    marginLeft: 5,
+    marginVertical: 4,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  infoItem: {
     flex: 1,
   },
-  routeArrow: {
+  infoLabel: {
+    fontSize: 12,
     color: '#999',
+    marginBottom: 2,
   },
-  priceText: {
+  infoValue: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1A1A1A',
+  },
+  priceValue: {
     fontSize: 18,
     fontWeight: 'bold',
     color: Colors.primary,
   },
-  cargoText: {
+  senderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+  },
+  senderAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  senderAvatarText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  senderName: {
     fontSize: 14,
-    color: '#666666',
+    fontWeight: '600',
+    color: '#1A1A1A',
   },
   timelineCard: {
     marginBottom: 16,

@@ -5,8 +5,8 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import { AppIcon, AppIconName } from '../../ui/Icon';
 import { Button } from '../../ui/Button';
@@ -61,7 +61,7 @@ const CarrierOnboarding2Screen: React.FC<CarrierOnboarding2ScreenProps> = ({
         <View style={styles.progressContainer}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => onNavigate?.('carrierRegister')}
+            onPress={() => onNavigate?.('back')}
             activeOpacity={0.7}
           >
             <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />

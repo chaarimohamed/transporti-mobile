@@ -5,11 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
   RefreshControl,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
@@ -67,34 +67,12 @@ const NotificationListScreen: React.FC<NotificationListScreenProps> = ({ onNavig
   };
 
   const handleAcceptInvitation = async (notification: any) => {
-    if (!notification.shipmentId) {
+    // Navigate to mission details where carrier can enter their proposed price
+    const shipmentId = notification.shipmentId || notification.data?.shipmentId;
+    if (shipmentId) {
+      onNavigate?.('missionDetails', { shipmentId, fromInvitation: true });
+    } else {
       Alert.alert('Erreur', 'ID d\'expédition manquant');
-      return;
-    }
-
-    setProcessingId(notification.id);
-    try {
-      // Accept the invitation — this sets status CONFIRMED and notifies the sender (BUG-01 fix)
-      const result = await shipmentService.acceptInvitation(notification.shipmentId, 0);
-
-      if (result.success) {
-        Alert.alert(
-          'Succès',
-          'Invitation acceptée ! L\'expédition est maintenant confirmée.',
-          [
-            {
-              text: 'OK',
-              onPress: () => fetchNotifications(),
-            },
-          ]
-        );
-      } else {
-        Alert.alert('Erreur', result.error || 'Impossible d\'accepter l\'invitation');
-      }
-    } catch (error) {
-      Alert.alert('Erreur', 'Une erreur s\'est produite');
-    } finally {
-      setProcessingId(null);
     }
   };
 

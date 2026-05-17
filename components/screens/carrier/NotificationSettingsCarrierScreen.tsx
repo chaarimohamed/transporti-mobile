@@ -5,9 +5,9 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   Switch,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../../theme';
 import { AppIcon } from '../../ui/Icon';
 
@@ -30,7 +30,7 @@ const NotificationSettingsCarrierScreen: React.FC<NotificationSettingsCarrierScr
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => onNavigate?.('profileCarrier')}
+          onPress={() => onNavigate?.('back')}
         >
           <AppIcon name="arrow-back" size={18} color="#1A1A1A" />
         </TouchableOpacity>

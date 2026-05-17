@@ -3,13 +3,14 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { AppIcon } from '../../ui/Icon';
@@ -30,9 +31,13 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
   initialData,
 }) => {
   const [shipment] = useState<Shipment | null>(initialData?.shipment || null);
+  const returnScreen = initialData?.returnScreen || 'applicationList';
+  const returnParams = initialData?.returnParams;
   const [applications, setApplications] = useState<ShipmentApplication[]>([]);
   const [loadingApps, setLoadingApps] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [counterAppId, setCounterAppId] = useState<string | null>(null);
+  const [counterPriceInput, setCounterPriceInput] = useState('');
 
   const fetchApplications = useCallback(async () => {
     if (!shipment?.id) return;
@@ -54,7 +59,7 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
         <View style={styles.errorContainer}>
           <AppIcon name="alert-triangle" size={24} color={Colors.error} />
           <Text style={styles.errorText}>Expédition introuvable</Text>
-          <TouchableOpacity style={styles.backBtn} onPress={() => onNavigate?.('applicationList')}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => onNavigate?.('back')}>
             <Text style={styles.backBtnText}>Retour</Text>
           </TouchableOpacity>
         </View>
@@ -134,6 +139,41 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
     }
   };
 
+  const handleCounter = async (app: ShipmentApplication) => {
+    const price = parseFloat(counterPriceInput);
+    if (!counterPriceInput || isNaN(price) || price <= 0) {
+      Alert.alert('Prix invalide', 'Veuillez saisir un prix valide.');
+      return;
+    }
+
+    try {
+      setActionLoading(app.id);
+      const result = await shipmentService.counterOffer(shipment!.id, app.id, price);
+      if (result.success) {
+        setCounterAppId(null);
+        setCounterPriceInput('');
+        fetchApplications();
+        const msg = result.message || 'Contre-offre envoyée';
+        if (Platform.OS === 'web') {
+          window.alert(msg);
+        } else {
+          Alert.alert('Succès', msg);
+        }
+      } else {
+        const msg = result.error || 'Impossible d\'envoyer la contre-offre';
+        if (Platform.OS === 'web') {
+          window.alert(msg);
+        } else {
+          Alert.alert('Erreur', msg);
+        }
+      }
+    } catch {
+      Alert.alert('Erreur', 'Erreur de connexion');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const renderStars = (rating?: number) => {
     if (!rating) return null;
     return `⭐ ${rating.toFixed(1)}`;
@@ -145,7 +185,7 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
       <View style={styles.header}>
         <TouchableOpacity
           activeOpacity={0.7}
-          onPress={() => onNavigate?.('applicationList')}
+          onPress={() => onNavigate?.('back')}
           style={styles.backButton}
         >
           <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
@@ -174,25 +214,36 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
           </View>
         </Card>
 
+        {/* Sender budget hint */}
+        {shipment.budget != null && (
+          <Card style={styles.routeCard}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <AppIcon name="wallet" size={14} color={Colors.textSecondary} />
+              <Text style={{ fontSize: 13, color: Colors.textSecondary }}>Budget indicatif du client : </Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: Colors.charcoal }}>{shipment.budget} DT</Text>
+            </View>
+          </Card>
+        )}
+
         {/* Applications list */}
         <Text style={styles.sectionTitle}>
           {loadingApps
             ? 'Chargement des candidatures\u2026'
-            : `${applications.filter(a => a.status === 'PENDING').length} candidature(s) en attente`}
+            : `${applications.filter(a => a.status === 'PENDING' || a.status === 'COUNTER_OFFERED').length} candidature(s) en cours`}
         </Text>
 
         {loadingApps ? (
           <View style={styles.loadingApps}>
             <ActivityIndicator size="large" color={Colors.primary} />
           </View>
-        ) : applications.filter(a => a.status === 'PENDING').length === 0 ? (
+        ) : applications.filter(a => a.status === 'PENDING' || a.status === 'COUNTER_OFFERED').length === 0 ? (
           <Card style={styles.emptyCard}>
             <AppIcon name="info-circle" size={24} color={Colors.textSecondary} />
             <Text style={styles.emptyText}>Aucune candidature en attente pour le moment</Text>
           </Card>
         ) : (
           applications
-            .filter(a => a.status === 'PENDING')
+            .filter(a => a.status === 'PENDING' || a.status === 'COUNTER_OFFERED')
             .map(app => {
               const isActioning = actionLoading === app.id;
               const carrierName = app.carrier
@@ -225,38 +276,99 @@ const ApplicationDetailsScreen: React.FC<ApplicationDetailsScreenProps> = ({
                     </View>
                   </View>
 
-                  <View style={styles.applicationActions}>
-                    <TouchableOpacity
-                      activeOpacity={0.7}
-                      disabled={isActioning || actionLoading !== null}
-                      onPress={() => handleReject(app)}
-                      style={[
-                        styles.rejectBtn,
-                        (isActioning || actionLoading !== null) && styles.btnDisabled,
-                      ]}
-                    >
-                      {isActioning ? (
-                        <ActivityIndicator size="small" color={Colors.error} />
-                      ) : (
-                        <Text style={styles.rejectBtnText}>Refuser</Text>
+                  {/* Negotiation status */}
+                  {app.status === 'COUNTER_OFFERED' && app.counterPrice != null && (
+                    <View style={styles.counterBadge}>
+                      <AppIcon name="info-circle" size={14} color="#E67E22" />
+                      <Text style={styles.counterBadgeText}>
+                        Votre contre-offre : {app.counterPrice} DT — en attente de réponse
+                      </Text>
+                    </View>
+                  )}
+
+                  {/* Counter-offer input */}
+                  {counterAppId === app.id && (
+                    <View style={styles.counterInputRow}>
+                      <TextInput
+                        style={styles.counterInput}
+                        value={counterPriceInput}
+                        onChangeText={setCounterPriceInput}
+                        keyboardType="numeric"
+                        placeholder="Votre prix (DT)"
+                        placeholderTextColor="#999"
+                      />
+                      <TouchableOpacity
+                        style={styles.counterSendBtn}
+                        onPress={() => handleCounter(app)}
+                        disabled={isActioning}
+                      >
+                        {isActioning ? (
+                          <ActivityIndicator size="small" color="#FFF" />
+                        ) : (
+                          <Text style={styles.counterSendText}>Envoyer</Text>
+                        )}
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.counterCancelBtn}
+                        onPress={() => { setCounterAppId(null); setCounterPriceInput(''); }}
+                      >
+                        <Text style={styles.counterCancelText}>Annuler</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+
+                  {/* Actions: only show for PENDING (ball is with sender) */}
+                  {app.status === 'PENDING' && (
+                    <View style={styles.applicationActions}>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        disabled={isActioning || actionLoading !== null}
+                        onPress={() => handleReject(app)}
+                        style={[
+                          styles.rejectBtn,
+                          (isActioning || actionLoading !== null) && styles.btnDisabled,
+                        ]}
+                      >
+                        {isActioning ? (
+                          <ActivityIndicator size="small" color={Colors.error} />
+                        ) : (
+                          <Text style={styles.rejectBtnText}>Refuser</Text>
+                        )}
+                      </TouchableOpacity>
+                      {/* Only allow counter-offer if no previous counter round */}
+                      {app.counterPrice == null && (
+                        <TouchableOpacity
+                          activeOpacity={0.7}
+                          disabled={isActioning || actionLoading !== null}
+                          onPress={() => {
+                            setCounterAppId(app.id);
+                            setCounterPriceInput('');
+                          }}
+                          style={[
+                            styles.counterBtn,
+                            (isActioning || actionLoading !== null) && styles.btnDisabled,
+                          ]}
+                        >
+                          <Text style={styles.counterBtnText}>Contre-offre</Text>
+                        </TouchableOpacity>
                       )}
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      activeOpacity={0.7}
-                      disabled={isActioning || actionLoading !== null}
-                      onPress={() => handleAccept(app)}
-                      style={[
-                        styles.acceptBtn,
-                        (isActioning || actionLoading !== null) && styles.btnDisabled,
-                      ]}
-                    >
-                      {isActioning ? (
-                        <ActivityIndicator size="small" color="#FFFFFF" />
-                      ) : (
-                        <Text style={styles.acceptBtnText}>Accepter</Text>
-                      )}
-                    </TouchableOpacity>
-                  </View>
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        disabled={isActioning || actionLoading !== null}
+                        onPress={() => handleAccept(app)}
+                        style={[
+                          styles.acceptBtn,
+                          (isActioning || actionLoading !== null) && styles.btnDisabled,
+                        ]}
+                      >
+                        {isActioning ? (
+                          <ActivityIndicator size="small" color="#FFFFFF" />
+                        ) : (
+                          <Text style={styles.acceptBtnText}>Accepter</Text>
+                        )}
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </Card>
               );
             })
@@ -318,6 +430,71 @@ const styles = StyleSheet.create({
   },
   btnDisabled: {
     opacity: 0.5,
+  },
+  counterBadge: {
+    alignItems: 'center',
+    backgroundColor: '#FFF8F0',
+    borderColor: '#F0D0A0',
+    borderRadius: 8,
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 12,
+    padding: 10,
+  },
+  counterBadgeText: {
+    color: '#E67E22',
+    flex: 1,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  counterBtn: {
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderColor: '#E67E22',
+    borderRadius: 8,
+    borderWidth: 1,
+    flex: 1,
+    paddingVertical: 10,
+  },
+  counterBtnText: {
+    color: '#E67E22',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  counterCancelBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  counterCancelText: {
+    color: '#666',
+    fontSize: 13,
+  },
+  counterInput: {
+    borderColor: '#DDD',
+    borderRadius: 8,
+    borderWidth: 1,
+    flex: 1,
+    fontSize: 15,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  counterInputRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 12,
+  },
+  counterSendBtn: {
+    backgroundColor: '#E67E22',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  counterSendText: {
+    color: '#FFF',
+    fontSize: 13,
+    fontWeight: '700',
   },
   carrierAvatar: {
     alignItems: 'center',

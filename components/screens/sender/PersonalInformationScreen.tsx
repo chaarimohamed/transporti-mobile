@@ -5,11 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   Alert,
   Platform,
   Image,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import { AppIcon } from '../../ui/Icon';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -104,7 +104,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
           updateUser(result.user);
         }
         Alert.alert('Succès', 'Vos informations ont été mises à jour', [
-          { text: 'OK', onPress: () => onNavigate?.('profile') },
+          { text: 'OK', onPress: () => onNavigate?.('back') },
         ]);
       } else {
         Alert.alert('Erreur', result.error || 'Impossible de mettre à jour les informations');
@@ -200,7 +200,7 @@ const PersonalInformationScreen: React.FC<PersonalInformationScreenProps> = ({
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => onNavigate?.('profile')}
+          onPress={() => onNavigate?.('back')}
         >
           <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
         </TouchableOpacity>

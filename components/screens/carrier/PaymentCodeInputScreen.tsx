@@ -5,15 +5,14 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   TextInput,
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
-import Badge from '../../ui/Badge';
 import { AppIcon } from '../../ui/Icon';
 import * as missionService from '../../../services/mission.service';
 
@@ -109,16 +108,24 @@ const PaymentCodeInputScreen: React.FC<PaymentCodeInputScreenProps> = ({
   };
 
   const handleResendCode = () => {
+    if (!shipmentId) {
+      Alert.alert('Erreur', 'Identifiant d\'expédition manquant');
+      return;
+    }
     Alert.alert(
       'Renvoyer le code',
-      'Un nouveau code sera envoyé au client par SMS',
+      'Un nouveau code sera envoyé au destinataire par SMS',
       [
         { text: 'Annuler', style: 'cancel' },
         {
           text: 'Confirmer',
-          onPress: () => {
-            // Call API to resend code
-            Alert.alert('Code renvoyé', 'Un nouveau code a été envoyé au client');
+          onPress: async () => {
+            const result = await missionService.resendDeliveryCode(shipmentId);
+            if (result.success) {
+              Alert.alert('Code renvoyé', 'Un nouveau code a été envoyé par SMS');
+            } else {
+              Alert.alert('Erreur', result.error || 'Impossible de renvoyer le code');
+            }
           },
         },
       ]
@@ -134,17 +141,14 @@ const PaymentCodeInputScreen: React.FC<PaymentCodeInputScreenProps> = ({
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View style={styles.headerRow}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => onNavigate?.('activeMissions')}
+            onPress={() => onNavigate?.('back')}
           >
             <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Confirmer la livraison</Text>
-          <View style={styles.missionBadge}>
-            <Text style={styles.missionBadgeText}>{missionId}</Text>
-          </View>
         </View>
 
         {/* Order Summary Card */}
@@ -175,16 +179,16 @@ const PaymentCodeInputScreen: React.FC<PaymentCodeInputScreenProps> = ({
         <View style={styles.instructionBanner}>
           <AppIcon name="info-circle" size={20} color={Colors.primary} />
           <View style={styles.instructionText}>
-            <Text style={styles.instructionTitle}>Demandez le code de paiement</Text>
+            <Text style={styles.instructionTitle}>Demandez le code de livraison</Text>
             <Text style={styles.instructionSubtitle}>
-              Le client a reçu ce code par SMS lors de la commande.
+              Le destinataire a reçu un code à 6 chiffres par SMS.
             </Text>
           </View>
         </View>
 
         {/* Code Input */}
         <View style={styles.codeInputSection}>
-          <Text style={styles.codeLabel}>Code de paiement</Text>
+          <Text style={styles.codeLabel}>Code de livraison</Text>
           <View style={styles.codeInputContainer}>
             {code.map((digit, index) => (
               <TextInput
@@ -252,6 +256,9 @@ const styles = StyleSheet.create({
     paddingBottom: 150, // Space for fixed buttons
   },
   header: {
+    marginBottom: 20,
+  },
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
@@ -264,27 +271,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  backIcon: {
-    fontSize: 20,
-    color: '#1A1A1A',
-  },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#1A1A1A',
-    flex: 1,
-    marginLeft: 8,
-  },
-  missionBadge: {
-    backgroundColor: '#E9E9E9',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  missionBadgeText: {
-    fontSize: 12,
-    color: '#666666',
-    fontWeight: '500',
+    marginLeft: 12,
   },
   orderCard: {
     marginBottom: 20,

@@ -5,9 +5,9 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import Badge from '../../ui/Badge';
@@ -194,7 +194,7 @@ const MissionListScreen: React.FC<MissionListScreenProps> = ({ onNavigate }) => 
                         </Text>
                       </View>
                     </View>
-                    <Text style={styles.priceText}>{shipment.price} TND</Text>
+                    <Text style={styles.priceText}>{shipment.price != null ? `${shipment.price} TND` : shipment.budget != null ? `~${shipment.budget} TND` : 'À négocier'}</Text>
                   </View>
 
                   <View style={styles.badgesContainer}>

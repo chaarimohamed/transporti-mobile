@@ -5,11 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   Alert,
   Image,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import { AppIcon } from '../../ui/Icon';
 import * as ImagePicker from 'expo-image-picker';
@@ -161,7 +161,7 @@ const CarrierOnboarding3Screen: React.FC<CarrierOnboarding3ScreenProps> = ({
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         {/* Progress */}
         <View style={styles.progressContainer}>
-          <TouchableOpacity style={styles.backButton} onPress={() => onNavigate?.('carrierOnboarding2')} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.backButton} onPress={() => onNavigate?.('back')} activeOpacity={0.7}>
             <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
           </TouchableOpacity>
           <View style={styles.progressBar}>

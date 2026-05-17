@@ -10,13 +10,13 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.transporti.app",
+      "bundleIdentifier": "com.transporti.tn",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Nous avons besoin de votre position pour vous aider à définir précisément les adresses de collecte et de livraison."
       }
     },
     "android": {
-      "package": "com.transporti.app",
+      "package": "com.transporti.tn",
       "versionCode": 1,
       "permissions": [
         "android.permission.INTERNET",

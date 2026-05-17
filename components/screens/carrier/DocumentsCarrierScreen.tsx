@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import {
   Alert,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { AppIcon } from '../../ui/Icon';
 import { Colors, FontSizes, Fonts, Radius, Spacing } from '../../../theme';
@@ -112,7 +112,7 @@ const DocumentsCarrierScreen: React.FC<DocumentsCarrierScreenProps> = ({
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => onNavigate?.('profileCarrier')} activeOpacity={0.7}>
+        <TouchableOpacity style={styles.backButton} onPress={() => onNavigate?.('back')} activeOpacity={0.7}>
           <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Documents</Text>

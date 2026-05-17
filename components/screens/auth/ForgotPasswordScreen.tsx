@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
 import { AppIcon } from '../../ui/Icon';
@@ -18,7 +19,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [devToken, setDevToken] = useState(''); // For development mode
+
 
   const handleBack = () => {
     if (step === 'reset') {
@@ -51,14 +52,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
       const result = await forgotPassword(email.trim());
 
       if (result.success) {
-        if (result.resetToken) {
-          setDevToken(result.resetToken);
-        }
-        // Single alert — embed the dev code in the message so it's visible immediately
-        const alertMsg = result.resetToken
-          ? `${result.message || 'Code généré.'}\n\n[🔧 Dev] Code : ${result.resetToken}`
-          : (result.message || 'Si un compte existe avec cet email, un code a été envoyé');
-        Alert.alert('Code envoyé', alertMsg, [{ text: 'OK', onPress: () => setStep('reset') }]);
+        Alert.alert('Code envoyé', result.message || 'Si un compte existe avec cet email, un code a été envoyé', [{ text: 'OK', onPress: () => setStep('reset') }]);
       } else {
         setError(result.error || 'Erreur lors de la demande');
       }
@@ -108,8 +102,9 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
   };
 
   return (
+    <SafeAreaView style={styles.container}>
     <KeyboardAvoidingView 
-      style={styles.container} 
+      style={{flex: 1}} 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       {/* Back navigation bar — ← goes back to login (step email) or back to email step (step reset) */}
@@ -182,12 +177,6 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
                   icon={<AppIcon name="lock" size={18} color={Colors.textMuted} />}
                 />
 
-                {devToken && (
-                  <Text style={styles.devHint}>
-                    Dev: {devToken}
-                  </Text>
-                )}
-
                 <Input
                   label="Nouveau mot de passe"
                   placeholder="••••••••"
@@ -226,6 +215,7 @@ export const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({ onNa
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -287,16 +277,6 @@ const styles = StyleSheet.create({
   inputs: {
     gap: 16,
     marginBottom: 24,
-  },
-  devHint: {
-    fontFamily: Fonts.regular,
-    fontSize: FontSizes.xs,
-    color: '#6366F1',
-    textAlign: 'center',
-    backgroundColor: '#EEF2FF',
-    padding: 8,
-    borderRadius: Radius.xs,
-    marginTop: -8,
   },
   footer: {
     alignItems: 'center',

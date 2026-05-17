@@ -36,18 +36,41 @@ export const login = async (credentials: LoginCredentials): Promise<{ success: b
 /**
  * Register a new user
  */
-export const register = async (data: RegisterData): Promise<{ success: boolean; user?: User; token?: string; error?: string }> => {
+export const register = async (data: RegisterData): Promise<{
+  success: boolean;
+  user?: User;
+  token?: string;
+  userId?: string;
+  phone?: string;
+  role?: string;
+  requiresVerification?: boolean;
+  error?: string;
+}> => {
   try {
-    const response = await apiClient.post<ApiResponse<{ user: User; token: string }>>(
+    const response = await apiClient.post<ApiResponse<any>>(
       API_ENDPOINTS.AUTH.REGISTER,
       data
     );
 
     if (response.data.success && response.data.data) {
+      const d = response.data.data;
+
+      // New flow: backend returns userId + requiresVerification
+      if (d.requiresVerification) {
+        return {
+          success: true,
+          userId: d.userId,
+          phone: d.phone,
+          role: d.role,
+          requiresVerification: true,
+        };
+      }
+
+      // Legacy fallback: backend returns user + token
       return {
         success: true,
-        user: response.data.data.user,
-        token: response.data.data.token,
+        user: d.user,
+        token: d.token,
       };
     }
 
@@ -271,6 +294,90 @@ export const getDocuments = async (): Promise<{
       return { success: true, ...response.data.data };
     }
     return { success: false, error: response.data.error || 'Erreur de récupération' };
+  } catch (error) {
+    const apiError = handleApiError(error);
+    return { success: false, error: apiError.message };
+  }
+};
+
+export const verifyPhone = async (
+  userId: string,
+  role: string,
+  otp: string
+): Promise<{ success: boolean; user?: User; token?: string; error?: string }> => {
+  try {
+    const response = await apiClient.post<ApiResponse<{ user: User; token: string }>>(
+      API_ENDPOINTS.AUTH.VERIFY_PHONE,
+      { userId, role, otp }
+    );
+
+    if (response.data.success && response.data.data) {
+      return {
+        success: true,
+        user: response.data.data.user,
+        token: response.data.data.token,
+      };
+    }
+
+    return { success: false, error: response.data.error || 'Code invalide' };
+  } catch (error) {
+    const apiError = handleApiError(error);
+    return { success: false, error: apiError.message };
+  }
+};
+
+export const resendOtp = async (
+  userId: string,
+  role: string
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const response = await apiClient.post<ApiResponse<any>>(
+      API_ENDPOINTS.AUTH.RESEND_OTP,
+      { userId, role }
+    );
+
+    if (response.data.success) {
+      return { success: true };
+    }
+
+    return { success: false, error: response.data.error || 'Erreur lors de l\'envoi' };
+  } catch (error) {
+    const apiError = handleApiError(error);
+    return { success: false, error: apiError.message };
+  }
+};
+
+export const sendEmailOtp = async (): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const response = await apiClient.post<ApiResponse<any>>(
+      API_ENDPOINTS.AUTH.SEND_EMAIL_OTP
+    );
+
+    if (response.data.success) {
+      return { success: true };
+    }
+
+    return { success: false, error: response.data.error || 'Erreur lors de l\'envoi' };
+  } catch (error) {
+    const apiError = handleApiError(error);
+    return { success: false, error: apiError.message };
+  }
+};
+
+export const verifyEmailOtp = async (
+  otp: string
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const response = await apiClient.post<ApiResponse<any>>(
+      API_ENDPOINTS.AUTH.VERIFY_EMAIL,
+      { otp }
+    );
+
+    if (response.data.success) {
+      return { success: true };
+    }
+
+    return { success: false, error: response.data.error || 'Code invalide' };
   } catch (error) {
     const apiError = handleApiError(error);
     return { success: false, error: apiError.message };

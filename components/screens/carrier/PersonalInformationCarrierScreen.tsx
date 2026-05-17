@@ -5,11 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   Alert,
   Platform,
   Image,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import { AppIcon } from '../../ui/Icon';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -170,7 +170,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
           updateUser(result.user);
         }
         Alert.alert('Succès', 'Vos informations ont été mises à jour', [
-          { text: 'OK', onPress: () => onNavigate?.('profileCarrier') },
+          { text: 'OK', onPress: () => onNavigate?.('back') },
         ]);
       } else {
         Alert.alert('Erreur', result.error || 'Impossible de mettre à jour les informations');
@@ -266,7 +266,7 @@ const PersonalInformationCarrierScreen: React.FC<PersonalInformationCarrierScree
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => onNavigate?.('profileCarrier')}
+          onPress={() => onNavigate?.('back')}
         >
           <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
         </TouchableOpacity>

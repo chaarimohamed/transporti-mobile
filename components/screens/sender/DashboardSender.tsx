@@ -5,13 +5,13 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   Alert,
   Platform,
   ActivityIndicator,
   AppState,
   Image,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
 import Badge from '../../ui/Badge';
@@ -334,7 +334,9 @@ const DashboardSender: React.FC<DashboardSenderProps> = ({ onNavigate, initialDa
                       </View>
                     )}
                     <View style={styles.shipmentFooter}>
-                      <Text style={styles.priceText}>{formatDate(shipment.pickupDate || shipment.createdAt)}</Text>
+                      <Text style={styles.priceText}>
+                        {shipment.price != null ? `${shipment.price} TND` : shipment.budget != null ? `Budget: ${shipment.budget} TND` : formatDate(shipment.pickupDate || shipment.createdAt)}
+                      </Text>
                       {isPendingOrRequested && (
                         <TouchableOpacity
                           activeOpacity={0.7}

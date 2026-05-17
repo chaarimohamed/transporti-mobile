@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../../theme';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
@@ -107,7 +108,14 @@ export const SenderRegisterScreen: React.FC<SenderRegisterScreenProps> = ({ onNa
         role: 'sender',
       });
 
-      if (result.success) {
+      if (result.success && result.requiresVerification) {
+        onNavigate('phoneVerification', {
+          userId: result.userId,
+          phone: phone.trim(),
+          role: 'sender',
+          nextScreen: 'dashboard',
+        });
+      } else if (result.success) {
         onNavigate('dashboard');
       } else {
         setError(result.error || 'Échec de l\'inscription');
@@ -120,13 +128,14 @@ export const SenderRegisterScreen: React.FC<SenderRegisterScreenProps> = ({ onNa
   };
 
   return (
+    <SafeAreaView style={styles.container}>
     <KeyboardAvoidingView 
-      style={styles.container} 
+      style={{flex: 1}} 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => onNavigate('roleSelection')} style={styles.backButton}>
+          <TouchableOpacity onPress={() => onNavigate('back')} style={styles.backButton}>
             <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
           </TouchableOpacity>
           <Text style={styles.title}>Inscription</Text>
@@ -237,6 +246,7 @@ export const SenderRegisterScreen: React.FC<SenderRegisterScreenProps> = ({ onNa
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

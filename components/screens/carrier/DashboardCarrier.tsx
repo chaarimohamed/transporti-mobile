@@ -5,13 +5,13 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   Alert,
   Platform,
   ActivityIndicator,
   RefreshControl,
   AppState,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card } from '../../ui/Card';
 import Badge from '../../ui/Badge';
 import BottomNav from '../../ui/BottomNav';
@@ -21,20 +21,45 @@ import { useAuth } from '../../../contexts/AuthContext';
 import * as shipmentService from '../../../services/shipment.service';
 import { Shipment } from '../../../services/shipment.service';
 import * as notificationService from '../../../services/notification.service';
+import { getMe } from '../../../services/authService';
 
 interface DashboardCarrierProps {
   onNavigate?: (screen: string, params?: unknown) => void;
 }
+
+const getStatusBadge = (status: string): { label: string; variant: 'success' | 'warning' | 'error' | 'neutral' | 'info' } => {
+  switch (status) {
+    case 'REQUESTED':
+      return { label: 'Candidature', variant: 'info' };
+    case 'CONFIRMED':
+      return { label: 'Confirmée', variant: 'warning' };
+    case 'HANDOVER_PENDING':
+      return { label: 'Remise en cours', variant: 'warning' };
+    case 'IN_TRANSIT':
+      return { label: 'En transit', variant: 'info' };
+    case 'DELIVERED':
+      return { label: 'Livrée', variant: 'success' };
+    case 'CANCELLED':
+      return { label: 'Annulée', variant: 'error' };
+    default:
+      return { label: status, variant: 'neutral' };
+  }
+};
 
 const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
   const { user, logout } = useAuth();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({ assigned: 0, applied: 0, inProgress: 0, completed: 0 });
-  const [availableShipments, setAvailableShipments] = useState<Shipment[]>([]);
+  const [recentShipments, setRecentShipments] = useState<Shipment[]>([]);
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [unreadCount, setUnreadCount] = useState(0);
   const [error, setError] = useState('');
+  const [verificationStatus, setVerificationStatus] = useState<{
+    phoneVerified: boolean;
+    emailVerified: boolean;
+    docsUploaded: boolean;
+  } | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -69,13 +94,19 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
 
       console.log('🔄 Fetching carrier dashboard data...');
 
-      // Fetch stats, available shipments, completed shipments, and notifications in parallel
-      const [statsResult, shipmentsResult, completedShipmentsResult, notifResult] = await Promise.all([
+      // Fetch stats, available shipments, completed shipments, notifications, and verification status in parallel
+      const [statsResult, myShipmentsResult, notifResult, meResult] = await Promise.all([
         shipmentService.getCarrierShipmentStats(),
-        shipmentService.getAvailableShipments('PENDING', user?.gouvernerat || undefined), // Filter by carrier's gouvernerat
-        shipmentService.getMyShipments(), // Get carrier's shipments for earnings calculation
+        shipmentService.getMyShipments(),
         notificationService.getUnreadCount(),
+        getMe(),
       ]);
+
+      // Set verification status
+      if (meResult.success && meResult.user) {
+        const vs = (meResult.user as any).verificationStatus;
+        if (vs) setVerificationStatus(vs);
+      }
 
       console.log('📊 Carrier stats result:', statsResult);
 
@@ -88,23 +119,19 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
         setStats({ assigned: 0, applied: 0, inProgress: 0, completed: 0 });
       }
 
-      if (shipmentsResult.success && shipmentsResult.shipments) {
-        const gouvernerat = user?.gouvernerat;
-        const filtered = gouvernerat
-          ? shipmentsResult.shipments.filter(s =>
-              s.from.toLowerCase().includes(gouvernerat.toLowerCase())
-            )
-          : shipmentsResult.shipments;
-        // Show only first 3 shipments on dashboard
-        setAvailableShipments(filtered.slice(0, 3));
-      }
+      if (myShipmentsResult.success && myShipmentsResult.shipments) {
+        // Only show active missions (not delivered or cancelled), sorted by most recent
+        const active = myShipmentsResult.shipments
+          .filter(s => !['DELIVERED', 'CANCELLED'].includes(s.status))
+          .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+        setRecentShipments(active.slice(0, 3));
 
-      // Calculate earnings from completed shipments
-      if (completedShipmentsResult.success && completedShipmentsResult.shipments) {
-        const completedShipments = completedShipmentsResult.shipments.filter(s => s.status === 'DELIVERED');
+        // Calculate earnings from completed shipments
+        const completedShipments = myShipmentsResult.shipments.filter(s => s.status === 'DELIVERED');
         const earnings = completedShipments.reduce((sum, shipment) => sum + (shipment.price ?? 0), 0);
         setTotalEarnings(earnings);
       } else {
+        setRecentShipments([]);
         setTotalEarnings(0);
       }
 
@@ -210,6 +237,34 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
+        {/* Verification Banner */}
+        {verificationStatus && (
+          verificationStatus.phoneVerified &&
+          verificationStatus.emailVerified &&
+          verificationStatus.docsUploaded
+            ? null
+            : (
+              <TouchableOpacity
+                style={styles.verificationBanner}
+                activeOpacity={0.8}
+                onPress={() => onNavigate?.('verificationChecklist')}
+              >
+                <View style={styles.verificationBannerIcon}>
+                  <AppIcon name="alert-triangle" size={20} color={Colors.warning} />
+                </View>
+                <View style={styles.verificationBannerContent}>
+                  <Text style={styles.verificationBannerTitle}>
+                    Profil incomplet ({[verificationStatus.phoneVerified, verificationStatus.emailVerified, verificationStatus.docsUploaded].filter(Boolean).length}/3)
+                  </Text>
+                  <Text style={styles.verificationBannerSubtitle}>
+                    Complétez votre vérification pour recevoir des missions
+                  </Text>
+                </View>
+                <AppIcon name="chevron-right" size={18} color={Colors.textMuted} />
+              </TouchableOpacity>
+            )
+        )}
+
         {/* KPI Hero Card */}
         <TouchableOpacity
           style={styles.kpiCard}
@@ -241,14 +296,14 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
           </Card>
         </View>
 
-        {/* Available Missions */}
+        {/* Recent Activity */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Missions disponibles</Text>
+            <Text style={styles.sectionTitle}>Suivi des missions</Text>
             <TouchableOpacity 
               style={styles.filterButton} 
               activeOpacity={0.7}
-              onPress={() => onNavigate?.('missionList')}
+              onPress={() => onNavigate?.('activeMissions')}
             >
               <AppIcon name="search" size={14} color={Colors.textSecondary} />
               <Text style={styles.filterText}>Voir tout</Text>
@@ -263,14 +318,14 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
                 <Text style={styles.retryText}>Réessayer</Text>
               </TouchableOpacity>
             </Card>
-          ) : availableShipments.length === 0 ? (
+          ) : recentShipments.length === 0 ? (
             <Card style={styles.emptyCard}>
               <AppIcon name="truck" size={40} color={Colors.primaryLight} />
-              <Text style={styles.emptyText}>Aucune mission disponible</Text>
-              <Text style={styles.emptySubtext}>Revenez plus tard pour voir les nouvelles missions</Text>
+              <Text style={styles.emptyText}>Aucune mission en cours</Text>
+              <Text style={styles.emptySubtext}>Vos missions actives apparaîtront ici</Text>
             </Card>
           ) : (
-            availableShipments.map((shipment) => (
+            recentShipments.map((shipment) => (
               <TouchableOpacity
                 key={shipment.id}
                 activeOpacity={0.8}
@@ -278,11 +333,11 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
               >
                 <Card style={styles.missionCard}>
                   <View style={styles.missionHeader}>
-                    <Badge status="neutral" text={shipment.refNumber} />
+                    <Badge status={getStatusBadge(shipment.status).variant} text={getStatusBadge(shipment.status).label} />
                     <View style={styles.dateTag}>
                       <AppIcon name="calendar" size={12} color={Colors.textInverse} />
                       <Text style={styles.dateText}>
-                        {new Date(shipment.createdAt).toLocaleDateString('fr-FR', {
+                        {new Date(shipment.updatedAt).toLocaleDateString('fr-FR', {
                           day: 'numeric',
                           month: 'short',
                         })}
@@ -299,7 +354,7 @@ const DashboardCarrier: React.FC<DashboardCarrierProps> = ({ onNavigate }) => {
                     {shipment.cargo || shipment.description || 'Marchandise'}
                   </Text>
                   <View style={styles.missionFooter}>
-                    <Text style={styles.priceText}>{shipment.price} TND</Text>
+                    <Text style={styles.priceText}>{shipment.price != null ? `${shipment.price} TND` : shipment.budget != null ? `~${shipment.budget} TND` : 'À négocier'}</Text>
                   </View>
                 </Card>
               </TouchableOpacity>
@@ -572,6 +627,39 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.sm,
     color: Colors.textSecondary,
     textAlign: 'center',
+  },
+  verificationBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.warningSurface,
+    borderRadius: Radius.md,
+    padding: 14,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+  },
+  verificationBannerIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  verificationBannerContent: {
+    flex: 1,
+  },
+  verificationBannerTitle: {
+    fontFamily: Fonts.semiBold,
+    fontSize: FontSizes.sm,
+    color: Colors.navy,
+  },
+  verificationBannerSubtitle: {
+    fontFamily: Fonts.regular,
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
+    marginTop: 2,
   },
 });
 

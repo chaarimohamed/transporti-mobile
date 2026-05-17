@@ -45,6 +45,8 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [proposedPrice, setProposedPrice] = useState('');
+  const [counterResponsePrice, setCounterResponsePrice] = useState('');
+  const [showCounterInput, setShowCounterInput] = useState(false);
   const [routeDistance, setRouteDistance] = useState<string | null>(null);
   const [routeDuration, setRouteDuration] = useState<string | null>(null);
   const myApplication = shipment?.myApplication ?? null;
@@ -71,6 +73,10 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
     !shipment.carrierId &&
     !myApplication &&
     (shipment.status === 'PENDING' || shipment.status === 'REQUESTED')
+  );
+  const hasCounterOffer = Boolean(
+    myApplication?.status === 'COUNTER_OFFERED' &&
+    myApplication?.counterPrice != null
   );
 
   useEffect(() => {
@@ -193,6 +199,51 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
     }
   };
 
+  const handleAcceptCounter = async () => {
+    if (!shipmentId) return;
+    try {
+      setSubmitting(true);
+      const result = await shipmentService.respondToCounter(shipmentId, 'accept');
+      if (result.success) {
+        Alert.alert('Succès', result.message || 'Contre-offre acceptée. L\'expéditeur peut maintenant confirmer.', [
+          { text: 'OK', onPress: () => fetchShipmentDetails(true) },
+        ]);
+      } else {
+        Alert.alert('Erreur', result.error || 'Échec');
+      }
+    } catch {
+      Alert.alert('Erreur', 'Erreur de connexion');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleCounterBack = async () => {
+    if (!shipmentId) return;
+    const priceNum = parseFloat(counterResponsePrice);
+    if (!counterResponsePrice || isNaN(priceNum) || priceNum <= 0) {
+      Alert.alert('Prix invalide', 'Veuillez saisir un prix valide.');
+      return;
+    }
+    try {
+      setSubmitting(true);
+      const result = await shipmentService.respondToCounter(shipmentId, 'counter', priceNum);
+      if (result.success) {
+        setShowCounterInput(false);
+        setCounterResponsePrice('');
+        Alert.alert('Succès', result.message || 'Nouvelle proposition envoyée.', [
+          { text: 'OK', onPress: () => fetchShipmentDetails(true) },
+        ]);
+      } else {
+        Alert.alert('Erreur', result.error || 'Échec');
+      }
+    } catch {
+      Alert.alert('Erreur', 'Erreur de connexion');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleAcceptInvitation = async () => {
     if (!shipmentId) return;
 
@@ -209,8 +260,8 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
 
       if (result.success) {
         Alert.alert(
-          'Succès',
-          'Invitation acceptée ! L\'expédition est maintenant confirmée.',
+          'Proposition envoyée',
+          'Votre proposition a été envoyée à l\'expéditeur. Vous serez notifié de sa réponse.',
           [
             {
               text: 'OK',
@@ -283,7 +334,7 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => onNavigate?.(returnScreen || 'missionList')}
+            onPress={() => onNavigate?.('back')}
             style={styles.backButton}
           >
             <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
@@ -312,7 +363,7 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
         {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
-            onPress={() => onNavigate?.(returnScreen || 'missionList')}
+            onPress={() => onNavigate?.('back')}
             style={styles.backButton}
           >
             <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
@@ -459,18 +510,30 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
               <>
                 <Text style={styles.priceAmount}>{myApplication.proposedPrice} TND</Text>
                 <Text style={styles.priceLabel}>Votre prix proposé</Text>
+                {(shipment as any).budget != null && (
+                  <Text style={[styles.priceLabel, { marginTop: 4 }]}>Budget client : {(shipment as any).budget} DT</Text>
+                )}
               </>
             ) : (
               <>
-                <Text style={styles.priceNegotiable}>À négocier</Text>
-                <Text style={styles.priceLabel}>Proposez votre prix lors de la candidature</Text>
+                {(shipment as any).budget != null ? (
+                  <>
+                    <Text style={styles.priceAmount}>{(shipment as any).budget} DT</Text>
+                    <Text style={styles.priceLabel}>Budget indicatif du client</Text>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.priceNegotiable}>À négocier</Text>
+                    <Text style={styles.priceLabel}>Proposez votre prix lors de la candidature</Text>
+                  </>
+                )}
               </>
             )}
           </View>
         </Card>
         </ScrollView>
         
-        {shipment.status === 'DELIVERED' && shipment.feedbackSummary?.canSubmit && (
+        {shipment.status === 'DELIVERED' && shipment.feedbackSummary?.canSubmit && !shipment.feedbackSummary?.hasSubmitted && (
           <Card style={styles.feedbackCard}>
             <Text style={styles.sectionTitle}>Votre évaluation</Text>
             <Text style={styles.feedbackTitle}>
@@ -540,6 +603,37 @@ const MissionDetailsScreen: React.FC<MissionDetailsScreenProps> = ({
           <View style={styles.actionsContainer}>
             <View style={styles.pendingResponseBadge}>
               <Text style={styles.pendingResponseText}>⏳ En attente de réponse</Text>
+            </View>
+          </View>
+        ) : hasCounterOffer ? (
+          /* Sender sent a counter-offer — carrier must respond */
+          <View style={styles.actionsContainerColumn}>
+            <View style={styles.counterOfferCard}>
+              <Text style={styles.counterOfferTitle}>Contre-offre du client</Text>
+              <Text style={styles.counterOfferPrice}>{myApplication!.counterPrice} DT</Text>
+              <Text style={styles.counterOfferSub}>Votre prix initial : {myApplication!.proposedPrice} DT</Text>
+            </View>
+
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <TouchableOpacity
+                style={[styles.fullWidthButton, { flex: 1, backgroundColor: '#DC3545' }, submitting && styles.buttonDisabled]}
+                onPress={() => {
+                  Alert.alert('Refuser', 'Voulez-vous refuser cette contre-offre ?', [
+                    { text: 'Annuler', style: 'cancel' },
+                    { text: 'Refuser', style: 'destructive', onPress: () => onNavigate?.('missionList') },
+                  ]);
+                }}
+                disabled={submitting}
+              >
+                <Text style={styles.fullWidthButtonText}>Refuser</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.fullWidthButton, { flex: 1, backgroundColor: Colors.primary }, submitting && styles.buttonDisabled]}
+                onPress={handleAcceptCounter}
+                disabled={submitting}
+              >
+                {submitting ? <ActivityIndicator size="small" color="#FFF" /> : <Text style={styles.fullWidthButtonText}>Accepter {myApplication!.counterPrice} DT</Text>}
+              </TouchableOpacity>
             </View>
           </View>
         ) : canApplyToShipment ? (
@@ -985,6 +1079,45 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#FFFFFF',
   },
+  invitationTripleRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  counterOfferButton: {
+    flex: 1,
+    paddingVertical: 16,
+    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.5,
+    borderColor: Colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  counterOfferButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.primary,
+  },
+  invitationBudgetBanner: {
+    backgroundColor: '#FFF8ED',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#F5E6CC',
+  },
+  invitationBudgetLabel: {
+    fontSize: 12,
+    color: '#999',
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  invitationBudgetAmount: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: Colors.primary,
+  },
   buttonDisabled: {
     opacity: 0.5,
   },
@@ -1002,6 +1135,30 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#8B5CF6',
+  },
+  counterOfferCard: {
+    backgroundColor: '#FFF8F0',
+    borderColor: '#F0D0A0',
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 16,
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 4,
+  },
+  counterOfferTitle: {
+    fontSize: 13,
+    color: '#E67E22',
+    fontWeight: '600',
+  },
+  counterOfferPrice: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#E67E22',
+  },
+  counterOfferSub: {
+    fontSize: 12,
+    color: '#999',
   },
   fullWidthButton: {
     width: '100%',

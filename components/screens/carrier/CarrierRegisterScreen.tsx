@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../../theme';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
@@ -151,12 +152,6 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
       errors.license = 'Format invalide — ex: 123 TN 4567';
     }
 
-    if (!matricule.trim()) {
-      errors.matricule = 'La matricule fiscale est obligatoire';
-    } else if (!isValidMatricule(matricule)) {
-      errors.matricule = 'Format invalide — 7 chiffres + 1 lettre (ex: 1234567A)';
-    }
-
     if (!password) {
       errors.password = 'Le mot de passe est obligatoire';
     } else if (!isStrongPassword(password)) {
@@ -193,11 +188,17 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
         role: 'carrier',
         gouvernerat,
         license: license.trim(),
-        matricule: matricule.trim(),
+        matricule: matricule.trim() || undefined,
       });
 
-      if (result.success) {
-        // Navigate to onboarding flow instead of dashboard
+      if (result.success && result.requiresVerification) {
+        onNavigate('phoneVerification', {
+          userId: result.userId,
+          phone: phone.trim(),
+          role: 'carrier',
+          nextScreen: 'carrierOnboarding2',
+        });
+      } else if (result.success) {
         onNavigate('carrierOnboarding2');
       } else {
         setError(result.error || 'Échec de l\'inscription');
@@ -210,13 +211,14 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
   };
 
   return (
+    <SafeAreaView style={styles.container}>
     <KeyboardAvoidingView 
-      style={styles.container} 
+      style={{flex: 1}} 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => onNavigate('roleSelection')} style={styles.backButton}>
+          <TouchableOpacity onPress={() => onNavigate('back')} style={styles.backButton}>
             <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
           </TouchableOpacity>
           <Text style={styles.title}>Inscription</Text>
@@ -324,17 +326,6 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
           {fieldErrors.license ? <Text style={styles.fieldError}>{fieldErrors.license}</Text> : null}
 
           <Input
-            label="Matricule Fiscale"
-            placeholder="1234567A"
-            value={matricule}
-            onChangeText={(v) => { setMatricule(v); setFieldErrors(e => ({ ...e, matricule: '' })); }}
-            keyboardType="default"
-            maxLength={8}
-            icon={<Text>🏢</Text>}
-          />
-          {fieldErrors.matricule ? <Text style={styles.fieldError}>{fieldErrors.matricule}</Text> : null}
-
-          <Input
             label="Mot de passe"
             placeholder="••••••••"
             value={password}
@@ -386,6 +377,7 @@ export const CarrierRegisterScreen: React.FC<CarrierRegisterScreenProps> = ({ on
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

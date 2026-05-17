@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts, FontSizes, Radius, Shadows } from '../../../theme';
 import { BrandLogo } from '../../ui/BrandLogo';
 
@@ -14,7 +15,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onNavigate }) => {
   }, [onNavigate]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <BrandLogo width={380} height={190} style={styles.logo} />
         <Text style={styles.tagline}>Connectez. Transportez. Gagnez.</Text>
@@ -24,7 +25,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onNavigate }) => {
         <View style={[styles.dot, styles.dotActive]} />
         <View style={styles.dot} />
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 

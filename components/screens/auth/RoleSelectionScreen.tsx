@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../ui/Button';
 import { Card } from '../../ui/Card';
 import { AppIcon } from '../../ui/Icon';
@@ -22,7 +23,8 @@ export const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onNavi
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <SafeAreaView style={styles.container}>
+    <ScrollView style={{flex: 1}} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <BrandLogo width={336} height={168} style={styles.logo} />
         <Text style={styles.title}>Bienvenue sur Transporti</Text>
@@ -62,6 +64,7 @@ export const RoleSelectionScreen: React.FC<RoleSelectionScreenProps> = ({ onNavi
         </TouchableOpacity>
       </View>
     </ScrollView>
+    </SafeAreaView>
   );
 };
 

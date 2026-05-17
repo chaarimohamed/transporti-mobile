@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../ui/Button';
 import { Input } from '../../ui/Input';
 import { AppIcon } from '../../ui/Icon';
@@ -46,11 +47,19 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
   };
 
   return (
+    <SafeAreaView style={styles.container}>
     <KeyboardAvoidingView 
-      style={styles.container} 
+      style={{flex: 1}} 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.content}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => onNavigate('back')}
+          activeOpacity={0.7}
+        >
+          <AppIcon name="arrow-back" size={20} color={Colors.charcoal} />
+        </TouchableOpacity>
         <View style={styles.header}>
           <BrandLogo width={320} height={160} style={styles.logo} />
         </View>
@@ -123,6 +132,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -133,7 +143,16 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 24,
-    paddingTop: 32,
+    paddingTop: 16,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.surface,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   header: {
     alignItems: 'center',

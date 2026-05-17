@@ -5,9 +5,9 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
@@ -111,7 +111,7 @@ const PaymentReceiptScreen: React.FC<PaymentReceiptScreenProps> = ({
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => onNavigate?.('activeMissions')}
+          onPress={() => onNavigate?.('back')}
         >
           <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
         </TouchableOpacity>

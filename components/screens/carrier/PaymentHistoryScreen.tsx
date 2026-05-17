@@ -5,9 +5,9 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../../theme';
 import { Card } from '../../ui/Card';
 import Badge from '../../ui/Badge';
@@ -188,7 +188,7 @@ const PaymentHistoryScreen: React.FC<PaymentHistoryScreenProps> = ({
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => onNavigate?.('activeMissions')}
+          onPress={() => onNavigate?.('back')}
         >
           <AppIcon name="arrow-back" size={18} color={Colors.charcoal} />
         </TouchableOpacity>

@@ -191,7 +191,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
       const result = await shipmentService.cancelShipment(shipment.id);
 
       if (result.success) {
-        onNavigate?.('dashboard');
+        onNavigate?.('back');
       } else {
         const msg = result.error || 'Impossible d\'annuler';
         if (Platform.OS === 'web') {
@@ -279,7 +279,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
         <View style={styles.errorContainer}>
           <AppIcon name="alert-triangle" size={48} color={Colors.error} />
           <Text style={styles.errorText}>{error || 'Expédition introuvable'}</Text>
-          <Button onPress={() => onNavigate?.('dashboard')}>
+          <Button onPress={() => onNavigate?.('back')}>
             <Text style={styles.errorButtonText}>Retour</Text>
           </Button>
         </View>
@@ -301,7 +301,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
-          onPress={() => onNavigate?.('dashboard')}
+          onPress={() => onNavigate?.('back')}
           style={styles.backButton}
         >
           <AppIcon name="arrow-back" size={20} color={Colors.textPrimary} />
@@ -366,7 +366,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
               <View style={styles.infoDivider} />
               <TouchableOpacity
                 style={styles.acceptButton}
-                onPress={() => onNavigate?.('applicationDetails', { shipment })}
+                onPress={() => onNavigate?.('applicationDetails', { shipment, returnScreen: 'shipmentDetails', returnParams: { id: shipment?.id } })}
                 activeOpacity={0.7}
               >
                 <Text style={styles.acceptButtonText}>Voir les candidatures</Text>
@@ -404,7 +404,7 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
           </>
         )}
 
-        {shipment.status === 'DELIVERED' && shipment.feedbackSummary?.canSubmit && (
+        {shipment.status === 'DELIVERED' && shipment.feedbackSummary?.canSubmit && !shipment.feedbackSummary?.hasSubmitted && (
           <>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Votre évaluation</Text>
@@ -600,6 +600,18 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
               </Text>
             </View>
           </View>
+          {(shipment as any).budget != null && (
+            <>
+              <View style={styles.infoDivider} />
+              <View style={styles.infoRow}>
+                <AppIcon name="wallet" size={16} color={Colors.textSecondary} />
+                <View style={styles.infoContent}>
+                  <Text style={styles.infoLabel}>Budget du client</Text>
+                  <Text style={styles.infoValue}>{(shipment as any).budget} DT</Text>
+                </View>
+              </View>
+            </>
+          )}
         </Card>
 
         {shipmentPhotos.length > 0 && (
@@ -685,13 +697,24 @@ const ShipmentDetailsScreen: React.FC<ShipmentDetailsScreenProps> = ({
       {/* Bottom Actions */}
       <View style={styles.bottomActions}>
         {(shipment.status === 'PENDING' || shipment.status === 'REQUESTED') ? (
-          <Button
-            style={styles.cancelButton}
-            onPress={handleCancelShipment}
-            disabled={loading}
-          >
-            Annuler l'expédition
-          </Button>
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={handleCancelShipment}
+              disabled={loading}
+            >
+              <AppIcon name="close" size={16} color={Colors.error} />
+              <Text style={styles.deleteButtonText}>Supprimer</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => onNavigate?.('editShipment', { shipment })}
+              disabled={loading}
+            >
+              <AppIcon name="edit" size={16} color="#FFF" />
+              <Text style={styles.editButtonText}>Modifier</Text>
+            </TouchableOpacity>
+          </View>
         ) : shipment.status === 'IN_TRANSIT' ? (
           <Button style={styles.trackButton} onPress={() => {}}>
             Suivre la livraison
@@ -1134,6 +1157,38 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.semiBold,
     color: Colors.error,
     fontSize: 16,
+  },
+  deleteButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: Radius.md,
+    borderWidth: 1.5,
+    borderColor: Colors.error,
+    backgroundColor: '#FFF',
+  },
+  deleteButtonText: {
+    fontFamily: Fonts.semiBold,
+    color: Colors.error,
+    fontSize: 15,
+  },
+  editButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: Radius.md,
+    backgroundColor: Colors.primary,
+  },
+  editButtonText: {
+    fontFamily: Fonts.semiBold,
+    color: '#FFF',
+    fontSize: 15,
   },
   backButtonText: {
     fontFamily: Fonts.semiBold,

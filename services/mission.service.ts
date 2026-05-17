@@ -136,6 +136,18 @@ export const confirmDelivery = async (
   }
 };
 
+// Resend delivery code via SMS to the recipient
+export const resendDeliveryCode = async (
+  shipmentId: string
+): Promise<{ success: boolean; message?: string; error?: string }> => {
+  try {
+    const response = await apiClient.post(`/shipments/${shipmentId}/resend-delivery-code`);
+    return { success: true, message: response.data.message };
+  } catch (error) {
+    return { success: false, error: handleApiError(error).message };
+  }
+};
+
 // Get mission stats
 export const getMissionStats = async (): Promise<{
   success: boolean;

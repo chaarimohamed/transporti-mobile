@@ -18,13 +18,8 @@ const getBaseUrl = () => {
   }
 
   if (isDevelopment) {
-    // Android emulator uses 10.0.2.2 to reach the host machine
-    if (Platform.OS === 'android') {
-      return 'https://unperceptional-unvaguely-ervin.ngrok-free.dev/api';
-    }
-
-    // iOS simulator or web
-    return 'https://unperceptional-unvaguely-ervin.ngrok-free.dev/api';
+    // Use cloud API for testing
+    return 'https://ciufp6cq05.execute-api.eu-west-1.amazonaws.com/api';
   }
 
   // Production: AWS API Gateway endpoint
@@ -50,6 +45,10 @@ export const API_ENDPOINTS = {
     UPDATE_PROFILE: '/auth/profile',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
+    VERIFY_PHONE: '/auth/verify-phone',
+    RESEND_OTP: '/auth/resend-otp',
+    SEND_EMAIL_OTP: '/auth/send-email-otp',
+    VERIFY_EMAIL: '/auth/verify-email',
     DOCUMENTS: '/auth/documents',
     PROFILE_PHOTO: '/auth/profile-photo',
   },

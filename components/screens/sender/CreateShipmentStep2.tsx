@@ -5,11 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  SafeAreaView,
   TextInput,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors, Fonts, FontSizes, Radius, Spacing } from '../../../theme';
 import { Card } from '../../ui/Card';
 import { Button } from '../../ui/Button';
@@ -32,6 +32,7 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
   const [width, setWidth] = useState(String(initialData?.dimensions?.width || ''));
   const [length, setLength] = useState(String(initialData?.dimensions?.length || ''));
   const [specialInstructions, setSpecialInstructions] = useState(initialData?.specialInstructions || '');
+  const [budget, setBudget] = useState(String(initialData?.budget || ''));
 
   const handleNext = () => {
     const data = {
@@ -41,6 +42,7 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
       specialInstructions,
       declaredValue: 0,
       insurance: false,
+      budget: budget ? parseFloat(budget) : null,
     };
     onNavigate?.('createShipmentStep3', data);
   };
@@ -64,6 +66,7 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
             specialInstructions,
             declaredValue: 0,
             insurance: false,
+            budget: budget ? parseFloat(budget) : null,
           })}
           style={styles.backButton}
         >
@@ -223,6 +226,20 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
           />
         </View>
 
+        {/* Budget */}
+        <View style={styles.section}>
+          <Text style={styles.label}>Budget (optionnel)</Text>
+          <Text style={styles.budgetHint}>Les transporteurs peuvent proposer un prix différent.</Text>
+          <TextInput
+            style={styles.budgetInput}
+            placeholder="ex: 80 DT"
+            placeholderTextColor="#999"
+            value={budget}
+            onChangeText={setBudget}
+            keyboardType="numeric"
+          />
+        </View>
+
         {/* Insurance — always OFF */}
         <Card style={styles.insuranceCard}>
           <View style={styles.insuranceContent}>
@@ -248,6 +265,7 @@ const CreateShipmentStep2: React.FC<CreateShipmentStep2Props> = ({
             specialInstructions,
             declaredValue: 0,
             insurance: false,
+            budget: budget ? parseFloat(budget) : null,
           })}
           variant="outline"
           style={styles.backActionButton}
@@ -540,6 +558,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  budgetHint: {
+    fontSize: FontSizes.xs,
+    color: Colors.textSecondary,
+    marginBottom: Spacing.sm,
+  },
+
+  budgetInput: {
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: Radius.md,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    fontSize: FontSizes.md,
+    color: Colors.text,
+    backgroundColor: Colors.surface,
+  },
+
 });
 
 export default CreateShipmentStep2;
